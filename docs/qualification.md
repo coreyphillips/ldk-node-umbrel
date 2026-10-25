@@ -61,6 +61,8 @@ Fourteen independent [Chrome checks](qualification/release-0.1.3-browser.json) p
 
 Both [AMD64](qualification/release-0.1.3-amd64.json) and [ARM64](qualification/release-0.1.3-arm64.json) images pass six packaging checks: architecture and version, actual manager startup with disposable storage, exact served frontend hash, denial of unauthenticated access, authenticated Fulcrum configuration and an empty wallet registry. [Release provenance](qualification/release-0.1.3.json) records source, image and archive hashes. Native daemon, Iroh and notice hashes remain identical to 0.1.2. The backend and native interoperability results above remain applicable to those unchanged files; no funded or native protocol tests were repeated for this frontend change.
 
+The [official Umbrel validator](qualification/release-0.1.3-umbrel-store-lint.json) passes with public image checks and zero errors, retaining only the two previously documented packaging warnings. Anonymous pulls of both architectures match the exact browser-qualified frontend and original native and notice hashes. The community store pins the verified combined 0.1.3 image index.
+
 ## Scope and limits
 
 This dashboard exposes the local native implementation. Mainnet is selectable, but all funding and interoperability qualification uses disposable regtest funds. A real Umbrel installation and a real ARM64 Umbrel device have not been modified or qualified.
