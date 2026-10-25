@@ -3,21 +3,35 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.0"
+version: "0.1.1"
 port: 2114
 description: >-
-  A local dashboard for independent native LDK Node wallets. Pair Chicory,
-  manage Bitcoin and Lightning balances, channels and payments, and configure
-  liquidity and offline settlement. Mainnet is the initial network selection.
-  Every wallet has its own native storage and identity. This experimental local
-  package includes the qualification report and is not published to a registry.
+  Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
+  View Bitcoin and Lightning balances, channels, payments and peers, and configure
+  liquidity, offline settlement and optional Iroh transport. Each wallet keeps its
+  own identity and storage. Mainnet is the initial network selection; choose your
+  chain backend before starting a wallet. This experimental release requires the
+  compatible Chicory client described in the repository. Funded qualification used
+  disposable regtest funds. Read the installation and qualification notes before use.
 developer: Corey Phillips
-website: https://lightningdevkit.org/
+website: https://github.com/coreyphillips/ldk-node-umbrel
+repo: https://github.com/coreyphillips/ldk-node-umbrel
+support: https://github.com/coreyphillips/ldk-node-umbrel/issues
+icon: https://raw.githubusercontent.com/coreyphillips/ldk-node-umbrel/main/ldk-node-wallet/icon.svg
+gallery:
+  - https://raw.githubusercontent.com/coreyphillips/ldk-node-umbrel/main/docs/screenshots/wallet.png
+  - https://raw.githubusercontent.com/coreyphillips/ldk-node-umbrel/main/docs/screenshots/mobile.png
+submitter: Corey Phillips
+submission: https://github.com/coreyphillips/ldk-node-umbrel
 dependencies: []
 path: ""
 defaultUsername: ""
-defaultPassword: ""
+deterministicPassword: true
+storage:
+  dataRoot: data
 releaseNotes: >-
-  Local test package with native LDK Node, an authenticated dashboard, explicit
-  Chicory provider controls, and an optional Iroh transport. Requires a locally
-  loaded architecture-specific image. See README.md for installation and limits.
+  First community store release for Intel/AMD and ARM64. Includes native LDK Node
+  with Chicory primary protocols, an authenticated dashboard, explicit provider
+  controls and optional Iroh transport. Uses the app password shown by Umbrel.
+  Choose and verify a chain backend before starting a wallet. Compatible local
+  Chicory client fixes are required; see the repository compatibility notes.

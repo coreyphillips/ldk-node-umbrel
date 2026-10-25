@@ -1,0 +1,2 @@
+! Copyright (c) 2014 The Rust Project Developers
+Includes code from `cargo-tree`, Copyright (c) 2015-2016 Steven Fackler

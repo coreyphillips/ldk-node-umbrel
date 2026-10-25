@@ -1,0 +1,2 @@
+# Preserve exact upstream license and source bytes for recorded checksums.
+licenses/** -text

@@ -1,0 +1,2 @@
+The original portions of this software are Copyright (c) 2015 The base32 Developers
+The remainder is copyright rust-lightning developers, as viewable in version control at

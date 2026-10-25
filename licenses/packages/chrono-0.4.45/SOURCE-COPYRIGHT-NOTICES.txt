@@ -1,0 +1,3 @@
+Copyright 2012-2014 The Rust Project Developers. See the COPYRIGHT
+Portions copyright (c) 2015, John Nagle.
+http://rust-lang.org/COPYRIGHT.

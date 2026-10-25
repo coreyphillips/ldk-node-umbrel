@@ -5,21 +5,34 @@ services:
       APP_HOST: ldk-node-wallet_manager_1
       APP_PORT: 3000
   manager:
-    container_name: ldk-node-wallet_manager_1
-    image: ldk-node-umbrel:0.1.0
-    pull_policy: never
+    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.1
     restart: on-failure
     init: true
     stop_grace_period: 75s
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ${APP_DATA_DIR}/data:/data
     ports:
-      - "19351-19358:9735-9742"
+      - "19351:9735"
+      - "19352:9736"
+      - "19353:9737"
+      - "19354:9738"
+      - "19355:9739"
+      - "19356:9740"
+      - "19357:9741"
+      - "19358:9742"
     environment:
       BIND_ADDRESS: "0.0.0.0"
-      AUTH_MODE: umbrel
+      AUTH_MODE: password
+      DASHBOARD_BOOTSTRAP_PASSWORD: "${APP_PASSWORD}"
       DATA_DIR: /data
       PORT: "3000"
       PUBLIC_PORT_BASE: "19351"
       LIGHTNING_PORT_BASE: "9735"
-      ALLOWED_HOSTS: "umbrel.local,localhost,127.0.0.1,ldk-node-wallet_manager_1"
+      ALLOWED_HOSTS: "*"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

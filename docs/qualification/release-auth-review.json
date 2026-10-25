@@ -1,0 +1,53 @@
+{
+  "release_version": "0.1.1",
+  "recorded_date": "2026-10-25",
+  "browser_review": {
+    "status": "passed",
+    "passed": 9,
+    "failed": 0,
+    "browser": "Installed Google Chrome, headless with an isolated temporary profile",
+    "scope": "Actual dashboard frontend and authentication server with disposable authentication data and an empty-wallet API stub",
+    "checks": [
+      "Fresh browser requests sign-in",
+      "Login establishes an HttpOnly session cookie and an origin-scoped browser proof",
+      "Same-tab reload preserves valid proof and authentication",
+      "An adjacent port receives the shared-host cookie but cannot read the browser proof",
+      "Captured cookie cannot recover session credentials, read wallets or mutate wallet state",
+      "Fresh tab requires sign-in despite the shared cookie",
+      "Logout removes browser proof and session cookie",
+      "Expired or restarted server sessions clear stale browser proof",
+      "No browser JavaScript errors"
+    ],
+    "native_wallet_backend_exercised": false,
+    "funds_used": false,
+    "physical_umbrel_tested": false
+  },
+  "official_umbrel_validator": {
+    "repository": "https://github.com/getumbrel/umbrel-apps",
+    "commit": "00c981c39ddc040c7252b260a3c5c5a6d2b114ce",
+    "tool": ".tools/lint-apps.mjs",
+    "self_tests": {
+      "command": "npm run test:lint",
+      "passed": 26,
+      "failed": 0
+    },
+    "static_package_review": {
+      "app_id": "ldk-node-wallet",
+      "status": "Awaiting final public image digest",
+      "remaining_errors": ["image.pinned: versioned image digest was not yet available during static review"],
+      "warnings": [
+        "access.security_opt: no-new-privileges is explicitly enabled",
+        "package.review_assets: a community-store icon is included locally"
+      ],
+      "official_catalog_port_conflicts": [],
+      "ports_checked": [2114, 19351, 19352, 19353, 19354, 19355, 19356, 19357, 19358]
+    },
+    "public_image_checks": "Pending publication and anonymous registry access"
+  },
+  "workflow_static_review": {
+    "files": [".github/workflows/check.yml", ".github/workflows/publish-images.yml"],
+    "yaml_parse": "passed",
+    "embedded_bash_syntax": "passed",
+    "remote_execution": "Not part of this review"
+  }
+}

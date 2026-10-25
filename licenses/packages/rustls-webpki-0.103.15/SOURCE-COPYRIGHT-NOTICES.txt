@@ -1,0 +1,7 @@
+Copyright 2015 Brian Smith.
+Copyright 2015-2016 Brian Smith.
+Copyright 2015-2020 Brian Smith.
+Copyright 2015-2021 Brian Smith.
+Copyright 2022 Rafael Fernández López.
+Copyright 2023 Daniel McCarney.
+copyright notice and this permission notice appear in all copies.

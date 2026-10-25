@@ -1,0 +1,7 @@
+- Redistributions in binary form must reproduce the above copyright
+- Redistributions of source code must retain the above copyright
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+Copyright (c) 2013-2014 The Rust Project Developers
+Copyright 2013-2014 The Rust Project Developers. See the COPYRIGHT
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+http://rust-lang.org/COPYRIGHT.

@@ -1,0 +1,4 @@
+Copyright 2016 Masaki Hara
+Copyright 2017 Fortanix, Inc.
+Copyright 2017,2019 Fortanix, Inc.
+Copyright 2019 Fortanix, Inc.

@@ -1,0 +1,6 @@
+Copyright 2014-2017 Melissa O'Neill and PCG Project contributors
+Copyright 2014-2017, 2019 Melissa O'Neill and PCG Project contributors
+Copyright 2017 Paul Dicker.
+Copyright 2018 Developers of the Rand project.
+Copyright 2018-2021 Developers of the Rand project.
+Copyright 2018-2023 Developers of the Rand project.

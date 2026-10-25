@@ -1,0 +1,57 @@
+Copyright (c) 2002, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2014, Google Inc.
+Copyright (c) 2014, Intel Corporation.
+Copyright (c) 2014, Intel Corporation. All Rights Reserved.
+Copyright (c) 2015, Google Inc.
+Copyright (c) 2015, Intel Inc.
+Copyright (c) 2019, Google Inc.
+Copyright 1995-2016 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 1999-2016 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 2001-2016 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 2002-2016 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 2014 The BoringSSL Authors
+Copyright 2014-2016 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 2015 Brian Smith.
+Copyright 2015 The BoringSSL Authors
+Copyright 2015-2016 Brian Smith.
+Copyright 2015-2017 Brian Smith.
+Copyright 2015-2019 Brian Smith.
+Copyright 2015-2021 Brian Smith.
+Copyright 2015-2022 Brian Smith.
+Copyright 2015-2023 Brian Smith.
+Copyright 2015-2024 Brian Smith.
+Copyright 2015-2025 Brian Smith.
+Copyright 2016 Brian Smith.
+Copyright 2016 David Judd.
+Copyright 2016 Simon Sapin.
+Copyright 2016-2017 Brian Smith.
+Copyright 2016-2019 Brian Smith.
+Copyright 2016-2021 Brian Smith.
+Copyright 2016-2023 Brian Smith.
+Copyright 2016-2024 Brian Smith.
+Copyright 2016-2025 Brian Smith.
+Copyright 2017 Brian Smith.
+Copyright 2017-2023 Brian Smith.
+Copyright 2017-2025 Brian Smith.
+Copyright 2018 Brian Smith.
+Copyright 2018 Trent Clarke.
+Copyright 2018-2024 Brian Smith.
+Copyright 2018-2025 Brian Smith.
+Copyright 2019-2024 Brian Smith.
+Copyright 2019-2025 Brian Smith.
+Copyright 2020 Brian Smith.
+Copyright 2020 The BoringSSL Authors
+Copyright 2021 Brian Smith.
+Copyright 2022 Brian Smith.
+Copyright 2023 Brian Smith.
+Copyright 2023 The BoringSSL Authors
+Copyright 2024 Brian Smith.
+Copyright 2024-2025 Brian Smith.
+Copyright 2025 Brian Smith.
+Portions Copyright (c) 2014, 2015, Google Inc.
+Portions Copyright (c) 2014, Google Inc.
+Portions Copyright (c) 2016, Google Inc.
+Portions Copyright 2020-2024 Brian Smith.
+SHALL THE AUTHOR OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+The above copyright notice and this permission notice
+copyright notice and this permission notice appear in all copies.

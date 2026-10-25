@@ -1,0 +1,18 @@
+All other files which have no copyright comments are original works
+Copyright © 1993,2004 Sun Microsystems or
+Copyright © 1994 David Burren. It is licensed under a BSD license.
+Copyright © 1999-2019, Arm Limited.
+Copyright © 2003-2009 Bruce D. Evans or
+Copyright © 2003-2009 Steven G. Kargl or
+Copyright © 2003-2011 David Schultz or
+Copyright © 2005-2020 Rich Felker, et al.
+Copyright © 2008 Stephen L. Moshier or
+Copyright © 2017-2018 Arm Limited
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+The ARM memcpy code (src/string/arm/memcpy.S) is Copyright © 2008
+The above copyright notice and this permission notice shall be
+The smoothsort implementation (src/stdlib/qsort.c) is Copyright © 2011
+omission of copyright and license comments in each file is in the
+src/regex/tre*) is Copyright © 2001-2008 Ville Laurikari and licensed
+the copyright notice and permission notice otherwise required by the
+to be subject to copyright, resulting in confusion over whether it

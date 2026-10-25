@@ -1,0 +1,26 @@
+Copyright (c) 2013, 2014 Pieter Wuille                              *
+Copyright (c) 2013, 2014, 2015 Pieter Wuille, Gregory Maxwell       *
+Copyright (c) 2013, 2014, 2015, 2021 Thomas Daede, Cory Fields, Pieter Wuille *
+Copyright (c) 2013, 2014, 2017 Pieter Wuille, Andrew Poelstra       *
+Copyright (c) 2013, 2014, 2017 Pieter Wuille, Andrew Poelstra, Jonas Nick  *
+Copyright (c) 2013, 2014, 2017, 2021 Pieter Wuille, Andrew Poelstra, Jonas Nick, Russell O'Connor *
+Copyright (c) 2013-2015 Pieter Wuille                               *
+Copyright (c) 2014 Pieter Wuille                                    *
+Copyright (c) 2014, 2015 Pieter Wuille                              *
+Copyright (c) 2014-2015 Pieter Wuille                               *
+Copyright (c) 2015 Andrew Poelstra                                  *
+Copyright (c) 2015 Pieter Wuille                                    *
+Copyright (c) 2015 Pieter Wuille, Andrew Poelstra                   *
+Copyright (c) 2015, 2022 Andrew Poelstra, Pieter Wuille             *
+Copyright (c) 2015, 2022 Pieter Wuille, Andrew Poelstra             *
+Copyright (c) 2016 Andrew Poelstra                                  *
+Copyright (c) 2017 Andrew Poelstra                                  *
+Copyright (c) 2017 Pieter Wuille                                    *
+Copyright (c) 2018-2020 Andrew Poelstra, Jonas Nick                 *
+Copyright (c) 2020 Gregory Maxwell                                  *
+Copyright (c) 2020 Jonas Nick                                       *
+Copyright (c) 2020 Peter Dettman                                    *
+Copyright (c) 2020 Pieter Wuille                                    *
+Copyright (c) 2020-2021 Elichai Turkel                                *
+Copyright (c) 2022 Pieter Wuille                                    *
+copyright and related and neighboring rights to the software in this  *

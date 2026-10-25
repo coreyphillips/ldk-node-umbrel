@@ -1,0 +1,13 @@
+Copyright (C) 2015 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2016 Benjamin Fry
+Copyright 2015-2016 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2017 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2018 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2019 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2020 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2021 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2022 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2023 Benjamin Fry <benjaminfry@me.com>
+Copyright 2017 Brian Smith <brian@briansmith.org>
+Copyright 2017 Google LLC.
+Copyright 2024 Brian Taber <btaber@zsd.systems>

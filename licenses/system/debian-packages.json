@@ -1,0 +1,1658 @@
+[
+  {
+    "architecture": "amd64",
+    "binary_package": "adduser",
+    "binary_version": "3.134",
+    "source_package": "adduser",
+    "source_version": "3.134",
+    "source_url": "https://snapshot.debian.org/package/adduser/3.134/",
+    "source_browser": "https://sources.debian.org/src/adduser/3.134/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "apt",
+    "binary_version": "2.6.1",
+    "source_package": "apt",
+    "source_version": "2.6.1",
+    "source_url": "https://snapshot.debian.org/package/apt/2.6.1/",
+    "source_browser": "https://sources.debian.org/src/apt/2.6.1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "base-files",
+    "binary_version": "12.4+deb12u15",
+    "source_package": "base-files",
+    "source_version": "12.4+deb12u15",
+    "source_url": "https://snapshot.debian.org/package/base-files/12.4%2Bdeb12u15/",
+    "source_browser": "https://sources.debian.org/src/base-files/12.4%2Bdeb12u15/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "base-passwd",
+    "binary_version": "3.6.1",
+    "source_package": "base-passwd",
+    "source_version": "3.6.1",
+    "source_url": "https://snapshot.debian.org/package/base-passwd/3.6.1/",
+    "source_browser": "https://sources.debian.org/src/base-passwd/3.6.1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "bash",
+    "binary_version": "5.2.15-2+b13",
+    "source_package": "bash",
+    "source_version": "5.2.15-2",
+    "source_url": "https://snapshot.debian.org/package/bash/5.2.15-2/",
+    "source_browser": "https://sources.debian.org/src/bash/5.2.15-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "bsdutils",
+    "binary_version": "1:2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "ca-certificates",
+    "binary_version": "20250419~deb12u2",
+    "source_package": "ca-certificates",
+    "source_version": "20250419~deb12u2",
+    "source_url": "https://snapshot.debian.org/package/ca-certificates/20250419~deb12u2/",
+    "source_browser": "https://sources.debian.org/src/ca-certificates/20250419~deb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "coreutils",
+    "binary_version": "9.1-1",
+    "source_package": "coreutils",
+    "source_version": "9.1-1",
+    "source_url": "https://snapshot.debian.org/package/coreutils/9.1-1/",
+    "source_browser": "https://sources.debian.org/src/coreutils/9.1-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "dash",
+    "binary_version": "0.5.12-2",
+    "source_package": "dash",
+    "source_version": "0.5.12-2",
+    "source_url": "https://snapshot.debian.org/package/dash/0.5.12-2/",
+    "source_browser": "https://sources.debian.org/src/dash/0.5.12-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "debconf",
+    "binary_version": "1.5.82",
+    "source_package": "debconf",
+    "source_version": "1.5.82",
+    "source_url": "https://snapshot.debian.org/package/debconf/1.5.82/",
+    "source_browser": "https://sources.debian.org/src/debconf/1.5.82/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "debian-archive-keyring",
+    "binary_version": "2023.3+deb12u2",
+    "source_package": "debian-archive-keyring",
+    "source_version": "2023.3+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/debian-archive-keyring/2023.3%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/debian-archive-keyring/2023.3%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "debianutils",
+    "binary_version": "5.7-0.5~deb12u1",
+    "source_package": "debianutils",
+    "source_version": "5.7-0.5~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/debianutils/5.7-0.5~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/debianutils/5.7-0.5~deb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "diffutils",
+    "binary_version": "1:3.8-4",
+    "source_package": "diffutils",
+    "source_version": "1:3.8-4",
+    "source_url": "https://snapshot.debian.org/package/diffutils/1%3A3.8-4/",
+    "source_browser": "https://sources.debian.org/src/diffutils/1%3A3.8-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "dpkg",
+    "binary_version": "1.21.23",
+    "source_package": "dpkg",
+    "source_version": "1.21.23",
+    "source_url": "https://snapshot.debian.org/package/dpkg/1.21.23/",
+    "source_browser": "https://sources.debian.org/src/dpkg/1.21.23/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "e2fsprogs",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "findutils",
+    "binary_version": "4.9.0-4",
+    "source_package": "findutils",
+    "source_version": "4.9.0-4",
+    "source_url": "https://snapshot.debian.org/package/findutils/4.9.0-4/",
+    "source_browser": "https://sources.debian.org/src/findutils/4.9.0-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "gcc-12-base:amd64",
+    "binary_version": "12.2.0-14+deb12u1",
+    "source_package": "gcc-12",
+    "source_version": "12.2.0-14+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/gcc-12/12.2.0-14%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/gcc-12/12.2.0-14%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "gosu",
+    "binary_version": "1.14-1+b10",
+    "source_package": "gosu",
+    "source_version": "1.14-1",
+    "source_url": "https://snapshot.debian.org/package/gosu/1.14-1/",
+    "source_browser": "https://sources.debian.org/src/gosu/1.14-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "gpgv",
+    "binary_version": "2.2.40-1.1+deb12u2",
+    "source_package": "gnupg2",
+    "source_version": "2.2.40-1.1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/gnupg2/2.2.40-1.1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/gnupg2/2.2.40-1.1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "grep",
+    "binary_version": "3.8-5",
+    "source_package": "grep",
+    "source_version": "3.8-5",
+    "source_url": "https://snapshot.debian.org/package/grep/3.8-5/",
+    "source_browser": "https://sources.debian.org/src/grep/3.8-5/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "gzip",
+    "binary_version": "1.12-1",
+    "source_package": "gzip",
+    "source_version": "1.12-1",
+    "source_url": "https://snapshot.debian.org/package/gzip/1.12-1/",
+    "source_browser": "https://sources.debian.org/src/gzip/1.12-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "hostname",
+    "binary_version": "3.23+nmu1",
+    "source_package": "hostname",
+    "source_version": "3.23+nmu1",
+    "source_url": "https://snapshot.debian.org/package/hostname/3.23%2Bnmu1/",
+    "source_browser": "https://sources.debian.org/src/hostname/3.23%2Bnmu1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "init-system-helpers",
+    "binary_version": "1.65.2+deb12u1",
+    "source_package": "init-system-helpers",
+    "source_version": "1.65.2+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/init-system-helpers/1.65.2%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/init-system-helpers/1.65.2%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libacl1:amd64",
+    "binary_version": "2.3.1-3",
+    "source_package": "acl",
+    "source_version": "2.3.1-3",
+    "source_url": "https://snapshot.debian.org/package/acl/2.3.1-3/",
+    "source_browser": "https://sources.debian.org/src/acl/2.3.1-3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libapt-pkg6.0:amd64",
+    "binary_version": "2.6.1",
+    "source_package": "apt",
+    "source_version": "2.6.1",
+    "source_url": "https://snapshot.debian.org/package/apt/2.6.1/",
+    "source_browser": "https://sources.debian.org/src/apt/2.6.1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libattr1:amd64",
+    "binary_version": "1:2.5.1-4",
+    "source_package": "attr",
+    "source_version": "1:2.5.1-4",
+    "source_url": "https://snapshot.debian.org/package/attr/1%3A2.5.1-4/",
+    "source_browser": "https://sources.debian.org/src/attr/1%3A2.5.1-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libaudit-common",
+    "binary_version": "1:3.0.9-1",
+    "source_package": "audit",
+    "source_version": "1:3.0.9-1",
+    "source_url": "https://snapshot.debian.org/package/audit/1%3A3.0.9-1/",
+    "source_browser": "https://sources.debian.org/src/audit/1%3A3.0.9-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libaudit1:amd64",
+    "binary_version": "1:3.0.9-1",
+    "source_package": "audit",
+    "source_version": "1:3.0.9-1",
+    "source_url": "https://snapshot.debian.org/package/audit/1%3A3.0.9-1/",
+    "source_browser": "https://sources.debian.org/src/audit/1%3A3.0.9-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libblkid1:amd64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libbz2-1.0:amd64",
+    "binary_version": "1.0.8-5+b1",
+    "source_package": "bzip2",
+    "source_version": "1.0.8-5",
+    "source_url": "https://snapshot.debian.org/package/bzip2/1.0.8-5/",
+    "source_browser": "https://sources.debian.org/src/bzip2/1.0.8-5/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libc-bin",
+    "binary_version": "2.36-9+deb12u14",
+    "source_package": "glibc",
+    "source_version": "2.36-9+deb12u14",
+    "source_url": "https://snapshot.debian.org/package/glibc/2.36-9%2Bdeb12u14/",
+    "source_browser": "https://sources.debian.org/src/glibc/2.36-9%2Bdeb12u14/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libc6:amd64",
+    "binary_version": "2.36-9+deb12u14",
+    "source_package": "glibc",
+    "source_version": "2.36-9+deb12u14",
+    "source_url": "https://snapshot.debian.org/package/glibc/2.36-9%2Bdeb12u14/",
+    "source_browser": "https://sources.debian.org/src/glibc/2.36-9%2Bdeb12u14/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libcap-ng0:amd64",
+    "binary_version": "0.8.3-1+b3",
+    "source_package": "libcap-ng",
+    "source_version": "0.8.3-1",
+    "source_url": "https://snapshot.debian.org/package/libcap-ng/0.8.3-1/",
+    "source_browser": "https://sources.debian.org/src/libcap-ng/0.8.3-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libcap2:amd64",
+    "binary_version": "1:2.66-4+deb12u3+b1",
+    "source_package": "libcap2",
+    "source_version": "1:2.66-4+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/libcap2/1%3A2.66-4%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/libcap2/1%3A2.66-4%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libcom-err2:amd64",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libcrypt1:amd64",
+    "binary_version": "1:4.4.33-2",
+    "source_package": "libxcrypt",
+    "source_version": "1:4.4.33-2",
+    "source_url": "https://snapshot.debian.org/package/libxcrypt/1%3A4.4.33-2/",
+    "source_browser": "https://sources.debian.org/src/libxcrypt/1%3A4.4.33-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libdb5.3:amd64",
+    "binary_version": "5.3.28+dfsg2-1",
+    "source_package": "db5.3",
+    "source_version": "5.3.28+dfsg2-1",
+    "source_url": "https://snapshot.debian.org/package/db5.3/5.3.28%2Bdfsg2-1/",
+    "source_browser": "https://sources.debian.org/src/db5.3/5.3.28%2Bdfsg2-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libdebconfclient0:amd64",
+    "binary_version": "0.270",
+    "source_package": "cdebconf",
+    "source_version": "0.270",
+    "source_url": "https://snapshot.debian.org/package/cdebconf/0.270/",
+    "source_browser": "https://sources.debian.org/src/cdebconf/0.270/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libext2fs2:amd64",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libffi8:amd64",
+    "binary_version": "3.4.4-1",
+    "source_package": "libffi",
+    "source_version": "3.4.4-1",
+    "source_url": "https://snapshot.debian.org/package/libffi/3.4.4-1/",
+    "source_browser": "https://sources.debian.org/src/libffi/3.4.4-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libgcc-s1:amd64",
+    "binary_version": "12.2.0-14+deb12u1",
+    "source_package": "gcc-12",
+    "source_version": "12.2.0-14+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/gcc-12/12.2.0-14%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/gcc-12/12.2.0-14%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libgcrypt20:amd64",
+    "binary_version": "1.10.1-3+deb12u1",
+    "source_package": "libgcrypt20",
+    "source_version": "1.10.1-3+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/libgcrypt20/1.10.1-3%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/libgcrypt20/1.10.1-3%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libgmp10:amd64",
+    "binary_version": "2:6.2.1+dfsg1-1.1",
+    "source_package": "gmp",
+    "source_version": "2:6.2.1+dfsg1-1.1",
+    "source_url": "https://snapshot.debian.org/package/gmp/2%3A6.2.1%2Bdfsg1-1.1/",
+    "source_browser": "https://sources.debian.org/src/gmp/2%3A6.2.1%2Bdfsg1-1.1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libgnutls30:amd64",
+    "binary_version": "3.7.9-2+deb12u7",
+    "source_package": "gnutls28",
+    "source_version": "3.7.9-2+deb12u7",
+    "source_url": "https://snapshot.debian.org/package/gnutls28/3.7.9-2%2Bdeb12u7/",
+    "source_browser": "https://sources.debian.org/src/gnutls28/3.7.9-2%2Bdeb12u7/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libgpg-error0:amd64",
+    "binary_version": "1.46-1",
+    "source_package": "libgpg-error",
+    "source_version": "1.46-1",
+    "source_url": "https://snapshot.debian.org/package/libgpg-error/1.46-1/",
+    "source_browser": "https://sources.debian.org/src/libgpg-error/1.46-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libhogweed6:amd64",
+    "binary_version": "3.8.1-2",
+    "source_package": "nettle",
+    "source_version": "3.8.1-2",
+    "source_url": "https://snapshot.debian.org/package/nettle/3.8.1-2/",
+    "source_browser": "https://sources.debian.org/src/nettle/3.8.1-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libidn2-0:amd64",
+    "binary_version": "2.3.3-1+b1",
+    "source_package": "libidn2",
+    "source_version": "2.3.3-1",
+    "source_url": "https://snapshot.debian.org/package/libidn2/2.3.3-1/",
+    "source_browser": "https://sources.debian.org/src/libidn2/2.3.3-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "liblz4-1:amd64",
+    "binary_version": "1.9.4-1",
+    "source_package": "lz4",
+    "source_version": "1.9.4-1",
+    "source_url": "https://snapshot.debian.org/package/lz4/1.9.4-1/",
+    "source_browser": "https://sources.debian.org/src/lz4/1.9.4-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "liblzma5:amd64",
+    "binary_version": "5.4.1-1+deb12u2",
+    "source_package": "xz-utils",
+    "source_version": "5.4.1-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/xz-utils/5.4.1-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/xz-utils/5.4.1-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libmd0:amd64",
+    "binary_version": "1.0.4-2",
+    "source_package": "libmd",
+    "source_version": "1.0.4-2",
+    "source_url": "https://snapshot.debian.org/package/libmd/1.0.4-2/",
+    "source_browser": "https://sources.debian.org/src/libmd/1.0.4-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libmount1:amd64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libnettle8:amd64",
+    "binary_version": "3.8.1-2",
+    "source_package": "nettle",
+    "source_version": "3.8.1-2",
+    "source_url": "https://snapshot.debian.org/package/nettle/3.8.1-2/",
+    "source_browser": "https://sources.debian.org/src/nettle/3.8.1-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libp11-kit0:amd64",
+    "binary_version": "0.24.1-2",
+    "source_package": "p11-kit",
+    "source_version": "0.24.1-2",
+    "source_url": "https://snapshot.debian.org/package/p11-kit/0.24.1-2/",
+    "source_browser": "https://sources.debian.org/src/p11-kit/0.24.1-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libpam-modules:amd64",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libpam-modules-bin",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libpam-runtime",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libpam0g:amd64",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libpcre2-8-0:amd64",
+    "binary_version": "10.42-1+deb12u2",
+    "source_package": "pcre2",
+    "source_version": "10.42-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pcre2/10.42-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pcre2/10.42-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libseccomp2:amd64",
+    "binary_version": "2.5.4-1+deb12u1",
+    "source_package": "libseccomp",
+    "source_version": "2.5.4-1+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/libseccomp/2.5.4-1%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/libseccomp/2.5.4-1%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libselinux1:amd64",
+    "binary_version": "3.4-1+b6",
+    "source_package": "libselinux",
+    "source_version": "3.4-1",
+    "source_url": "https://snapshot.debian.org/package/libselinux/3.4-1/",
+    "source_browser": "https://sources.debian.org/src/libselinux/3.4-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libsemanage-common",
+    "binary_version": "3.4-1",
+    "source_package": "libsemanage",
+    "source_version": "3.4-1",
+    "source_url": "https://snapshot.debian.org/package/libsemanage/3.4-1/",
+    "source_browser": "https://sources.debian.org/src/libsemanage/3.4-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libsemanage2:amd64",
+    "binary_version": "3.4-1+b5",
+    "source_package": "libsemanage",
+    "source_version": "3.4-1",
+    "source_url": "https://snapshot.debian.org/package/libsemanage/3.4-1/",
+    "source_browser": "https://sources.debian.org/src/libsemanage/3.4-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libsepol2:amd64",
+    "binary_version": "3.4-2.1",
+    "source_package": "libsepol",
+    "source_version": "3.4-2.1",
+    "source_url": "https://snapshot.debian.org/package/libsepol/3.4-2.1/",
+    "source_browser": "https://sources.debian.org/src/libsepol/3.4-2.1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libsmartcols1:amd64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libss2:amd64",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libssl3:amd64",
+    "binary_version": "3.0.22-1~deb12u1",
+    "source_package": "openssl",
+    "source_version": "3.0.22-1~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/openssl/3.0.22-1~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/openssl/3.0.22-1~deb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libstdc++6:amd64",
+    "binary_version": "12.2.0-14+deb12u1",
+    "source_package": "gcc-12",
+    "source_version": "12.2.0-14+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/gcc-12/12.2.0-14%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/gcc-12/12.2.0-14%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libsystemd0:amd64",
+    "binary_version": "252.39-1~deb12u2",
+    "source_package": "systemd",
+    "source_version": "252.39-1~deb12u2",
+    "source_url": "https://snapshot.debian.org/package/systemd/252.39-1~deb12u2/",
+    "source_browser": "https://sources.debian.org/src/systemd/252.39-1~deb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libtasn1-6:amd64",
+    "binary_version": "4.19.0-2+deb12u1",
+    "source_package": "libtasn1-6",
+    "source_version": "4.19.0-2+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/libtasn1-6/4.19.0-2%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/libtasn1-6/4.19.0-2%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libtinfo6:amd64",
+    "binary_version": "6.4-4",
+    "source_package": "ncurses",
+    "source_version": "6.4-4",
+    "source_url": "https://snapshot.debian.org/package/ncurses/6.4-4/",
+    "source_browser": "https://sources.debian.org/src/ncurses/6.4-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libudev1:amd64",
+    "binary_version": "252.39-1~deb12u2",
+    "source_package": "systemd",
+    "source_version": "252.39-1~deb12u2",
+    "source_url": "https://snapshot.debian.org/package/systemd/252.39-1~deb12u2/",
+    "source_browser": "https://sources.debian.org/src/systemd/252.39-1~deb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libunistring2:amd64",
+    "binary_version": "1.0-2",
+    "source_package": "libunistring",
+    "source_version": "1.0-2",
+    "source_url": "https://snapshot.debian.org/package/libunistring/1.0-2/",
+    "source_browser": "https://sources.debian.org/src/libunistring/1.0-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libuuid1:amd64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libxxhash0:amd64",
+    "binary_version": "0.8.1-1",
+    "source_package": "xxhash",
+    "source_version": "0.8.1-1",
+    "source_url": "https://snapshot.debian.org/package/xxhash/0.8.1-1/",
+    "source_browser": "https://sources.debian.org/src/xxhash/0.8.1-1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "libzstd1:amd64",
+    "binary_version": "1.5.4+dfsg2-5",
+    "source_package": "libzstd",
+    "source_version": "1.5.4+dfsg2-5",
+    "source_url": "https://snapshot.debian.org/package/libzstd/1.5.4%2Bdfsg2-5/",
+    "source_browser": "https://sources.debian.org/src/libzstd/1.5.4%2Bdfsg2-5/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "login",
+    "binary_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_package": "shadow",
+    "source_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "logsave",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "mawk",
+    "binary_version": "1.3.4.20200120-3.1",
+    "source_package": "mawk",
+    "source_version": "1.3.4.20200120-3.1",
+    "source_url": "https://snapshot.debian.org/package/mawk/1.3.4.20200120-3.1/",
+    "source_browser": "https://sources.debian.org/src/mawk/1.3.4.20200120-3.1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "mount",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "ncurses-base",
+    "binary_version": "6.4-4",
+    "source_package": "ncurses",
+    "source_version": "6.4-4",
+    "source_url": "https://snapshot.debian.org/package/ncurses/6.4-4/",
+    "source_browser": "https://sources.debian.org/src/ncurses/6.4-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "ncurses-bin",
+    "binary_version": "6.4-4",
+    "source_package": "ncurses",
+    "source_version": "6.4-4",
+    "source_url": "https://snapshot.debian.org/package/ncurses/6.4-4/",
+    "source_browser": "https://sources.debian.org/src/ncurses/6.4-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "openssl",
+    "binary_version": "3.0.22-1~deb12u1",
+    "source_package": "openssl",
+    "source_version": "3.0.22-1~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/openssl/3.0.22-1~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/openssl/3.0.22-1~deb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "passwd",
+    "binary_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_package": "shadow",
+    "source_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "perl-base",
+    "binary_version": "5.36.0-7+deb12u4",
+    "source_package": "perl",
+    "source_version": "5.36.0-7+deb12u4",
+    "source_url": "https://snapshot.debian.org/package/perl/5.36.0-7%2Bdeb12u4/",
+    "source_browser": "https://sources.debian.org/src/perl/5.36.0-7%2Bdeb12u4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "sed",
+    "binary_version": "4.9-1+deb12u1",
+    "source_package": "sed",
+    "source_version": "4.9-1+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/sed/4.9-1%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/sed/4.9-1%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "sysvinit-utils",
+    "binary_version": "3.06-4",
+    "source_package": "sysvinit",
+    "source_version": "3.06-4",
+    "source_url": "https://snapshot.debian.org/package/sysvinit/3.06-4/",
+    "source_browser": "https://sources.debian.org/src/sysvinit/3.06-4/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "tar",
+    "binary_version": "1.34+dfsg-1.2+deb12u1",
+    "source_package": "tar",
+    "source_version": "1.34+dfsg-1.2+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/tar/1.34%2Bdfsg-1.2%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/tar/1.34%2Bdfsg-1.2%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "tzdata",
+    "binary_version": "2026c-0+deb12u1",
+    "source_package": "tzdata",
+    "source_version": "2026c-0+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/tzdata/2026c-0%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/tzdata/2026c-0%2Bdeb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "usr-is-merged",
+    "binary_version": "37~deb12u1",
+    "source_package": "usrmerge",
+    "source_version": "37~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/usrmerge/37~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/usrmerge/37~deb12u1/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "util-linux",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "util-linux-extra",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "amd64",
+    "binary_package": "zlib1g:amd64",
+    "binary_version": "1:1.2.13.dfsg-1",
+    "source_package": "zlib",
+    "source_version": "1:1.2.13.dfsg-1",
+    "source_url": "https://snapshot.debian.org/package/zlib/1%3A1.2.13.dfsg-1/",
+    "source_browser": "https://sources.debian.org/src/zlib/1%3A1.2.13.dfsg-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "adduser",
+    "binary_version": "3.134",
+    "source_package": "adduser",
+    "source_version": "3.134",
+    "source_url": "https://snapshot.debian.org/package/adduser/3.134/",
+    "source_browser": "https://sources.debian.org/src/adduser/3.134/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "apt",
+    "binary_version": "2.6.1",
+    "source_package": "apt",
+    "source_version": "2.6.1",
+    "source_url": "https://snapshot.debian.org/package/apt/2.6.1/",
+    "source_browser": "https://sources.debian.org/src/apt/2.6.1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "base-files",
+    "binary_version": "12.4+deb12u15",
+    "source_package": "base-files",
+    "source_version": "12.4+deb12u15",
+    "source_url": "https://snapshot.debian.org/package/base-files/12.4%2Bdeb12u15/",
+    "source_browser": "https://sources.debian.org/src/base-files/12.4%2Bdeb12u15/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "base-passwd",
+    "binary_version": "3.6.1",
+    "source_package": "base-passwd",
+    "source_version": "3.6.1",
+    "source_url": "https://snapshot.debian.org/package/base-passwd/3.6.1/",
+    "source_browser": "https://sources.debian.org/src/base-passwd/3.6.1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "bash",
+    "binary_version": "5.2.15-2+b13",
+    "source_package": "bash",
+    "source_version": "5.2.15-2",
+    "source_url": "https://snapshot.debian.org/package/bash/5.2.15-2/",
+    "source_browser": "https://sources.debian.org/src/bash/5.2.15-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "bsdutils",
+    "binary_version": "1:2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "ca-certificates",
+    "binary_version": "20250419~deb12u2",
+    "source_package": "ca-certificates",
+    "source_version": "20250419~deb12u2",
+    "source_url": "https://snapshot.debian.org/package/ca-certificates/20250419~deb12u2/",
+    "source_browser": "https://sources.debian.org/src/ca-certificates/20250419~deb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "coreutils",
+    "binary_version": "9.1-1",
+    "source_package": "coreutils",
+    "source_version": "9.1-1",
+    "source_url": "https://snapshot.debian.org/package/coreutils/9.1-1/",
+    "source_browser": "https://sources.debian.org/src/coreutils/9.1-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "dash",
+    "binary_version": "0.5.12-2",
+    "source_package": "dash",
+    "source_version": "0.5.12-2",
+    "source_url": "https://snapshot.debian.org/package/dash/0.5.12-2/",
+    "source_browser": "https://sources.debian.org/src/dash/0.5.12-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "debconf",
+    "binary_version": "1.5.82",
+    "source_package": "debconf",
+    "source_version": "1.5.82",
+    "source_url": "https://snapshot.debian.org/package/debconf/1.5.82/",
+    "source_browser": "https://sources.debian.org/src/debconf/1.5.82/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "debian-archive-keyring",
+    "binary_version": "2023.3+deb12u2",
+    "source_package": "debian-archive-keyring",
+    "source_version": "2023.3+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/debian-archive-keyring/2023.3%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/debian-archive-keyring/2023.3%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "debianutils",
+    "binary_version": "5.7-0.5~deb12u1",
+    "source_package": "debianutils",
+    "source_version": "5.7-0.5~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/debianutils/5.7-0.5~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/debianutils/5.7-0.5~deb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "diffutils",
+    "binary_version": "1:3.8-4",
+    "source_package": "diffutils",
+    "source_version": "1:3.8-4",
+    "source_url": "https://snapshot.debian.org/package/diffutils/1%3A3.8-4/",
+    "source_browser": "https://sources.debian.org/src/diffutils/1%3A3.8-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "dpkg",
+    "binary_version": "1.21.23",
+    "source_package": "dpkg",
+    "source_version": "1.21.23",
+    "source_url": "https://snapshot.debian.org/package/dpkg/1.21.23/",
+    "source_browser": "https://sources.debian.org/src/dpkg/1.21.23/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "e2fsprogs",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "findutils",
+    "binary_version": "4.9.0-4",
+    "source_package": "findutils",
+    "source_version": "4.9.0-4",
+    "source_url": "https://snapshot.debian.org/package/findutils/4.9.0-4/",
+    "source_browser": "https://sources.debian.org/src/findutils/4.9.0-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "gcc-12-base:arm64",
+    "binary_version": "12.2.0-14+deb12u1",
+    "source_package": "gcc-12",
+    "source_version": "12.2.0-14+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/gcc-12/12.2.0-14%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/gcc-12/12.2.0-14%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "gosu",
+    "binary_version": "1.14-1+b10",
+    "source_package": "gosu",
+    "source_version": "1.14-1",
+    "source_url": "https://snapshot.debian.org/package/gosu/1.14-1/",
+    "source_browser": "https://sources.debian.org/src/gosu/1.14-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "gpgv",
+    "binary_version": "2.2.40-1.1+deb12u2",
+    "source_package": "gnupg2",
+    "source_version": "2.2.40-1.1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/gnupg2/2.2.40-1.1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/gnupg2/2.2.40-1.1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "grep",
+    "binary_version": "3.8-5",
+    "source_package": "grep",
+    "source_version": "3.8-5",
+    "source_url": "https://snapshot.debian.org/package/grep/3.8-5/",
+    "source_browser": "https://sources.debian.org/src/grep/3.8-5/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "gzip",
+    "binary_version": "1.12-1",
+    "source_package": "gzip",
+    "source_version": "1.12-1",
+    "source_url": "https://snapshot.debian.org/package/gzip/1.12-1/",
+    "source_browser": "https://sources.debian.org/src/gzip/1.12-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "hostname",
+    "binary_version": "3.23+nmu1",
+    "source_package": "hostname",
+    "source_version": "3.23+nmu1",
+    "source_url": "https://snapshot.debian.org/package/hostname/3.23%2Bnmu1/",
+    "source_browser": "https://sources.debian.org/src/hostname/3.23%2Bnmu1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "init-system-helpers",
+    "binary_version": "1.65.2+deb12u1",
+    "source_package": "init-system-helpers",
+    "source_version": "1.65.2+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/init-system-helpers/1.65.2%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/init-system-helpers/1.65.2%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libacl1:arm64",
+    "binary_version": "2.3.1-3",
+    "source_package": "acl",
+    "source_version": "2.3.1-3",
+    "source_url": "https://snapshot.debian.org/package/acl/2.3.1-3/",
+    "source_browser": "https://sources.debian.org/src/acl/2.3.1-3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libapt-pkg6.0:arm64",
+    "binary_version": "2.6.1",
+    "source_package": "apt",
+    "source_version": "2.6.1",
+    "source_url": "https://snapshot.debian.org/package/apt/2.6.1/",
+    "source_browser": "https://sources.debian.org/src/apt/2.6.1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libattr1:arm64",
+    "binary_version": "1:2.5.1-4",
+    "source_package": "attr",
+    "source_version": "1:2.5.1-4",
+    "source_url": "https://snapshot.debian.org/package/attr/1%3A2.5.1-4/",
+    "source_browser": "https://sources.debian.org/src/attr/1%3A2.5.1-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libaudit-common",
+    "binary_version": "1:3.0.9-1",
+    "source_package": "audit",
+    "source_version": "1:3.0.9-1",
+    "source_url": "https://snapshot.debian.org/package/audit/1%3A3.0.9-1/",
+    "source_browser": "https://sources.debian.org/src/audit/1%3A3.0.9-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libaudit1:arm64",
+    "binary_version": "1:3.0.9-1",
+    "source_package": "audit",
+    "source_version": "1:3.0.9-1",
+    "source_url": "https://snapshot.debian.org/package/audit/1%3A3.0.9-1/",
+    "source_browser": "https://sources.debian.org/src/audit/1%3A3.0.9-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libblkid1:arm64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libbz2-1.0:arm64",
+    "binary_version": "1.0.8-5+b1",
+    "source_package": "bzip2",
+    "source_version": "1.0.8-5",
+    "source_url": "https://snapshot.debian.org/package/bzip2/1.0.8-5/",
+    "source_browser": "https://sources.debian.org/src/bzip2/1.0.8-5/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libc-bin",
+    "binary_version": "2.36-9+deb12u14",
+    "source_package": "glibc",
+    "source_version": "2.36-9+deb12u14",
+    "source_url": "https://snapshot.debian.org/package/glibc/2.36-9%2Bdeb12u14/",
+    "source_browser": "https://sources.debian.org/src/glibc/2.36-9%2Bdeb12u14/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libc6:arm64",
+    "binary_version": "2.36-9+deb12u14",
+    "source_package": "glibc",
+    "source_version": "2.36-9+deb12u14",
+    "source_url": "https://snapshot.debian.org/package/glibc/2.36-9%2Bdeb12u14/",
+    "source_browser": "https://sources.debian.org/src/glibc/2.36-9%2Bdeb12u14/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libcap-ng0:arm64",
+    "binary_version": "0.8.3-1+b3",
+    "source_package": "libcap-ng",
+    "source_version": "0.8.3-1",
+    "source_url": "https://snapshot.debian.org/package/libcap-ng/0.8.3-1/",
+    "source_browser": "https://sources.debian.org/src/libcap-ng/0.8.3-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libcap2:arm64",
+    "binary_version": "1:2.66-4+deb12u3+b1",
+    "source_package": "libcap2",
+    "source_version": "1:2.66-4+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/libcap2/1%3A2.66-4%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/libcap2/1%3A2.66-4%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libcom-err2:arm64",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libcrypt1:arm64",
+    "binary_version": "1:4.4.33-2",
+    "source_package": "libxcrypt",
+    "source_version": "1:4.4.33-2",
+    "source_url": "https://snapshot.debian.org/package/libxcrypt/1%3A4.4.33-2/",
+    "source_browser": "https://sources.debian.org/src/libxcrypt/1%3A4.4.33-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libdb5.3:arm64",
+    "binary_version": "5.3.28+dfsg2-1",
+    "source_package": "db5.3",
+    "source_version": "5.3.28+dfsg2-1",
+    "source_url": "https://snapshot.debian.org/package/db5.3/5.3.28%2Bdfsg2-1/",
+    "source_browser": "https://sources.debian.org/src/db5.3/5.3.28%2Bdfsg2-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libdebconfclient0:arm64",
+    "binary_version": "0.270",
+    "source_package": "cdebconf",
+    "source_version": "0.270",
+    "source_url": "https://snapshot.debian.org/package/cdebconf/0.270/",
+    "source_browser": "https://sources.debian.org/src/cdebconf/0.270/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libext2fs2:arm64",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libffi8:arm64",
+    "binary_version": "3.4.4-1",
+    "source_package": "libffi",
+    "source_version": "3.4.4-1",
+    "source_url": "https://snapshot.debian.org/package/libffi/3.4.4-1/",
+    "source_browser": "https://sources.debian.org/src/libffi/3.4.4-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libgcc-s1:arm64",
+    "binary_version": "12.2.0-14+deb12u1",
+    "source_package": "gcc-12",
+    "source_version": "12.2.0-14+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/gcc-12/12.2.0-14%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/gcc-12/12.2.0-14%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libgcrypt20:arm64",
+    "binary_version": "1.10.1-3+deb12u1",
+    "source_package": "libgcrypt20",
+    "source_version": "1.10.1-3+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/libgcrypt20/1.10.1-3%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/libgcrypt20/1.10.1-3%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libgmp10:arm64",
+    "binary_version": "2:6.2.1+dfsg1-1.1",
+    "source_package": "gmp",
+    "source_version": "2:6.2.1+dfsg1-1.1",
+    "source_url": "https://snapshot.debian.org/package/gmp/2%3A6.2.1%2Bdfsg1-1.1/",
+    "source_browser": "https://sources.debian.org/src/gmp/2%3A6.2.1%2Bdfsg1-1.1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libgnutls30:arm64",
+    "binary_version": "3.7.9-2+deb12u7",
+    "source_package": "gnutls28",
+    "source_version": "3.7.9-2+deb12u7",
+    "source_url": "https://snapshot.debian.org/package/gnutls28/3.7.9-2%2Bdeb12u7/",
+    "source_browser": "https://sources.debian.org/src/gnutls28/3.7.9-2%2Bdeb12u7/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libgpg-error0:arm64",
+    "binary_version": "1.46-1",
+    "source_package": "libgpg-error",
+    "source_version": "1.46-1",
+    "source_url": "https://snapshot.debian.org/package/libgpg-error/1.46-1/",
+    "source_browser": "https://sources.debian.org/src/libgpg-error/1.46-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libhogweed6:arm64",
+    "binary_version": "3.8.1-2",
+    "source_package": "nettle",
+    "source_version": "3.8.1-2",
+    "source_url": "https://snapshot.debian.org/package/nettle/3.8.1-2/",
+    "source_browser": "https://sources.debian.org/src/nettle/3.8.1-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libidn2-0:arm64",
+    "binary_version": "2.3.3-1+b1",
+    "source_package": "libidn2",
+    "source_version": "2.3.3-1",
+    "source_url": "https://snapshot.debian.org/package/libidn2/2.3.3-1/",
+    "source_browser": "https://sources.debian.org/src/libidn2/2.3.3-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "liblz4-1:arm64",
+    "binary_version": "1.9.4-1",
+    "source_package": "lz4",
+    "source_version": "1.9.4-1",
+    "source_url": "https://snapshot.debian.org/package/lz4/1.9.4-1/",
+    "source_browser": "https://sources.debian.org/src/lz4/1.9.4-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "liblzma5:arm64",
+    "binary_version": "5.4.1-1+deb12u2",
+    "source_package": "xz-utils",
+    "source_version": "5.4.1-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/xz-utils/5.4.1-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/xz-utils/5.4.1-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libmd0:arm64",
+    "binary_version": "1.0.4-2",
+    "source_package": "libmd",
+    "source_version": "1.0.4-2",
+    "source_url": "https://snapshot.debian.org/package/libmd/1.0.4-2/",
+    "source_browser": "https://sources.debian.org/src/libmd/1.0.4-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libmount1:arm64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libnettle8:arm64",
+    "binary_version": "3.8.1-2",
+    "source_package": "nettle",
+    "source_version": "3.8.1-2",
+    "source_url": "https://snapshot.debian.org/package/nettle/3.8.1-2/",
+    "source_browser": "https://sources.debian.org/src/nettle/3.8.1-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libp11-kit0:arm64",
+    "binary_version": "0.24.1-2",
+    "source_package": "p11-kit",
+    "source_version": "0.24.1-2",
+    "source_url": "https://snapshot.debian.org/package/p11-kit/0.24.1-2/",
+    "source_browser": "https://sources.debian.org/src/p11-kit/0.24.1-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libpam-modules:arm64",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libpam-modules-bin",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libpam-runtime",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libpam0g:arm64",
+    "binary_version": "1.5.2-6+deb12u2",
+    "source_package": "pam",
+    "source_version": "1.5.2-6+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pam/1.5.2-6%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pam/1.5.2-6%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libpcre2-8-0:arm64",
+    "binary_version": "10.42-1+deb12u2",
+    "source_package": "pcre2",
+    "source_version": "10.42-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/pcre2/10.42-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/pcre2/10.42-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libseccomp2:arm64",
+    "binary_version": "2.5.4-1+deb12u1",
+    "source_package": "libseccomp",
+    "source_version": "2.5.4-1+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/libseccomp/2.5.4-1%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/libseccomp/2.5.4-1%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libselinux1:arm64",
+    "binary_version": "3.4-1+b6",
+    "source_package": "libselinux",
+    "source_version": "3.4-1",
+    "source_url": "https://snapshot.debian.org/package/libselinux/3.4-1/",
+    "source_browser": "https://sources.debian.org/src/libselinux/3.4-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libsemanage-common",
+    "binary_version": "3.4-1",
+    "source_package": "libsemanage",
+    "source_version": "3.4-1",
+    "source_url": "https://snapshot.debian.org/package/libsemanage/3.4-1/",
+    "source_browser": "https://sources.debian.org/src/libsemanage/3.4-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libsemanage2:arm64",
+    "binary_version": "3.4-1+b5",
+    "source_package": "libsemanage",
+    "source_version": "3.4-1",
+    "source_url": "https://snapshot.debian.org/package/libsemanage/3.4-1/",
+    "source_browser": "https://sources.debian.org/src/libsemanage/3.4-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libsepol2:arm64",
+    "binary_version": "3.4-2.1",
+    "source_package": "libsepol",
+    "source_version": "3.4-2.1",
+    "source_url": "https://snapshot.debian.org/package/libsepol/3.4-2.1/",
+    "source_browser": "https://sources.debian.org/src/libsepol/3.4-2.1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libsmartcols1:arm64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libss2:arm64",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libssl3:arm64",
+    "binary_version": "3.0.22-1~deb12u1",
+    "source_package": "openssl",
+    "source_version": "3.0.22-1~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/openssl/3.0.22-1~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/openssl/3.0.22-1~deb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libstdc++6:arm64",
+    "binary_version": "12.2.0-14+deb12u1",
+    "source_package": "gcc-12",
+    "source_version": "12.2.0-14+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/gcc-12/12.2.0-14%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/gcc-12/12.2.0-14%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libsystemd0:arm64",
+    "binary_version": "252.39-1~deb12u2",
+    "source_package": "systemd",
+    "source_version": "252.39-1~deb12u2",
+    "source_url": "https://snapshot.debian.org/package/systemd/252.39-1~deb12u2/",
+    "source_browser": "https://sources.debian.org/src/systemd/252.39-1~deb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libtasn1-6:arm64",
+    "binary_version": "4.19.0-2+deb12u1",
+    "source_package": "libtasn1-6",
+    "source_version": "4.19.0-2+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/libtasn1-6/4.19.0-2%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/libtasn1-6/4.19.0-2%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libtinfo6:arm64",
+    "binary_version": "6.4-4",
+    "source_package": "ncurses",
+    "source_version": "6.4-4",
+    "source_url": "https://snapshot.debian.org/package/ncurses/6.4-4/",
+    "source_browser": "https://sources.debian.org/src/ncurses/6.4-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libudev1:arm64",
+    "binary_version": "252.39-1~deb12u2",
+    "source_package": "systemd",
+    "source_version": "252.39-1~deb12u2",
+    "source_url": "https://snapshot.debian.org/package/systemd/252.39-1~deb12u2/",
+    "source_browser": "https://sources.debian.org/src/systemd/252.39-1~deb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libunistring2:arm64",
+    "binary_version": "1.0-2",
+    "source_package": "libunistring",
+    "source_version": "1.0-2",
+    "source_url": "https://snapshot.debian.org/package/libunistring/1.0-2/",
+    "source_browser": "https://sources.debian.org/src/libunistring/1.0-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libuuid1:arm64",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libxxhash0:arm64",
+    "binary_version": "0.8.1-1",
+    "source_package": "xxhash",
+    "source_version": "0.8.1-1",
+    "source_url": "https://snapshot.debian.org/package/xxhash/0.8.1-1/",
+    "source_browser": "https://sources.debian.org/src/xxhash/0.8.1-1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "libzstd1:arm64",
+    "binary_version": "1.5.4+dfsg2-5",
+    "source_package": "libzstd",
+    "source_version": "1.5.4+dfsg2-5",
+    "source_url": "https://snapshot.debian.org/package/libzstd/1.5.4%2Bdfsg2-5/",
+    "source_browser": "https://sources.debian.org/src/libzstd/1.5.4%2Bdfsg2-5/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "login",
+    "binary_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_package": "shadow",
+    "source_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "logsave",
+    "binary_version": "1.47.0-2+b2",
+    "source_package": "e2fsprogs",
+    "source_version": "1.47.0-2",
+    "source_url": "https://snapshot.debian.org/package/e2fsprogs/1.47.0-2/",
+    "source_browser": "https://sources.debian.org/src/e2fsprogs/1.47.0-2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "mawk",
+    "binary_version": "1.3.4.20200120-3.1",
+    "source_package": "mawk",
+    "source_version": "1.3.4.20200120-3.1",
+    "source_url": "https://snapshot.debian.org/package/mawk/1.3.4.20200120-3.1/",
+    "source_browser": "https://sources.debian.org/src/mawk/1.3.4.20200120-3.1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "mount",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "ncurses-base",
+    "binary_version": "6.4-4",
+    "source_package": "ncurses",
+    "source_version": "6.4-4",
+    "source_url": "https://snapshot.debian.org/package/ncurses/6.4-4/",
+    "source_browser": "https://sources.debian.org/src/ncurses/6.4-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "ncurses-bin",
+    "binary_version": "6.4-4",
+    "source_package": "ncurses",
+    "source_version": "6.4-4",
+    "source_url": "https://snapshot.debian.org/package/ncurses/6.4-4/",
+    "source_browser": "https://sources.debian.org/src/ncurses/6.4-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "openssl",
+    "binary_version": "3.0.22-1~deb12u1",
+    "source_package": "openssl",
+    "source_version": "3.0.22-1~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/openssl/3.0.22-1~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/openssl/3.0.22-1~deb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "passwd",
+    "binary_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_package": "shadow",
+    "source_version": "1:4.13+dfsg1-1+deb12u2",
+    "source_url": "https://snapshot.debian.org/package/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/",
+    "source_browser": "https://sources.debian.org/src/shadow/1%3A4.13%2Bdfsg1-1%2Bdeb12u2/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "perl-base",
+    "binary_version": "5.36.0-7+deb12u4",
+    "source_package": "perl",
+    "source_version": "5.36.0-7+deb12u4",
+    "source_url": "https://snapshot.debian.org/package/perl/5.36.0-7%2Bdeb12u4/",
+    "source_browser": "https://sources.debian.org/src/perl/5.36.0-7%2Bdeb12u4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "sed",
+    "binary_version": "4.9-1+deb12u1",
+    "source_package": "sed",
+    "source_version": "4.9-1+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/sed/4.9-1%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/sed/4.9-1%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "sysvinit-utils",
+    "binary_version": "3.06-4",
+    "source_package": "sysvinit",
+    "source_version": "3.06-4",
+    "source_url": "https://snapshot.debian.org/package/sysvinit/3.06-4/",
+    "source_browser": "https://sources.debian.org/src/sysvinit/3.06-4/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "tar",
+    "binary_version": "1.34+dfsg-1.2+deb12u1",
+    "source_package": "tar",
+    "source_version": "1.34+dfsg-1.2+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/tar/1.34%2Bdfsg-1.2%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/tar/1.34%2Bdfsg-1.2%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "tzdata",
+    "binary_version": "2026c-0+deb12u1",
+    "source_package": "tzdata",
+    "source_version": "2026c-0+deb12u1",
+    "source_url": "https://snapshot.debian.org/package/tzdata/2026c-0%2Bdeb12u1/",
+    "source_browser": "https://sources.debian.org/src/tzdata/2026c-0%2Bdeb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "usr-is-merged",
+    "binary_version": "37~deb12u1",
+    "source_package": "usrmerge",
+    "source_version": "37~deb12u1",
+    "source_url": "https://snapshot.debian.org/package/usrmerge/37~deb12u1/",
+    "source_browser": "https://sources.debian.org/src/usrmerge/37~deb12u1/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "util-linux",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "util-linux-extra",
+    "binary_version": "2.38.1-5+deb12u3",
+    "source_package": "util-linux",
+    "source_version": "2.38.1-5+deb12u3",
+    "source_url": "https://snapshot.debian.org/package/util-linux/2.38.1-5%2Bdeb12u3/",
+    "source_browser": "https://sources.debian.org/src/util-linux/2.38.1-5%2Bdeb12u3/"
+  },
+  {
+    "architecture": "arm64",
+    "binary_package": "zlib1g:arm64",
+    "binary_version": "1:1.2.13.dfsg-1",
+    "source_package": "zlib",
+    "source_version": "1:1.2.13.dfsg-1",
+    "source_url": "https://snapshot.debian.org/package/zlib/1%3A1.2.13.dfsg-1/",
+    "source_browser": "https://sources.debian.org/src/zlib/1%3A1.2.13.dfsg-1/"
+  }
+]

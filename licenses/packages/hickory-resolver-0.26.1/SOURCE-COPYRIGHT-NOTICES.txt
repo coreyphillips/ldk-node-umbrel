@@ -1,0 +1,7 @@
+Copyright 2015-2017 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2018 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2019 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2020 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2022 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2023 Benjamin Fry <benjaminfry@me.com>
+Copyright 2015-2026 Benjamin Fry <benjaminfry@me.com>

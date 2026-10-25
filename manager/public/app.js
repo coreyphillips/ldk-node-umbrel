@@ -1,5 +1,22 @@
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#dialog');
+// Cookies are shared across ports. This second secret stays in browser storage
+// scoped to this exact origin, so another Umbrel app cannot replay our cookie.
+const sessionProofKey = 'ldk-dashboard-session-proof';
+let sessionProof = '';
+try { sessionProof = sessionStorage.getItem(sessionProofKey) || ''; } catch {}
+if (!/^[A-Za-z0-9_-]{43}$/.test(sessionProof)) sessionProof = '';
+function rememberSessionProof(proof) {
+  sessionProof = typeof proof === 'string' && /^[A-Za-z0-9_-]{43}$/.test(proof) ? proof : '';
+  try { if (sessionProof) sessionStorage.setItem(sessionProofKey, sessionProof); else sessionStorage.removeItem(sessionProofKey); } catch {}
+}
+function acceptSession(session) {
+  if (session.proof) rememberSessionProof(session.proof);
+  if (!session.authenticated) rememberSessionProof('');
+  const { proof, ...publicSession } = session;
+  state.session = publicSession;
+}
+function clearSession() { rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; if (dialog.open) dialog.close(); }
 const state = { session: null, wallets: [], selected: null, view: 'overview', data: {}, config: {}, polling: false };
 const networks = { bitcoin: 'Mainnet', regtest: 'Regtest', signet: 'Signet', testnet: 'Testnet' };
 const integer = value => {
@@ -17,10 +34,10 @@ const active = () => state.wallets.find(wallet => wallet.id === state.selected);
 const available = method => state.data.info?.capabilities?.includes(method);
 
 async function api(route, options = {}) {
-  const response = await fetch(`/api${route}`, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.session?.csrf || '' }, ...options, body: options.body === undefined ? undefined : JSON.stringify(options.body) });
+  const response = await fetch(`/api${route}`, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.session?.csrf || '', 'X-Session-Proof': sessionProof }, ...options, body: options.body === undefined ? undefined : JSON.stringify(options.body) });
   const data = await response.json();
   if (!response.ok) {
-    if (response.status === 401) { state.session = null; login(); }
+    if (response.status === 401 && route !== '/login') { clearSession(); login(); }
     throw new Error(data.error?.message || 'Request failed');
   }
   return data;
@@ -73,8 +90,8 @@ async function login(message) {
   if (message) panel.append(notice(message, true));
   const form = el('form'); const password = field(form, 'password', 'Dashboard password', { type: 'password', required: true }); password.autocomplete = 'current-password';
   const error = el('div', 'form-error'); error.role = 'alert'; const enter = el('button', 'primary', 'Sign in'); enter.type = 'submit'; add(form, error, enter);
-  form.addEventListener('submit', async event => { event.preventDefault(); enter.disabled = true; try { state.session = await api('/login', { method: 'POST', body: { password: password.value } }); await start(); } catch (err) { error.textContent = err.message; } finally { enter.disabled = false; } });
-  add(panel, form, el('small', '', 'For a local installation, read data/dashboard-password on your server. Umbrel app-proxy installations use your Umbrel sign-in.')); add(screen, panel); app.replaceChildren(screen);
+  form.addEventListener('submit', async event => { event.preventDefault(); enter.disabled = true; try { acceptSession(await api('/login', { method: 'POST', body: { password: password.value } })); password.value = ''; await start(); } catch (err) { error.textContent = err.message; } finally { enter.disabled = false; } });
+  add(panel, form, el('small', '', 'On Umbrel, use the App Password shown for LDK Node. For a local installation, read data/dashboard-password on your server. A new tab may ask you to sign in again.')); add(screen, panel); app.replaceChildren(screen);
 }
 
 async function start() { state.config = await api('/config'); await refresh(); }
@@ -90,7 +107,7 @@ async function refresh() {
       for (let i = 0; i < methods.length; i++) state.data[methods[i]] = responses[i].status === 'fulfilled' ? responses[i].value : null;
       state.data.error = responses.find(value => value.status === 'rejected')?.reason?.message;
     } else state.data = {};
-    if (!dialog.open) render();
+    if (state.session?.authenticated && !dialog.open) render();
   } catch (error) { toast(error.message, true); } finally { state.polling = false; }
 }
 function navigate(view, id = state.selected) { state.view = view; state.selected = id; state.data = {}; render(); refresh(); }
@@ -112,7 +129,7 @@ function render() {
     }
     sidebar.append(nav);
   }
-  add(sidebar, add(el('div', 'sidebar-bottom'), el('p', '', 'Native LDK Node\nLocal, self-custodial infrastructure.'), button('+ New wallet', () => walletForm(), 'small'), button('Sign out', () => run(async () => { await api('/logout', { method: 'POST', body: {} }); state.session = null; login(); }), 'small ghost')));
+  add(sidebar, add(el('div', 'sidebar-bottom'), el('p', '', 'Native LDK Node\nLocal, self-custodial infrastructure.'), button('+ New wallet', () => walletForm(), 'small'), button('Sign out', () => run(async () => { try { await api('/logout', { method: 'POST', body: {} }); } finally { clearSession(); login(); } }), 'small ghost')));
   const main = el('main', 'main'); const menu = button('☰', () => sidebar.classList.toggle('open'), 'ghost mobile-menu'); menu.setAttribute('aria-label', 'Open navigation');
   add(main, add(el('header', 'topbar'), add(el('div', 'actions'), menu, el('span', 'crumb', wallet ? `Wallets / ${wallet.name}` : 'Your workspace')), add(el('div', 'top-actions'), badge('Local installation', 'green'), button('Refresh', () => refresh(), 'small'))));
   const content = el('div', 'content');
@@ -291,5 +308,5 @@ function channelForm(channel) {
 }
 
 dialog.addEventListener('close', () => refresh());
-try { state.session = await api('/session'); if (state.session.authenticated) await start(); else login(); } catch (error) { login(error.message); }
+try { acceptSession(await api('/session')); if (state.session.authenticated) await start(); else login(); } catch (error) { login(error.message); }
 setInterval(() => { if (document.visibilityState === 'visible' && !dialog.open) refresh(); }, 5000);

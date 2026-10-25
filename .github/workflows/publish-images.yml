@@ -1,0 +1,68 @@
+name: Publish qualified images
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing release version, without v
+        required: true
+        default: "0.1.1"
+permissions:
+  contents: read
+  packages: write
+concurrency:
+  group: publish-images
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+      IMAGE: ghcr.io/${{ github.repository }}
+    steps:
+      - name: Download and verify qualified release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          mkdir release
+          cd release
+          gh release download "v$VERSION" --repo "$GITHUB_REPOSITORY" \
+            --pattern "ldk-node-umbrel-$VERSION-amd64.tar" \
+            --pattern "ldk-node-umbrel-$VERSION-arm64.tar" \
+            --pattern SHA256SUMS
+          test -s "ldk-node-umbrel-$VERSION-amd64.tar"
+          test -s "ldk-node-umbrel-$VERSION-arm64.tar"
+          sha256sum --check SHA256SUMS
+      - name: Publish both architectures
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          for architecture in amd64 arm64; do
+            docker load --input "release/ldk-node-umbrel-$VERSION-$architecture.tar"
+            local_image="ldk-node-umbrel:$VERSION-$architecture"
+            test "$(docker image inspect "$local_image" --format '{{.Os}}/{{.Architecture}}')" = "linux/$architecture"
+            test "$(docker image inspect "$local_image" --format '{{index .Config.Labels "org.opencontainers.image.source"}}')" = "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+            docker tag "$local_image" "$IMAGE:$VERSION-$architecture"
+            docker push "$IMAGE:$VERSION-$architecture"
+          done
+      - name: Publish combined architecture index
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker buildx imagetools create --tag "$IMAGE:$VERSION" \
+            --annotation "index:org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+            "$IMAGE:$VERSION-amd64" "$IMAGE:$VERSION-arm64"
+          docker buildx imagetools inspect "$IMAGE:$VERSION" | tee manifest.txt
+          {
+            echo '## Published image'
+            echo '```text'
+            cat manifest.txt
+            echo '```'
+            echo 'Verify public anonymous pulls, then pin the community app to this index digest.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove registry credentials
+        if: always()
+        run: docker logout ghcr.io

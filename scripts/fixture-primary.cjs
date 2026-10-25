@@ -49,7 +49,7 @@ async function handle(input) {
     const suffix = crypto.createHash('sha256').update(directory).digest('hex').slice(0, 14); const name = `ldk-umbrel-funded-${suffix}`;
     saved = { container: name, volume: name + '-data', port: Number(portText), http_port: await freePort(), architecture };
     docker('volume', 'create', saved.volume);
-    docker('run', '-d', '--name', name, '--platform', `linux/${architecture}`, '--init', '--security-opt', 'no-new-privileges:true', '--add-host', 'host.docker.internal:host-gateway', '-p', `127.0.0.1:${saved.http_port}:3000`, '-p', `127.0.0.1:${saved.port}:9735`, '-v', `${saved.volume}:/data`, '-e', `PUBLIC_ORIGIN=http://127.0.0.1:${saved.http_port}`, '-e', 'ALLOWED_HOSTS=127.0.0.1', `ldk-node-umbrel:0.1.0-${architecture}`);
+    docker('run', '-d', '--name', name, '--platform', `linux/${architecture}`, '--init', '--security-opt', 'no-new-privileges:true', '--add-host', 'host.docker.internal:host-gateway', '-p', `127.0.0.1:${saved.http_port}:3000`, '-p', `127.0.0.1:${saved.port}:9735`, '-v', `${saved.volume}:/data`, '-e', `PUBLIC_ORIGIN=http://127.0.0.1:${saved.http_port}`, '-e', 'ALLOWED_HOSTS=127.0.0.1', `ldk-node-umbrel:0.1.1-${architecture}`);
     fs.writeFileSync(file, JSON.stringify(saved), { mode: 0o600 });
     if (process.env.LDK_CONTAINER_RESOURCE_LOG) fs.appendFileSync(process.env.LDK_CONTAINER_RESOURCE_LOG, JSON.stringify(saved) + '\n', { mode: 0o600 });
   }
@@ -57,7 +57,7 @@ async function handle(input) {
   let healthy = false; for (let i = 0; i < 100; i++) { try { if ((await fetch(origin + '/healthz')).ok) { healthy = true; break; } } catch {} await delay(300); } if (!healthy) throw new Error('Container startup failed');
   const password = docker('exec', saved.container, 'cat', '/data/dashboard-password');
   const login = await fetch(origin + '/api/login', { method: 'POST', headers: { origin, 'content-type': 'application/json' }, body: JSON.stringify({ password }) }); if (!login.ok) throw new Error('Container sign-in failed');
-  const session = await login.json(); headers = { origin, cookie: login.headers.get('set-cookie').split(';')[0], 'x-csrf-token': session.csrf, 'content-type': 'application/json' };
+  const session = await login.json(); headers = { origin, cookie: login.headers.get('set-cookie').split(';')[0], 'x-csrf-token': session.csrf, 'x-session-proof': session.proof, 'content-type': 'application/json' };
   if (!saved.wallet_id) {
     const wallet = await request('/api/wallets', { name: 'Funded regtest qualification', network: 'regtest', chain_source, autostart: false, chicory: { enabled: true, offline_enabled: true, flat_fee_sat: 100, fee_ppm: 1000, max_client_funding_sats: 500000, max_total_fronted_sats: 2000000 } }); saved.wallet_id = wallet.id; fs.writeFileSync(file, JSON.stringify(saved), { mode: 0o600 });
   }

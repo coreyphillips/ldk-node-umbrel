@@ -1,0 +1,4 @@
+!   - Copyright (c) 2009 The Go Authors
+!   - Copyright 2013-2014 The Rust Project Developers
+!   - https://github.com/rust-lang/rust/blob/master/COPYRIGHT
+! Copyright & License:

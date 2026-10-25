@@ -1,0 +1,54 @@
+{
+  "amd64": {
+    "qualified_base": {
+      "image_id": "sha256:fd496b324a9e6dcac4fe3a757023ebe9410500718163137823413bf500b36601",
+      "architecture": "amd64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "a733a3e805426f11a59be85bae414bb8807c7a8eded2a8da6b64287605a7ba1b",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-x64-gnu/iroh.linux-x64-gnu.node": "d660aa1abbc2b65b99a970e8da094339256725078b75ed1201b49e0b0acbda55"
+      }
+    },
+    "release_image": {
+      "image_id": "sha256:c2a8e898f18f06cd7f64d9fd2afaa20a701c78179930869749591293c7a275ca",
+      "architecture": "amd64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "a733a3e805426f11a59be85bae414bb8807c7a8eded2a8da6b64287605a7ba1b",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-x64-gnu/iroh.linux-x64-gnu.node": "d660aa1abbc2b65b99a970e8da094339256725078b75ed1201b49e0b0acbda55"
+      }
+    },
+    "archive": {
+      "file": "ldk-node-umbrel-0.1.1-amd64.tar",
+      "sha256": "5ccf5329bd2a0c28bd6175a71b145a9422d3732d0645e6ad0c67dc885bdd92b1",
+      "bytes": 107890688
+    }
+  },
+  "arm64": {
+    "qualified_base": {
+      "image_id": "sha256:aefb2be42dfd48df2bf80bba3d6ab993fe7dcdeeb66720ece1cc16a8d8af5d27",
+      "architecture": "arm64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "9c32115bcd926489690c5c063dd261f3eebb541c8f34593e1a865de765c510ab",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-arm64-gnu/iroh.linux-arm64-gnu.node": "e19d9da4111f5e35b630317c281b575e81c7f0abf6e3cd09dd1ba15d074eec82"
+      }
+    },
+    "release_image": {
+      "image_id": "sha256:afc877b6f7fd6a1d766a7ddf369e9a2219b5a23a3edc419e15c49bc3caf849f1",
+      "architecture": "arm64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "9c32115bcd926489690c5c063dd261f3eebb541c8f34593e1a865de765c510ab",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-arm64-gnu/iroh.linux-arm64-gnu.node": "e19d9da4111f5e35b630317c281b575e81c7f0abf6e3cd09dd1ba15d074eec82"
+      }
+    },
+    "archive": {
+      "file": "ldk-node-umbrel-0.1.1-arm64.tar",
+      "sha256": "8d4121fdd883dd27280a2012b266afb45b933b7d3434ed0463d98dc52992cb47",
+      "bytes": 106892288
+    }
+  },
+  "native_runtime_commit": "35b49a99bdff7edbe3c97dd5a605edf6e878ead4",
+  "notice_checksums_sha256": "93d90830764028d84a8595f08985cc23514e7bea689ba09d2af2665041f71272"
+}

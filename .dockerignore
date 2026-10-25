@@ -1,6 +1,8 @@
 .git
-data
 dist
 **/node_modules
-**/*.log
+**/data
 .env
+.env.*
+**/*.log
+.DS_Store

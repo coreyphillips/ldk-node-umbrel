@@ -1,0 +1,2 @@
+Copyright 2014 The Rust Project Developers. See the COPYRIGHT
+http://rust-lang.org/COPYRIGHT.

@@ -1,0 +1,1 @@
+Copyright 2021 Martin Habovstiak and The rust-url developers.

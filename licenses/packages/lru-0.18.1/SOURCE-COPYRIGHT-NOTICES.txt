@@ -1,0 +1,3 @@
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+Copyright (c) 2016 Jerome Froelich
+The above copyright notice and this permission notice shall be included in all

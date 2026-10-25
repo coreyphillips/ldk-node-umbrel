@@ -1,0 +1,6 @@
+Copyright (c) 2023 Synonym. MIT license, see LICENSE-BEIGNET.
+Copyright 2012-2013 The Rust Project Developers. See the COPYRIGHT
+FFOR protocol adaptation from Beignet, Copyright (c) 2023 Synonym.
+The original portions of this software are Copyright (c) 2015 The base32 Developers
+This file is Copyright its original authors, visible in version control
+http://rust-lang.org/COPYRIGHT.

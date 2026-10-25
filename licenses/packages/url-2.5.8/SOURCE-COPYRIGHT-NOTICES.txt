@@ -1,0 +1,4 @@
+Copyright 2013-2014 The rust-url developers.
+Copyright 2013-2015 The rust-url developers.
+Copyright 2013-2016 The rust-url developers.
+Copyright 2016 The rust-url developers.

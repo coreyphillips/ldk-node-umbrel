@@ -1,0 +1,2 @@
+Copyright Mozilla Foundation
+Excerpt from https://github.com/rust-lang/rust/blob/ab32548539ec38a939c1b58599249f3b54130026/COPYRIGHT ,

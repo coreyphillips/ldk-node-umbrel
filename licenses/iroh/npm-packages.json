@@ -1,0 +1,32 @@
+[
+  {
+    "name": "@number0/iroh",
+    "version": "1.1.0",
+    "license": "MIT OR Apache-2.0",
+    "source_revision": "16221a5286fd201c00fab6e9a316285a05492b39",
+    "repository": "https://github.com/n0-computer/iroh-ffi",
+    "tarball": "https://registry.npmjs.org/@number0/iroh/-/iroh-1.1.0.tgz",
+    "tarball_sha512_integrity": "sha512-DlrJ4Sza5MiI+WwQg63lg+7eSbxlfQR2Bd+wVDjo7XTqenALD2OCRoSfPTuD12IhcvDbVHr4l7qH48DilocqYA==",
+    "tarball_sha1": "cf2aded5be766ac972e8fa64bd1a829539728fe5"
+  },
+  {
+    "name": "@number0/iroh-linux-arm64-gnu",
+    "version": "1.1.0",
+    "license": "MIT",
+    "source_revision": "16221a5286fd201c00fab6e9a316285a05492b39",
+    "repository": "https://github.com/n0-computer/iroh-ffi",
+    "tarball": "https://registry.npmjs.org/@number0/iroh-linux-arm64-gnu/-/iroh-linux-arm64-gnu-1.1.0.tgz",
+    "tarball_sha512_integrity": "sha512-AZHpCKQEcJdXya9llNld5u+S2Cz+ehWgGzILtpEJ1qljNYJAClDovzA+5ehUVaXEc+P7ZUNQ+pIjMcWXM0cAug==",
+    "tarball_sha1": "ee1e7471642922afa7a11f3e615d865765757296"
+  },
+  {
+    "name": "@number0/iroh-linux-x64-gnu",
+    "version": "1.1.0",
+    "license": "MIT",
+    "source_revision": "16221a5286fd201c00fab6e9a316285a05492b39",
+    "repository": "https://github.com/n0-computer/iroh-ffi",
+    "tarball": "https://registry.npmjs.org/@number0/iroh-linux-x64-gnu/-/iroh-linux-x64-gnu-1.1.0.tgz",
+    "tarball_sha512_integrity": "sha512-P2mo734gUjrfJgwbma1fHAyfeWqtY5IHTx53b1peei2/05JKZ2JJ4LS/YzI4qYW20mVtLKD9GS0T3q/iFYVC9Q==",
+    "tarball_sha1": "5982fd8b4ae7880c0dd23e90e167635000097752"
+  }
+]

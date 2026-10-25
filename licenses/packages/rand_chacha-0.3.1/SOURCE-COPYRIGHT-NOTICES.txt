@@ -1,0 +1,3 @@
+Copyright 2018 Developers of the Rand project.
+Copyright 2019 The CryptoCorrosion Contributors
+Copyright 2020 Developers of the Rand project.
