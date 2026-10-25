@@ -1,0 +1,84 @@
+{
+  "release_version": "0.1.3",
+  "recorded_at": "2026-10-25T21:38:20.137Z",
+  "status": "passed",
+  "passed": 14,
+  "failed": 0,
+  "source_sha256": {
+    "manager/public/app.js": "1a87c786330bf88a2e7870d716469d10cb7c1a581d44e7d430db53c18ceca995"
+  },
+  "baseline": {
+    "release_version": "0.1.2",
+    "source_sha256": {
+      "manager/public/app.js": "59046e38e5ddd36aca951f4d32fbebefdb7df152fda0d98a056e4d4b39b6e6d5"
+    },
+    "scenarios": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 800
+        },
+        "before_scroll_y": 534,
+        "after_scroll_y": 0,
+        "scroll_preserved": false,
+        "copy_focus_preserved": false,
+        "uri_selection_preserved": false
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "before_scroll_y": 620,
+        "after_scroll_y": 0,
+        "scroll_preserved": false,
+        "copy_focus_preserved": false,
+        "uri_selection_preserved": false
+      }
+    ]
+  },
+  "checks": [
+    "Desktop pairing preserves scroll, focused Copy button and selected URI across automatic polling",
+    "Desktop remains stable over a second natural polling interval",
+    "Changed transport updates TCP details and QR without transiently collapsing scroll",
+    "Restored Iroh transport is discovered by ordinary polling",
+    "Wallet stop removes pairing details and restart restores them",
+    "Desktop navigation still works and ordinary polling updates chain height",
+    "Desktop open form retains input focus, typed value, server choice and transport options across a polling interval",
+    "Mobile pairing preserves scroll, focused Copy button and selected URI across automatic polling",
+    "Mobile remains stable over a second natural polling interval",
+    "Mobile navigation still works and ordinary polling updates chain height",
+    "Mobile open form retains input focus, typed value, server choice and transport options across a polling interval",
+    "A successful delayed QR response cannot attach after navigation away from Pair Chicory",
+    "A successful delayed pairing response cannot restore logged-out wallet content or credentials",
+    "A delayed unauthorized response from an older session cannot sign out a successful new login"
+  ],
+  "final_scenarios": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 800
+      },
+      "before_scroll_y": 534,
+      "after_scroll_y": 534,
+      "scroll_preserved": true,
+      "copy_focus_preserved": true,
+      "uri_selection_preserved": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "before_scroll_y": 620,
+      "after_scroll_y": 620,
+      "scroll_preserved": true,
+      "copy_focus_preserved": true,
+      "uri_selection_preserved": true
+    }
+  ],
+  "javascript_errors": [],
+  "scope": "Real Chrome with isolated profiles and actual dashboard frontend and authentication. Wallet and node responses are disposable in-memory fixtures. Automatic polling uses the unmodified five-second browser interval.",
+  "funds_used": false,
+  "physical_umbrel_tested": false
+}

@@ -16,8 +16,10 @@ function acceptSession(session) {
   const { proof, ...publicSession } = session;
   state.session = publicSession;
 }
-function clearSession() { rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; if (dialog.open) dialog.close(); }
+function clearSession() { rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; refreshQueued = false; if (dialog.open) dialog.close(); }
 const state = { session: null, wallets: [], selected: null, view: 'overview', data: {}, config: {}, polling: false };
+let pairingView = null;
+let refreshQueued = false;
 const networks = { bitcoin: 'Mainnet', regtest: 'Regtest', signet: 'Signet', testnet: 'Testnet' };
 const integer = value => {
   if (typeof value === 'number' && Number.isSafeInteger(value)) return BigInt(value);
@@ -34,10 +36,11 @@ const active = () => state.wallets.find(wallet => wallet.id === state.selected);
 const available = method => state.data.info?.capabilities?.includes(method);
 
 async function api(route, options = {}) {
+  const requestSession = state.session;
   const response = await fetch(`/api${route}`, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.session?.csrf || '', 'X-Session-Proof': sessionProof }, ...options, body: options.body === undefined ? undefined : JSON.stringify(options.body) });
   const data = await response.json();
   if (!response.ok) {
-    if (response.status === 401 && route !== '/login') { clearSession(); login(); }
+    if (response.status === 401 && route !== '/login' && state.session === requestSession) { clearSession(); login(); }
     throw new Error(data.error?.message || 'Request failed');
   }
   return data;
@@ -96,23 +99,41 @@ async function login(message) {
 
 async function start() { state.config = await api('/config'); await refresh(); }
 async function refresh() {
-  if (!state.session?.authenticated || state.polling) return;
+  if (!state.session?.authenticated) return;
+  if (state.polling) { refreshQueued = true; return; }
   state.polling = true;
+  const session = state.session;
   try {
-    state.wallets = await api('/wallets');
+    const wallets = await api('/wallets');
+    if (state.session !== session) return;
+    state.wallets = wallets;
     if (state.selected && !active()) state.selected = null;
+    const walletId = state.selected;
     if (active()?.status === 'running') {
       const methods = ['info', 'balance', 'channels', 'payments', 'peers', 'offline_status', 'events'];
-      const responses = await Promise.allSettled(methods.map(method => api(`/wallets/${state.selected}/${method}`)));
+      const responses = await Promise.allSettled(methods.map(method => api(`/wallets/${walletId}/${method}`)));
+      if (state.session !== session) return;
+      if (state.selected !== walletId) { refreshQueued = true; return; }
       for (let i = 0; i < methods.length; i++) state.data[methods[i]] = responses[i].status === 'fulfilled' ? responses[i].value : null;
       state.data.error = responses.find(value => value.status === 'rejected')?.reason?.message;
     } else state.data = {};
     if (state.session?.authenticated && !dialog.open) render();
-  } catch (error) { toast(error.message, true); } finally { state.polling = false; }
+  } catch (error) { if (state.session === session) toast(error.message, true); }
+  finally {
+    state.polling = false;
+    if (refreshQueued) { refreshQueued = false; refresh(); }
+  }
 }
 function navigate(view, id = state.selected) { state.view = view; state.selected = id; state.data = {}; render(); refresh(); }
+function pairingRenderKey() { return active() && state.view === 'pairing' ? JSON.stringify([state.selected, state.wallets, state.data.error || null]) : null; }
 function render() {
-  const wallet = active(); const layout = el('div', 'layout'); const sidebar = el('aside', 'sidebar'); add(sidebar, brand());
+  const wallet = active();
+  const pairingKey = pairingRenderKey();
+  // Polling keeps the mounted pairing controls, QR and selection intact. Only
+  // visible wallet state or changed connection details need new content.
+  if (pairingKey && pairingView?.key === pairingKey && pairingView.root.isConnected) { updatePairing(pairingView, wallet); return; }
+  pairingView = null;
+  const layout = el('div', 'layout'); const sidebar = el('aside', 'sidebar'); add(sidebar, brand());
   add(sidebar, add(el('div', 'nav'), button('◫   All wallets', () => navigate('overview', null), !wallet ? 'active' : '')));
   if (state.wallets.length) {
     sidebar.append(el('div', 'nav-label', 'Workspace'));
@@ -141,7 +162,8 @@ function render() {
     add(content, add(el('div', 'page-head'), add(el('div'), el('div', 'eyebrow', networks[wallet.network]), el('h1', '', titles[state.view]), el('p', '', state.view === 'overview' ? 'A clear view of your Bitcoin and Lightning balance.' : 'Manage your native LDK node.')), actions));
     if (wallet.last_error) content.append(notice(wallet.last_error, true));
     if (state.data.error) content.append(notice(state.data.error, true));
-    ({ overview: renderOverview, channels: renderChannels, activity: renderActivity, pairing: renderPairing, offline: renderOffline, settings: renderSettings, logs: renderLogs }[state.view] || renderOverview)(content, wallet);
+    if (state.view === 'pairing') renderPairing(content, wallet, pairingKey);
+    else ({ overview: renderOverview, channels: renderChannels, activity: renderActivity, offline: renderOffline, settings: renderSettings, logs: renderLogs }[state.view] || renderOverview)(content, wallet);
   }
   add(main, content); add(layout, sidebar, main); app.replaceChildren(layout);
 }
@@ -178,19 +200,47 @@ function renderChannels(content, wallet) {
   const peers = state.data.peers || [];
   content.append(card('Peers', peers.length ? table(['Node','Address','Connection',''], peers.map(peer => [short(peer.node_id), peer.address || '', badge(peer.is_connected ? 'Connected' : 'Disconnected', peer.is_connected ? 'green' : ''), button('Disconnect', () => run(() => rpc('disconnect', { node_id: peer.node_id }), 'Peer disconnected'), 'small')])) : empty('No connected peers', 'Connect to a Lightning node using its public key and address.'), available('connect') ? button('Connect peer', connectPeer, 'small') : null));
 }
-async function renderPairing(content, wallet) {
-  const body = el('div'); content.append(card('Connect Chicory to this primary', body));
+function renderPairing(content, wallet, key) {
+  const root = el('div'); content.append(root);
+  const body = el('div'); root.append(card('Connect Chicory to this primary', body));
+  const view = { root, key, walletId: wallet.id, session: state.session, signature: null, qrUri: null, qrImage: null, loading: false, error: null };
+  pairingView = view;
   if (wallet.status !== 'running') { body.append(empty('Start this wallet first', 'Pairing uses the live node identity.')); return; }
+  body.append(el('p', '', 'Loading connection details...'));
+  updatePairing(view, wallet);
+}
+function currentPairing(view) {
+  return pairingView === view && state.session === view.session && state.session?.authenticated && state.view === 'pairing' && state.selected === view.walletId && active()?.status === 'running' && view.key === pairingRenderKey();
+}
+async function updatePairing(view, wallet) {
+  if (view.loading || !currentPairing(view)) return;
+  view.loading = true;
   try {
-    const pairing = await api(`/wallets/${wallet.id}/pairing`); if (state.view !== 'pairing' || state.selected !== wallet.id) return;
-    const uri = pairing.iroh_uri || pairing.tcp_uri; const { image } = await api(`/wallets/${wallet.id}/qr`, { method: 'POST', body: { text: uri } });
+    const pairing = await api(`/wallets/${wallet.id}/pairing`);
+    if (!currentPairing(view)) return;
+    const signature = JSON.stringify([pairing.network, pairing.node_id, pairing.iroh_uri, pairing.tcp_uri, pairing.tor_uri]);
+    if (signature === view.signature) { view.error?.remove(); view.error = null; return; }
+    const uri = pairing.iroh_uri || pairing.tcp_uri;
+    const image = uri === view.qrUri ? view.qrImage : (await api(`/wallets/${wallet.id}/qr`, { method: 'POST', body: { text: uri } })).image;
+    if (!currentPairing(view)) return;
+    // Assemble the complete replacement before touching the displayed page, so
+    // an asynchronous QR request never collapses its height between polls.
+    const replacement = el('div'); const body = el('div'); replacement.append(card('Connect Chicory to this primary', body));
     const qr = el('img', 'qr'); qr.src = image; qr.alt = 'Chicory primary connection QR code'; add(body, qr, copyValue(uri));
     add(body, el('hr', 'divider'), detail([['Network', networks[pairing.network]], ['Transport', pairing.iroh_uri ? 'Iroh' : 'Lightning TCP'], ['Node ID', pairing.node_id]]));
     const steps = el('ol', 'instructions'); for (const step of ['Open Chicory on the same Bitcoin network.', 'Choose an external primary and scan this QR code or paste the connection URI.', 'Fund this node if you enable liquidity provisioning, then complete pairing in Chicory.']) steps.append(el('li', '', step)); body.append(steps);
-    if (pairing.tor_uri) content.append(card('Optional Tor fallback', add(el('div'), copyValue(pairing.tor_uri), el('p', '', 'Paste this separately into Chicory’s Tor fallback field. Your onion service must forward to this wallet’s native Lightning port. This dashboard does not create or verify an onion service.'))));
-    if (pairing.iroh_uri) { content.append(card('Local network address', copyValue(pairing.tcp_uri))); content.append(notice('Iroh uses the relay and endpoint discovery services you enabled. The TCP address remains available for local network connections.')); }
-    else content.append(notice('This address must be reachable from your phone. For a local Docker installation, use the server LAN address in Settings. Iroh is configured separately and never enabled automatically.'));
-  } catch (error) { body.append(notice(error.message, true)); }
+    if (pairing.tor_uri) replacement.append(card('Optional Tor fallback', add(el('div'), copyValue(pairing.tor_uri), el('p', '', 'Paste this separately into Chicory’s Tor fallback field. Your onion service must forward to this wallet’s native Lightning port. This dashboard does not create or verify an onion service.'))));
+    if (pairing.iroh_uri) { replacement.append(card('Local network address', copyValue(pairing.tcp_uri))); replacement.append(notice('Iroh uses the relay and endpoint discovery services you enabled. The TCP address remains available for local network connections.')); }
+    else replacement.append(notice('This address must be reachable from your phone. For a local Docker installation, use the server LAN address in Settings. Iroh is configured separately and never enabled automatically.'));
+    const scroll = { left: window.scrollX, top: window.scrollY, behavior: 'instant' };
+    view.root.replaceChildren(...replacement.childNodes);
+    window.scrollTo(scroll);
+    Object.assign(view, { signature, qrUri: uri, qrImage: image, error: null });
+  } catch (error) {
+    if (!currentPairing(view)) return;
+    if (!view.error) { view.error = notice('', true); view.root.append(view.error); }
+    view.error.textContent = view.signature ? `Unable to refresh pairing: ${error.message} The displayed connection details may be outdated.` : error.message;
+  } finally { view.loading = false; }
 }
 function renderOffline(content, wallet) {
   const status = state.data.offline_status || {}; const epochs = status.epochs || [];

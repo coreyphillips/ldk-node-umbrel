@@ -33,7 +33,7 @@ COPY LICENSE /opt/ldk/manager/LICENSE
 COPY licenses/ /opt/ldk/licenses/third-party/
 LABEL org.opencontainers.image.source="https://github.com/coreyphillips/ldk-node-umbrel" \
       org.opencontainers.image.title="LDK Node for Umbrel" \
-      org.opencontainers.image.version="0.1.2"
+      org.opencontainers.image.version="0.1.3"
 COPY docker/entrypoint.sh /usr/local/bin/ldk-entrypoint
 RUN chmod 755 /usr/local/bin/ldk-entrypoint
 ENV NODE_ENV=production DATA_DIR=/data BIND_ADDRESS=0.0.0.0 PORT=3000 \

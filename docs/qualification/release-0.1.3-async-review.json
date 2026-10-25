@@ -1,0 +1,51 @@
+{
+  "reviewed_at": "2026-10-25T21:37:31.803563+00:00",
+  "release": "0.1.3",
+  "source": "manager/public/app.js",
+  "source_sha256": "1a87c786330bf88a2e7870d716469d10cb7c1a581d44e7d430db53c18ceca995",
+  "method": "Independent Node VM minimal-DOM regression harness with deferred mocked HTTP responses",
+  "result": "pass",
+  "checks": [
+    {
+      "check": "mounted QR and view retained during unchanged polling",
+      "result": "pass"
+    },
+    {
+      "check": "late QR discarded after navigation away and back",
+      "result": "pass"
+    },
+    {
+      "check": "late QR discarded after wallet metadata change",
+      "result": "pass"
+    },
+    {
+      "check": "stopped wallet removes pairing QR",
+      "result": "pass"
+    },
+    {
+      "check": "Transient failure marks stale details and recovers without QR replacement",
+      "result": "pass"
+    },
+    {
+      "check": "wallet A replies cannot populate wallet B and a current refresh is queued",
+      "result": "pass"
+    },
+    {
+      "check": "late pairing response discarded after logout",
+      "result": "pass"
+    },
+    {
+      "check": "old 401 response preserves a newer login session",
+      "result": "pass"
+    },
+    {
+      "check": "current-session 401 response still signs out",
+      "result": "pass"
+    }
+  ],
+  "source_review": "No blocking findings after the session and pairing metadata guards.",
+  "limits": [
+    "The harness validates DOM identity and async state transitions, not browser layout or actual scroll position. Browser scroll verification is separate.",
+    "No live wallet state or user credentials were accessed by these tests."
+  ]
+}

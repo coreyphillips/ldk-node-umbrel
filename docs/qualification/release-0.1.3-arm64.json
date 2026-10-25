@@ -1,0 +1,19 @@
+{
+  "architecture": "arm64",
+  "image": "ldk-node-umbrel:0.1.3-arm64",
+  "image_id": "sha256:3debe191f3ee156d58480fb953b62c12405c805f0b00db0b37527bf12d2d293f",
+  "frontend_sha256": "1a87c786330bf88a2e7870d716469d10cb7c1a581d44e7d430db53c18ceca995",
+  "version": "0.1.3",
+  "checks": [
+    "image architecture and version verified",
+    "actual manager starts with empty disposable state",
+    "served frontend matches browser-qualified source",
+    "unauthenticated wallet access denied",
+    "authenticated configuration retains Fulcrum preset",
+    "empty disposable wallet registry"
+  ],
+  "funds_sent": false,
+  "native_wallet_created": false,
+  "physical_umbrel": false,
+  "date": "2026-10-25T21:36:42.310Z"
+}

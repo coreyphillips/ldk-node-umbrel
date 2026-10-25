@@ -22,7 +22,7 @@ For Fulcrum installed on the same Umbrel, use **`tcp://10.21.21.200:50002`**, wi
 
 Update the app, then open the existing wallet's **Settings > Edit configuration**. Stop it first if it is running. Choose **Umbrel Fulcrum** or **Umbrel Electrs**, select **Test connection**, save, and start that same wallet. Its identity and channel storage remain in place. A failed wallet can be edited directly. Do not create a replacement wallet or uninstall the app to repair this setting.
 
-Version 0.1.2 also accepts a trailing slash in existing Electrum URLs when starting the native node. Other saved server choices remain unchanged. For a server on another device, use its reachable LAN IP or hostname instead of an Umbrel-local preset. [Connection details and troubleshooting](docs/umbrel.md#configure-a-chain-backend).
+Version 0.1.2 and later also accept a trailing slash in existing Electrum URLs when starting the native node. Other saved server choices remain unchanged. For a server on another device, use its reachable LAN IP or hostname instead of an Umbrel-local preset. [Connection details and troubleshooting](docs/umbrel.md#configure-a-chain-backend).
 
 ## Features
 
@@ -43,6 +43,8 @@ The qualified phone builds use Chicory 0.7.4 with local portable-engine fixes fo
 3. Enable the Chicory provider if this node should fund phone channels. Review funding caps and fees. Offline settlement is a separate setting.
 4. Open **Pair Chicory** and scan or paste the URI as an external primary.
 5. For Iroh pairing, explicitly enable Iroh, public relays and endpoint discovery. An existing v3 onion service can be configured as a same-key fallback. The dashboard does not create an onion service.
+
+Version 0.1.3 keeps the Pair Chicory page in place during background updates, including its scroll position and selected connection text. Reload the dashboard tab after updating the app.
 
 The primary needs liquidity for its enabled funding and routing functions. Never reuse another live node's storage. Back up complete stopped wallet state; a seed alone cannot restore current Lightning channels.
 

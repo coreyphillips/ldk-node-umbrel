@@ -49,6 +49,18 @@ Separate checks use an actual plaintext Mainnet Fulcrum server. Both [AMD64](qua
 
 The [official Umbrel validator](qualification/release-0.1.2-umbrel-store-lint.json), including public image checks, reports zero errors and the same two packaging warnings as 0.1.1. Both architectures were pulled anonymously and retain the verified native and notice hashes. The community app pins the combined 0.1.2 image index.
 
+## Public release 0.1.3
+
+The Pair Chicory page previously replaced its entire layout every five seconds and then loaded its pairing details and QR asynchronously. This temporarily collapsed the page. A real Chrome baseline reproduced desktop scrolling from 534 pixels to zero and mobile scrolling from 620 pixels to zero, while also losing Copy button focus and selected URI text.
+
+The fix keeps unchanged pairing content mounted while continuing live checks, prepares changed content before replacing it, and only regenerates the QR when its URI changes. Session, wallet and view checks reject delayed responses after navigation or configuration changes. A prior wallet's RPC responses cannot populate a newly selected wallet, and an old unauthorized response cannot clear a newer login.
+
+Nine independent [async and DOM regression checks](qualification/release-0.1.3-async-review.json) pass against the exact released frontend source. These checks use deferred mocked responses and distinguish DOM identity from real browser layout verification.
+
+Fourteen independent [Chrome checks](qualification/release-0.1.3-browser.json) pass with zero JavaScript errors. Across natural five-second polling, desktop scroll stays at 534 pixels and mobile scroll stays at 620 pixels, with the same Copy focus and selected URI text. Changed Iroh/TCP details, QR updates, stop/start, normal chain-height polling, open forms, navigation, logout and a new login after an old unauthorized response also pass. Browser tests use disposable mocked wallet responses without accessing a user wallet.
+
+Both [AMD64](qualification/release-0.1.3-amd64.json) and [ARM64](qualification/release-0.1.3-arm64.json) images pass six packaging checks: architecture and version, actual manager startup with disposable storage, exact served frontend hash, denial of unauthenticated access, authenticated Fulcrum configuration and an empty wallet registry. [Release provenance](qualification/release-0.1.3.json) records source, image and archive hashes. Native daemon, Iroh and notice hashes remain identical to 0.1.2. The backend and native interoperability results above remain applicable to those unchanged files; no funded or native protocol tests were repeated for this frontend change.
+
 ## Scope and limits
 
 This dashboard exposes the local native implementation. Mainnet is selectable, but all funding and interoperability qualification uses disposable regtest funds. A real Umbrel installation and a real ARM64 Umbrel device have not been modified or qualified.
