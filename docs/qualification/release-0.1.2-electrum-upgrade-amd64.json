@@ -1,0 +1,30 @@
+{
+  "architecture": "amd64",
+  "image": "ldk-node-umbrel:0.1.2-amd64",
+  "image_id": "sha256:f2d24f2fcecf0ea93fed6ccd918266fd977c53a82cf0d5965a8bc9598d9400fc",
+  "checks": [
+    "released image reproduces invalid legacy Electrs DNS failure",
+    "released image accepts a trailing slash in saved configuration but fails native startup",
+    "upgrade preserves existing wallet and legacy server setting",
+    "upgrade repairs existing trailing-slash URL without manual save and preserves native wallet identity",
+    "connection test reports invalid legacy DNS before wallet startup",
+    "Electrs and plaintext Fulcrum preset checks accept the real chain and reject mainnet mismatch",
+    "connection test normalizes the same trailing slash accepted by wallet configuration",
+    "plaintext Fulcrum port rejects a TLS connection test",
+    "Beignet Electrs preset reaches real regtest backend and native wallet synchronizes",
+    "disposable wallet has no funds",
+    "server correction and restart retain wallet identity",
+    "explicit switch to plaintext Fulcrum preset preserves native identity and synchronizes"
+  ],
+  "network": "regtest",
+  "local_presets": [
+    "tcp://10.21.21.10:50001",
+    "tcp://10.21.21.200:50002"
+  ],
+  "funds_sent": false,
+  "chain_reset": false,
+  "physical_umbrel": false,
+  "date": "2026-10-25T21:24:17.112Z",
+  "preset_fixture": "Both preset listeners forward the existing regtest Electrs server. Actual Fulcrum implementation is checked separately against the user-provided Mainnet endpoint.",
+  "cleanup_verified": true
+}

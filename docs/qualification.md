@@ -35,6 +35,18 @@ Both updated release images pass fourteen container checks using Umbrel's per-in
 
 The [official Umbrel validator](qualification/umbrel-store-lint.json), including public image checks, passes with zero errors. Its two warnings concern the retained no-new-privileges option and the local icon used by this community store. Both registry architectures were pulled with an empty Docker credential configuration, and their native daemon, Iroh files and notice bundle hashes match the qualified release archives. The Compose manifest pins the verified combined index digest. Docker and gateway-request simulation do not constitute a physical Umbrel installation test.
 
+## Public release 0.1.2
+
+This release aligns Electrum setup with Beignet Umbrel: explicit Electrs, plaintext Fulcrum and rbitcoin presets, optional backend environment defaults, and an authenticated connection check that verifies the genesis header before native startup. Saved custom endpoints remain selected. A saved trailing slash is normalized before native launch, preserving wallet identity and node storage without requiring a settings save.
+
+All 32 manager tests pass. Thirteen independent [browser checks](qualification/release-0.1.2-browser.json) cover actual HTTP and Electrum protocol checks, all presets, custom URL preservation, explicit legacy-default repair, same-wallet saving, wrong-network feedback and stale-result suppression. The browser fixture uses disposable protocol servers and no native process.
+
+Both architectures pass fourteen container checks with real native regtest sync and Iroh lifecycle checks: [AMD64](qualification/release-0.1.2-amd64.json) and [ARM64](qualification/release-0.1.2-arm64.json). Each also passes twelve upgrade and preset checks: [AMD64](qualification/release-0.1.2-electrum-upgrade-amd64.json) and [ARM64](qualification/release-0.1.2-electrum-upgrade-arm64.json). Those checks reproduce the old DNS default and trailing-slash startup failures, recover the existing wallet after upgrade, verify DNS, TLS and network diagnostics, and retain native identity through explicit server changes. Their isolated Umbrel preset listeners forward a real regtest Electrs server; they do not claim that fixture is Fulcrum.
+
+Separate checks use an actual plaintext Mainnet Fulcrum server. Both [AMD64](qualification/release-0.1.2-fulcrum-amd64.json) and [ARM64](qualification/release-0.1.2-fulcrum-arm64.json) pass six checks covering the exact optional-backend Compose environment, authenticated network verification, canonical URL persistence, native startup, zero balances, peers and channels, and clean stop. All test wallets are disposable. No user wallet was accessed or funds sent, and test containers, volumes and networks were removed.
+
+[Release provenance](qualification/release-0.1.2.json) records image and archive hashes. The native daemon, Iroh bridge, native addon and notice bundle exactly match 0.1.1 on each architecture. The release changes the dashboard and its configuration, with the original funded interoperability evidence still tied to those unchanged native binaries.
+
 ## Scope and limits
 
 This dashboard exposes the local native implementation. Mainnet is selectable, but all funding and interoperability qualification uses disposable regtest funds. A real Umbrel installation and a real ARM64 Umbrel device have not been modified or qualified.

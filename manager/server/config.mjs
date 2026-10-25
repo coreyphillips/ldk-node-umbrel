@@ -1,4 +1,5 @@
 import { failure } from './files.mjs';
+import { electrumUrl } from './electrum.mjs';
 
 export const NETWORKS = ['regtest', 'signet', 'testnet', 'bitcoin'];
 export const METHODS = new Set(['info', 'balance', 'channels', 'payments', 'peers', 'address', 'invoice', 'pay', 'send_onchain', 'connect', 'disconnect', 'open', 'close', 'sync', 'offline_status', 'splice_in', 'splice_out', 'events', 'estimate_onchain']);
@@ -31,10 +32,13 @@ export function walletConfig(input, previous) {
     chain_source = { type: 'bitcoind', host, port: number(chain.port, 1, 65535, 'RPC port'), user: text(chain.user, 128, 'RPC user'), password };
   } else if (chain.type === 'electrum' || chain.type === 'esplora') {
     const url = text(chain.url, 2048, 'chain URL');
-    let parsed; try { parsed = new URL(url); } catch { throw failure('Enter a complete chain URL'); }
-    const protocols = chain.type === 'electrum' ? ['tcp:', 'ssl:'] : ['http:', 'https:'];
-    if (!protocols.includes(parsed.protocol) || parsed.username || parsed.password || parsed.hash || parsed.search || !parsed.hostname || (chain.type === 'electrum' && (!parsed.port || !['', '/'].includes(parsed.pathname)))) throw failure('Unsupported chain URL');
-    chain_source = { type: chain.type, url };
+    if (chain.type === 'electrum') {
+      chain_source = { type: 'electrum', url: electrumUrl(url).url };
+    } else {
+      let parsed; try { parsed = new URL(url); } catch { throw failure('Enter a complete chain URL'); }
+      if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.hash || parsed.search || !parsed.hostname) throw failure('Unsupported chain URL');
+      chain_source = { type: 'esplora', url };
+    }
   } else throw failure('Unsupported chain source');
   const policy = input.chicory || {};
   const chicory = {

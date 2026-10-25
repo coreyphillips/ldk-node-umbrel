@@ -226,7 +226,34 @@ function walletForm(wallet) {
       field(fields, 'port', 'RPC port', { type: 'number', value: wallet?.chain_source.port || (network.value === 'regtest' ? 18443 : network.value === 'signet' ? 38332 : network.value === 'testnet' ? 18332 : 8332), min: 1, max: 65535, required: true });
       field(fields, 'user', 'RPC username', { value: wallet?.chain_source.user || '', required: true });
       field(fields, 'password', 'RPC password', { type: 'password', help: wallet?.chain_source.password_configured ? 'Leave blank to keep the saved password.' : undefined, required: !wallet?.chain_source.password_configured });
-    } else field(chainFields, 'url', source.value === 'electrum' ? 'Electrum URL' : 'Esplora URL', { value: wallet?.chain_source.type === source.value ? wallet.chain_source.url : source.value === 'electrum' ? 'tcp://electrs_server_1:50001' : '', required: true, help: source.value === 'electrum' ? 'Use ssl:// for TLS or tcp:// for a trusted local server. No public server is contacted automatically.' : 'An HTTP or HTTPS Esplora base URL on the selected network.' });
+    } else if (source.value === 'electrum') {
+      const presets = state.config.electrum_presets || [];
+      const initial = wallet?.chain_source.type === 'electrum' ? wallet.chain_source.url : state.config.default_electrum_url || '';
+      const preset = field(chainFields, 'electrum_preset', 'Electrum server', { value: presets.find(item => item.url === initial)?.id || 'custom', options: [['custom', 'Custom server'], ...presets.map(item => [item.id, item.label])], help: 'Local presets connect to an app installed on this same Umbrel. For another machine, enter its LAN IP or reachable hostname.' });
+      const url = field(chainFields, 'url', 'Electrum URL', { value: initial, required: true, help: 'Umbrel Electrs uses tcp://10.21.21.10:50001. Umbrel Fulcrum uses tcp://10.21.21.200:50002 with SSL disabled. Use ssl:// only for a server that requires TLS.' });
+      const result = el('div'); result.setAttribute('aria-live', 'polite');
+      let revision = 0; const clearResult = () => { revision++; result.replaceChildren(); };
+      network.addEventListener('change', clearResult);
+      const selectPreset = value => { preset.value = value.id; url.value = value.url; clearResult(); };
+      preset.addEventListener('change', () => { const chosen = presets.find(item => item.id === preset.value); if (chosen) selectPreset(chosen); });
+      url.addEventListener('input', () => { preset.value = presets.find(item => item.url === url.value.trim())?.id || 'custom'; clearResult(); });
+      if (/^tcp:\/\/electrs_server_1:50001\/?$/.test(initial)) {
+        const electrs = presets.find(item => item.id === 'electrs');
+        const legacy = notice("This older default is not Umbrel's Electrs address. Choose the installed server below, then save the settings for this existing wallet.");
+        if (electrs) legacy.append(button('Use Umbrel Electrs', () => selectPreset(electrs), 'small'));
+        chainFields.append(legacy);
+      }
+      const testConnection = button('Test connection', async () => {
+        const testedRevision = revision; testConnection.disabled = true; result.replaceChildren(notice('Checking the Electrum connection and Bitcoin network...'));
+        try {
+          const checked = await api('/electrum/check', { method: 'POST', body: { url: url.value.trim(), network: network.value } });
+          if (testedRevision !== revision) return;
+          result.replaceChildren(notice(`Connected to ${networks[checked.network] || checked.network}. Network verified${Number.isSafeInteger(checked.height) ? `; server height ${checked.height.toLocaleString('en-US')}` : ''}.`));
+        } catch (error) { if (testedRevision === revision) result.replaceChildren(notice(error.message, true)); }
+        finally { testConnection.disabled = false; }
+      }, 'small');
+      add(chainFields, testConnection, result);
+    } else field(chainFields, 'url', 'Esplora URL', { value: wallet?.chain_source.type === 'esplora' ? wallet.chain_source.url : '', required: true, help: 'An HTTP or HTTPS Esplora base URL on the selected network.' });
   }; source.addEventListener('change', renderSource); renderSource();
   add(form, el('hr', 'divider'), el('h3', '', 'Chicory provider'));
   field(form, 'provider', 'Fund eligible Chicory channels automatically', { type: 'checkbox', value: wallet?.chicory.enabled || false, help: 'Uses this wallet balance within the caps below.' });

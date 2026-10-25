@@ -8,6 +8,7 @@ import { Authentication } from './auth.mjs';
 import { WalletManager } from './wallets.mjs';
 import { privateDir, failure } from './files.mjs';
 import { READ_METHODS } from './config.mjs';
+import { createElectrumChecker, electrumSettings } from './electrum.mjs';
 import { canonicalAuthority, canonicalOrigin, allowedHostnames } from './request-security.mjs';
 
 const PUBLIC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../public');
@@ -20,7 +21,7 @@ async function body(request) {
 }
 function send(response, status, value) { response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(value)); }
 
-export function createServer({ auth, wallets, publicOrigin, secureCookies = false, allowedHosts }) {
+export function createServer({ auth, wallets, publicOrigin, secureCookies = false, allowedHosts, electrumCheck = createElectrumChecker(), electrumConfig = electrumSettings({}) }) {
   const hosts = allowedHostnames(allowedHosts || ['localhost', '127.0.0.1', 'umbrel.local'], auth.mode);
   if (publicOrigin) publicOrigin = canonicalOrigin(publicOrigin);
   const server = http.createServer(async (request, response) => {
@@ -39,7 +40,8 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
         const mutation = request.method !== 'GET'; auth.require(request, mutation);
         if (['POST', 'PUT'].includes(request.method) && !String(request.headers['content-type'] || '').startsWith('application/json')) throw failure('JSON request required', 415);
         if (url.pathname === '/api/logout' && request.method === 'POST') { auth.logout(request, response); return send(response, 200, { ok: true }); }
-        if (url.pathname === '/api/config' && request.method === 'GET') return send(response, 200, { version: packageMetadata.version, default_network: 'bitcoin', max_wallets: 8, backend: 'native-ldk-node', mainnet_experimental: true, iroh_available: Boolean(wallets.bridge) });
+        if (url.pathname === '/api/config' && request.method === 'GET') return send(response, 200, { version: packageMetadata.version, default_network: 'bitcoin', max_wallets: 8, backend: 'native-ldk-node', mainnet_experimental: true, iroh_available: Boolean(wallets.bridge), ...electrumConfig });
+        if (url.pathname === '/api/electrum/check' && request.method === 'POST') return send(response, 200, await electrumCheck(await body(request)));
         if (url.pathname === '/api/wallets' && request.method === 'GET') return send(response, 200, wallets.list());
         if (url.pathname === '/api/wallets' && request.method === 'POST') return send(response, 201, await wallets.create(await body(request)));
         const match = /^\/api\/wallets\/([0-9a-f-]{36})(?:\/([a-z_]+))?$/.exec(url.pathname);
@@ -82,11 +84,13 @@ async function main() {
   delete process.env.DASHBOARD_BOOTSTRAP_PASSWORD;
   await auth.initialize(process.env.DASHBOARD_PASSWORD_FILE, bootstrapPassword);
   bootstrapPassword = undefined;
+  const electrumCheck = createElectrumChecker();
+  const electrumConfig = electrumSettings();
   const wallets = new WalletManager({ dataDir, binary: process.env.LDK_NODE_BIN || '/opt/ldk/bin/ldk-node-daemon', bridge: process.env.IROH_BRIDGE || undefined,
-    portBase: Number(process.env.LIGHTNING_PORT_BASE || 9735), publicPortBase: Number(process.env.PUBLIC_PORT_BASE || 19351) });
+    portBase: Number(process.env.LIGHTNING_PORT_BASE || 9735), publicPortBase: Number(process.env.PUBLIC_PORT_BASE || 19351), electrumCheck });
   await wallets.initialize();
   const allowedHosts = new Set((process.env.ALLOWED_HOSTS || (publicOrigin ? new URL(publicOrigin).hostname : 'localhost,127.0.0.1,umbrel.local')).split(','));
-  const server = createServer({ auth, wallets, publicOrigin, allowedHosts, secureCookies: process.env.COOKIE_SECURE === '1' });
+  const server = createServer({ auth, wallets, publicOrigin, allowedHosts, electrumCheck, electrumConfig, secureCookies: process.env.COOKIE_SECURE === '1' });
   server.listen(Number(process.env.PORT || 3000), process.env.BIND_ADDRESS || '127.0.0.1', () => console.error('LDK dashboard is listening'));
   void wallets.boot();
   const stop = async () => { server.close(); auth.close(); await wallets.close(); console.error('Dashboard shutdown completed'); process.exit(0); };

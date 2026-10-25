@@ -1,0 +1,19 @@
+{
+  "architecture": "arm64",
+  "image": "ldk-node-umbrel:0.1.2-arm64",
+  "backend": "user-provided Mainnet Fulcrum endpoint",
+  "checks": [
+    "exact optional-backend compose environment starts",
+    "authenticated connection check normalizes trailing slash and verifies Mainnet",
+    "new wallet configuration canonicalizes endpoint before native launch",
+    "native daemon starts on real plaintext Fulcrum",
+    "zero balances, peers and channels",
+    "clean wallet stop"
+  ],
+  "funds_sent": false,
+  "real_wallet_accessed": false,
+  "state_storage": "ephemeral tmpfs removed with container",
+  "physical_umbrel": false,
+  "date": "2026-10-25T21:24:51.727Z",
+  "cleanup_verified": true
+}

@@ -14,7 +14,23 @@ Current Umbrel gateways preserve the browser's Host and may terminate HTTPS. Pas
 
 Mainnet is preselected. Select regtest, signet or testnet only if both your backend and phone use that network. The native daemon verifies the backend genesis hash and refuses a mismatch.
 
-Choose a reachable Bitcoin Core RPC, Electrum or Esplora endpoint. For another Umbrel app, use its documented internal connection details. For example, an Electrs app may expose `tcp://electrs_server_1:50001` on the shared app network; verify your installation's actual service name and port. No chain app is automatically installed, and credentials are never guessed. Backend passwords are stored privately on the server and redacted from dashboard reads.
+Choose a reachable Bitcoin Core RPC, Electrum or Esplora endpoint. Electrum offers the same local presets as Beignet:
+
+| Installed app on this Umbrel | URL | Transport |
+| --- | --- | --- |
+| Electrs | `tcp://10.21.21.10:50001` | TCP, SSL disabled |
+| Fulcrum | `tcp://10.21.21.200:50002` | TCP, SSL disabled |
+| rbitcoin | `tcp://beignet-rbitcoin_node_1:50001` | TCP, SSL disabled |
+
+Fulcrum's internal port 50002 uses plaintext TCP on Umbrel. Do not select TLS merely because the port is 50002. The address `electrs_server_1` offered by version 0.1.1 was incorrect; choose the Electrs preset to repair an existing wallet that saved it.
+
+These presets require the corresponding app to be installed and synced on the same Umbrel. Electrs remains optional, as it does in Beignet. If Umbrel supplies Electrs dependency exports they can seed a default; otherwise choose a preset or enter a server explicitly. A `.local` name may resolve on your computer but fail inside a Linux container. Use an internal preset for the same Umbrel, or a reachable LAN IP/hostname for a server on another machine.
+
+**Test connection** checks the server's actual genesis header against the selected wallet network and shows its height when available. It distinguishes DNS lookup, connection refusal, timeout, TLS and protocol failures. Startup also performs this check while retaining native genesis verification. It never changes the wallet network to fit a server.
+
+For a saved failed wallet, open **Settings > Edit configuration**, select the installed server, test, save and start the same wallet. A running wallet must be stopped before editing. This changes the connection setting while retaining the wallet ID, native identity and channel storage. Version 0.1.2 normalizes a trailing slash before passing an existing Electrum URL to the native client; it does not silently substitute a different host or rewrite the wallet registry on startup.
+
+No chain app is automatically installed. Backend passwords are stored privately on the server and redacted from dashboard reads.
 
 Enable provider funding and offline settlement only after reviewing the configured limits. For Iroh phone pairing, enable the transport, public relays and discovery explicitly. TCP pairing requires the phone to reach the displayed host and Lightning port.
 

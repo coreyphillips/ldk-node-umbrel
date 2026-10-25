@@ -1,0 +1,32 @@
+{
+  "release_version": "0.1.2",
+  "recorded_at": "2026-10-25T21:25:16.681Z",
+  "status": "passed",
+  "passed": 13,
+  "failed": 0,
+  "checks": [
+    "Authenticated backend config exposes version, explicit presets and no guessed default",
+    "New wallet remains Mainnet and Fulcrum preset uses plaintext TCP port 50002",
+    "Electrs preset uses the exported node IP and port",
+    "Custom TLS endpoint remains explicitly entered and is not replaced by a preset",
+    "Connection button traverses real HTTP and Electrum protocol checks and reports verified Mainnet height",
+    "Wrong genesis produces a helpful Regtest versus Mainnet error",
+    "Changing wallet network clears stale result and matching Regtest verifies",
+    "Editing URL during an in-flight probe suppresses stale success",
+    "Selecting another preset clears previous connection result",
+    "Explicit repair replaces only the legacy bad default and saving retains existing wallet ID",
+    "Existing custom local hostname URL is preserved without suggesting or applying automatic repair",
+    "Custom URL change persists to the original wallet registry entry with no additional wallet",
+    "No browser JavaScript errors"
+  ],
+  "source_sha256": {
+    "manager/server/electrum.mjs": "1734649b3d065e879e1432d3bde4ce04612d44da163947e60d6867fde67006ab",
+    "manager/server/config.mjs": "77412234d32dd53014c80dd47531a402d0a4365916584baf4071c229c1bc5dc0",
+    "manager/server/index.mjs": "7ce873e5486c43539aeb0406533e77401b5a417adfad8c52d3708e2efc40c77b",
+    "manager/server/wallets.mjs": "75e5225f4b4eabda66dd70aef581393b9c9848b15ee5c823e608f333c1d9aa6c",
+    "manager/public/app.js": "59046e38e5ddd36aca951f4d32fbebefdb7df152fda0d98a056e4d4b39b6e6d5"
+  },
+  "scope": "Actual dashboard frontend, authentication, wallet registry and Electrum checker exercised in isolated Chrome with disposable local Electrum protocol fixtures. No native daemon launched and no user backend contacted.",
+  "funds_used": false,
+  "physical_umbrel_tested": false
+}

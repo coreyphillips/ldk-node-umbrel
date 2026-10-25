@@ -10,11 +10,19 @@ An Umbrel community app store and dashboard for independent native LDK Node wall
 2. Add this store URL: **https://github.com/coreyphillips/ldk-node-umbrel**.
 3. Open the **LDK Node** community store and install **LDK Node**.
 4. Open the app and sign in with the app password shown by Umbrel. There is no username.
-5. Create a wallet, select its network and enter a reachable Bitcoin Core RPC, Electrum or Esplora backend. Start the wallet and wait for sync.
+5. Create a wallet, select its network and choose a local Electrum preset or enter a Bitcoin Core RPC, Electrum or Esplora backend. For Fulcrum on the same Umbrel, choose **Umbrel Fulcrum** with SSL disabled. Use **Test connection**, then start the wallet and wait for sync.
 
 Umbrel selects the matching architecture automatically. The app manifest pins the public container image by its multiarchitecture digest. No image loading, command line, GitHub credentials or Docker configuration is needed for this installation. See [installation and backup details](docs/umbrel.md).
 
 This is an experimental test release. All funded interoperability qualification used disposable regtest funds, and installation on physical Umbrel hardware has not yet been qualified. The compatible local Chicory client described below is required for the tested flows.
+
+## Correct an existing Electrum connection
+
+For Fulcrum installed on the same Umbrel, use **`tcp://10.21.21.200:50002`**, with SSL disabled. Electrs uses `tcp://10.21.21.10:50001`. These match Beignet's local Umbrel presets and avoid relying on `.local` name resolution inside containers.
+
+Update the app, then open the existing wallet's **Settings > Edit configuration**. Stop it first if it is running. Choose **Umbrel Fulcrum** or **Umbrel Electrs**, select **Test connection**, save, and start that same wallet. Its identity and channel storage remain in place. A failed wallet can be edited directly. Do not create a replacement wallet or uninstall the app to repair this setting.
+
+Version 0.1.2 also accepts a trailing slash in existing Electrum URLs when starting the native node. Other saved server choices remain unchanged. For a server on another device, use its reachable LAN IP or hostname instead of an Umbrel-local preset. [Connection details and troubleshooting](docs/umbrel.md#configure-a-chain-backend).
 
 ## Features
 

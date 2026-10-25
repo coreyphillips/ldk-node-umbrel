@@ -6,9 +6,9 @@ import { atomicJson, privateDir, readJson, failure } from './files.mjs';
 import { walletConfig, publicConfig, rpcRequest } from './config.mjs';
 
 export class WalletManager {
-  constructor({ dataDir, binary, bridge, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options) }) {
+  constructor({ dataDir, binary, bridge, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), electrumCheck }) {
     this.dataDir = dataDir; this.binary = binary; this.bridge = bridge; this.portBase = portBase; this.publicPortBase = publicPortBase;
-    this.processFactory = processFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false;
+    this.electrumCheck = electrumCheck; this.processFactory = processFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false;
   }
   async initialize() {
     await privateDir(path.join(this.dataDir, 'wallets'));
@@ -59,12 +59,17 @@ export class WalletManager {
     const state = { status: 'starting', error: null, attempts: old.attempts || [], logs: old.logs || [], intentional: false };
     this.runtime.set(id, state);
     try {
+    // Normalize legacy Electrum URLs before passing them to the native socket
+    // client, which treats a trailing slash as part of the address.
+    const { chain_source } = walletConfig(wallet);
+    if (chain_source.type === 'electrum' && this.electrumCheck) await this.electrumCheck({ url: chain_source.url, network: wallet.network });
+    if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const directory = this.directory(id);
     await privateDir(path.join(directory, 'node'));
     const configFile = path.join(directory, 'node.json');
     await atomicJson(configFile, {
       network: wallet.network, data_dir: path.join(directory, 'node'), listen_address: `0.0.0.0:${this.portBase + wallet.slot}`,
-      alias: wallet.name, chain_source: wallet.chain_source, chicory: wallet.chicory,
+      alias: wallet.name, chain_source, chicory: wallet.chicory,
     });
     const process = this.processFactory({ binary: this.binary, config: configFile }); state.process = process;
     process.once('fault', message => { state.noRestart = true; state.error = message; state.status = 'stopping'; });
@@ -72,8 +77,7 @@ export class WalletManager {
       state.logs = process.logs || []; state.iroh?.child?.kill('SIGTERM'); state.iroh = null;
       if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return; }
       state.status = 'failed'; state.error ||= 'Native node stopped unexpectedly. Check logs before retrying an operation.';
-      state.attempts = state.attempts.filter(time => Date.now() - time < 300_000); state.attempts.push(Date.now());
-      if (!state.noRestart && wallet.autostart && state.attempts.length < 5) state.restartTimer = setTimeout(() => this.start(id).catch(() => {}), Math.min(60_000, 2000 * 2 ** state.attempts.length));
+      this.scheduleRestart(wallet, state);
     });
       const ready = await process.start(); state.ready = ready;
       if (state.intentional || this.shuttingDown) { await process.stop(); return { status: 'stopped' }; }
@@ -82,8 +86,14 @@ export class WalletManager {
       return { status: state.status };
     } catch (error) {
       state.status = state.intentional || this.shuttingDown ? 'stopped' : 'failed';
-      state.error = state.status === 'failed' ? state.error || error.message : null; throw error;
+      state.error = state.status === 'failed' ? state.error || error.message : null;
+      if (state.status === 'failed' && !state.process) this.scheduleRestart(wallet, state);
+      throw error;
     }
+  }
+  scheduleRestart(wallet, state) {
+    state.attempts = state.attempts.filter(time => Date.now() - time < 300_000); state.attempts.push(Date.now());
+    if (!state.noRestart && !state.intentional && !this.shuttingDown && wallet.autostart && state.attempts.length < 5) state.restartTimer = setTimeout(() => this.start(wallet.id).catch(() => {}), Math.min(60_000, 2000 * 2 ** state.attempts.length));
   }
   async stop(id) {
     this.get(id); const state = this.state(id); state.intentional = true; clearTimeout(state.restartTimer);
