@@ -1,0 +1,58 @@
+{
+  "recorded_at": "2026-10-25T14:17:06.555Z",
+  "validator": {
+    "repository": "https://github.com/getumbrel/umbrel-apps",
+    "commit": "00c981c39ddc040c7252b260a3c5c5a6d2b114ce",
+    "tool": ".tools/lint-apps.mjs",
+    "command_options": [
+      "ldk-node-wallet",
+      "--check-images",
+      "--format",
+      "json"
+    ],
+    "self_tests_passed": 26,
+    "self_tests_failed": 0
+  },
+  "apps": [
+    "ldk-node-wallet"
+  ],
+  "exit_code": 0,
+  "errors": [],
+  "warnings": [
+    {
+      "rule": "access.security_opt",
+      "file": "ldk-node-wallet/docker-compose.yml",
+      "line": 12,
+      "message": "Service `manager` sets security options; justify this in the PR.",
+      "disposition": "The package explicitly enables no-new-privileges."
+    },
+    {
+      "rule": "package.review_assets",
+      "file": "ldk-node-wallet/icon.svg",
+      "line": null,
+      "message": "Do not commit App Store screenshots, gallery assets, or icon/logo assets; include them in the PR body instead.",
+      "disposition": "This repository is a community app store and hosts its own icon."
+    }
+  ],
+  "image": {
+    "reference": "ghcr.io/coreyphillips/ldk-node-umbrel:0.1.1@sha256:40200e175805bb098e93ecc27b3e57f8596795df714434220b3ade51791f98fd",
+    "tag_matches_pinned_digest": true,
+    "anonymous_index_access": true,
+    "media_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+    "platforms": [
+      {
+        "os": "linux",
+        "architecture": "amd64",
+        "digest": "sha256:bcd1f594d1bec4dc7e17b729f684548993087eb74d42a0d7e5c0c4f573914bbe",
+        "media_type": "application/vnd.docker.distribution.manifest.v2+json"
+      },
+      {
+        "os": "linux",
+        "architecture": "arm64",
+        "digest": "sha256:e8c557d16dad906e133e746730e92a37e2c51b170b55474cbfd41fdec931f6de",
+        "media_type": "application/vnd.docker.distribution.manifest.v2+json"
+      }
+    ]
+  },
+  "scope": "Official package lint plus anonymous registry index and architecture verification. Actual image pulls are recorded separately."
+}

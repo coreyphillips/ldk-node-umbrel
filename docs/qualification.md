@@ -33,7 +33,7 @@ Nineteen manager tests pass. Nine independent Chrome checks pass, including real
 
 Both updated release images pass fourteen container checks using Umbrel's per-install password model and a custom hostname: native regtest sync, empty balance, receive address, unpaid invoice, pairing QR, Iroh loading and real relay/discovery startup, native and container restart, stable node and transport identities, graceful shutdown, and rejection of unauthenticated or cookie-only access. [AMD64 results](qualification/release-0.1.1-amd64.json) and [ARM64 results](qualification/release-0.1.1-arm64.json) record those runs. No funds were sent in these release packaging checks; the funded native results above refer to the unchanged native binaries in their original images.
 
-The official Umbrel validator and anonymous multiarchitecture image checks are recorded separately when the public registry index is pinned. Docker and gateway-request simulation do not constitute a physical Umbrel installation test.
+The [official Umbrel validator](qualification/umbrel-store-lint.json), including public image checks, passes with zero errors. Its two warnings concern the retained no-new-privileges option and the local icon used by this community store. Both registry architectures were pulled with an empty Docker credential configuration, and their native daemon, Iroh files and notice bundle hashes match the qualified release archives. The Compose manifest pins the verified combined index digest. Docker and gateway-request simulation do not constitute a physical Umbrel installation test.
 
 ## Scope and limits
 
