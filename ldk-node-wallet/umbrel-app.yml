@@ -1,0 +1,23 @@
+manifestVersion: 1
+id: ldk-node-wallet
+name: LDK Node
+tagline: Your native Bitcoin and Chicory primary
+category: bitcoin
+version: "0.1.0"
+port: 2114
+description: >-
+  A local dashboard for independent native LDK Node wallets. Pair Chicory,
+  manage Bitcoin and Lightning balances, channels and payments, and configure
+  liquidity and offline settlement. Mainnet is the initial network selection.
+  Every wallet has its own native storage and identity. This experimental local
+  package includes the qualification report and is not published to a registry.
+developer: Corey Phillips
+website: https://lightningdevkit.org/
+dependencies: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+releaseNotes: >-
+  Local test package with native LDK Node, an authenticated dashboard, explicit
+  Chicory provider controls, and an optional Iroh transport. Requires a locally
+  loaded architecture-specific image. See README.md for installation and limits.

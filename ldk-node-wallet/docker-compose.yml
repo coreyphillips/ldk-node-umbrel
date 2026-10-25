@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  app_proxy:
+    environment:
+      APP_HOST: ldk-node-wallet_manager_1
+      APP_PORT: 3000
+  manager:
+    container_name: ldk-node-wallet_manager_1
+    image: ldk-node-umbrel:0.1.0
+    pull_policy: never
+    restart: on-failure
+    init: true
+    stop_grace_period: 75s
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
+    ports:
+      - "19351-19358:9735-9742"
+    environment:
+      BIND_ADDRESS: "0.0.0.0"
+      AUTH_MODE: umbrel
+      DATA_DIR: /data
+      PORT: "3000"
+      PUBLIC_PORT_BASE: "19351"
+      LIGHTNING_PORT_BASE: "9735"
+      ALLOWED_HOSTS: "umbrel.local,localhost,127.0.0.1,ldk-node-wallet_manager_1"
