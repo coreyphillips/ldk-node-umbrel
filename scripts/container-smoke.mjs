@@ -46,8 +46,21 @@ try {
   docker('restart', '--time', '75', name); await ready(); await login(); await running(wallet.id); if ((await request(`/api/wallets/${wallet.id}/info`)).node_id !== first.node_id) throw new Error('Container restart changed identity'); checks.push('container restart autostarts same native identity');
   const logs = spawnSync('docker', ['logs', name], { encoding: 'utf8' });
   if (!(logs.stdout + logs.stderr).includes('Dashboard shutdown completed')) throw new Error('Container did not shut down its manager gracefully'); checks.push('Docker termination reaches graceful native shutdown');
+  if (process.env.LDK_TEST_IROH === '1') {
+    await request(`/api/wallets/${wallet.id}/stop`, {});
+    const current = (await request('/api/wallets')).find(value => value.id === wallet.id);
+    await request(`/api/wallets/${wallet.id}`, { ...current, iroh: { enabled: true, discovery: true, default_relays: true } }, 'PUT');
+    await request(`/api/wallets/${wallet.id}/start`, {});
+    const firstIroh = await request(`/api/wallets/${wallet.id}/pairing`);
+    if (firstIroh.iroh_status !== 'ready' || !firstIroh.iroh_uri?.startsWith(first.node_id + '@iroh:')) throw new Error('Native Iroh bridge did not start');
+    checks.push('dashboard starts real Iroh relay and discovery bridge');
+    await request(`/api/wallets/${wallet.id}/stop`, {}); await request(`/api/wallets/${wallet.id}/start`, {});
+    const nextIroh = await request(`/api/wallets/${wallet.id}/pairing`);
+    if (nextIroh.iroh_uri?.split('?')[0] !== firstIroh.iroh_uri.split('?')[0]) throw new Error('Iroh transport identity changed');
+    checks.push('native and Iroh identities survive supervised restart');
+  }
   const evidence = { architecture, image_id: inspect.Id, checks, network: 'regtest', funds_sent: false, physical_umbrel: false, date: new Date().toISOString() };
-  await fs.writeFile(path.join(root, 'dist', `qualification-${architecture}.json`), JSON.stringify(evidence, null, 2) + '\n'); console.log(JSON.stringify(evidence));
+  await fs.writeFile(path.join(root, 'dist', `qualification-${process.env.LDK_TEST_IROH === '1' ? 'iroh-' : ''}${architecture}.json`), JSON.stringify(evidence, null, 2) + '\n'); console.log(JSON.stringify(evidence));
 } finally {
   try { docker('rm', '-f', name); } catch {}
   try { docker('volume', 'rm', volume); } catch {}

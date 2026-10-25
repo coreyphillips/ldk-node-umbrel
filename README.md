@@ -47,6 +47,8 @@ Umbrel documents custom containers through Docker Compose and Portainer in [Runn
 
 ## Create and pair a wallet
 
+Before pairing this candidate with Chicory, install the matching local portable-engine compatibility bundle and rebuild the phone app. The required initial-fee, shared-input audit, and reconnect fixes are documented in the adjacent fork's [local client compatibility fixes](../../synonym/ldk-node/docs/chicory-primary.md#local-client-compatibility-fixes). Run its `scripts/chicory-install-local-engine.cjs` first with `--check`, then without it, against your reviewed engine source and Chicory checkout. Package reinstallation can replace that local bundle. For builds using the iOS 27 SDK, also apply the documented [scene lifecycle patch](../../synonym/ldk-node/patches/chicory/ios27-scenes.patch) and follow the [iOS build notes](../../synonym/ldk-node/docs/chicory-ios-testing.md). These are local client changes; this dashboard does not update your phone automatically.
+
 1. Create a wallet and explicitly choose its Bitcoin network. Mainnet is preselected.
 2. Enter your Bitcoin Core RPC, Electrum, or Esplora connection. Credentials stay on the server. Native startup checks the backend genesis hash and refuses a mismatch.
 3. Start the wallet. Open Overview and sync before interpreting its balance or chain height.
