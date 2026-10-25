@@ -5,7 +5,7 @@ services:
       APP_HOST: ldk-node-wallet_manager_1
       APP_PORT: 3000
   manager:
-    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.1@sha256:40200e175805bb098e93ecc27b3e57f8596795df714434220b3ade51791f98fd
+    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.2@sha256:c05416e7b04ae0495095a2cb382c07644da34890158399b65244c7fe37329805
     restart: on-failure
     init: true
     stop_grace_period: 75s
@@ -31,6 +31,11 @@ services:
       PUBLIC_PORT_BASE: "19351"
       LIGHTNING_PORT_BASE: "9735"
       ALLOWED_HOSTS: "*"
+      # Electrs remains optional. Umbrel normally injects these exports only
+      # for declared dependencies; otherwise choose a local preset in the UI.
+      DEFAULT_ELECTRUM_HOST: "${APP_ELECTRS_NODE_IP:-}"
+      DEFAULT_ELECTRUM_PORT: "${APP_ELECTRS_NODE_PORT:-50001}"
+      DEFAULT_ELECTRUM_TLS: "false"
     logging:
       driver: json-file
       options:

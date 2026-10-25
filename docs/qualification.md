@@ -47,6 +47,8 @@ Separate checks use an actual plaintext Mainnet Fulcrum server. Both [AMD64](qua
 
 [Release provenance](qualification/release-0.1.2.json) records image and archive hashes. The native daemon, Iroh bridge, native addon and notice bundle exactly match 0.1.1 on each architecture. The release changes the dashboard and its configuration, with the original funded interoperability evidence still tied to those unchanged native binaries.
 
+The [official Umbrel validator](qualification/release-0.1.2-umbrel-store-lint.json), including public image checks, reports zero errors and the same two packaging warnings as 0.1.1. Both architectures were pulled anonymously and retain the verified native and notice hashes. The community app pins the combined 0.1.2 image index.
+
 ## Scope and limits
 
 This dashboard exposes the local native implementation. Mainnet is selectable, but all funding and interoperability qualification uses disposable regtest funds. A real Umbrel installation and a real ARM64 Umbrel device have not been modified or qualified.

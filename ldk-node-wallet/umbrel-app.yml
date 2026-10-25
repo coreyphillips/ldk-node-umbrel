@@ -3,7 +3,7 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.1"
+version: "0.1.2"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
@@ -30,8 +30,9 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  First community store release for Intel/AMD and ARM64. Includes native LDK Node
-  with Chicory primary protocols, an authenticated dashboard, explicit provider
-  controls and optional Iroh transport. Uses the app password shown by Umbrel.
-  Choose and verify a chain backend before starting a wallet. Compatible local
-  Chicory client fixes are required; see the repository compatibility notes.
+  Fixes Electrum setup with Beignet-style presets for Umbrel Electrs, Fulcrum and
+  rbitcoin, plus a Test connection action and useful DNS, TCP, TLS and network
+  diagnostics. Fulcrum uses port 50002 with SSL disabled. Accepts a trailing slash
+  in existing Electrum URLs without changing wallet identity or stored channel
+  state. Saved servers are not silently replaced. Existing wallets can select a
+  local preset in Edit configuration and save without creating a new wallet.
