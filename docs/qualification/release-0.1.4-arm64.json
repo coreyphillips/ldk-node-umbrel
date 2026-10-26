@@ -1,0 +1,26 @@
+{
+  "architecture": "arm64",
+  "image": "ldk-node-umbrel:0.1.4-arm64",
+  "image_id": "sha256:6d488e73cd9a5bd67a9ffa844e02827269d7dc62a6dc85fc88dd9023fb7980c4",
+  "version": "0.1.4",
+  "checks": [
+    "image architecture and version verified",
+    "isolated disposable Bitcoin Core regtest backend",
+    "authenticated manager starts from empty disposable data",
+    "new wallet exposes 24 words only through explicit recovery request",
+    "legacy random seed remains unchanged and is never presented as a mnemonic",
+    "stored new-wallet seed equals BIP39 derivation of displayed words",
+    "real native daemon starts both wallet kinds and creates regtest addresses with zero funds",
+    "backup refuses running native wallets",
+    "stopped full backup downloads as an uncached authenticated encrypted attachment",
+    "offline restore into a separate volume preserves both seed identities and private state",
+    "restored native wallets retain both node identities after original container removal",
+    "restored dashboard retains authentication and explicit phrase recovery"
+  ],
+  "network": "regtest",
+  "funds_sent": false,
+  "native_wallet_created": true,
+  "legacy_wallet_fixture": true,
+  "physical_umbrel": false,
+  "date": "2026-10-26T02:52:31.166Z"
+}

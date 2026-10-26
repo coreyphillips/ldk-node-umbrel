@@ -16,10 +16,11 @@ function acceptSession(session) {
   const { proof, ...publicSession } = session;
   state.session = publicSession;
 }
-function clearSession() { rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; refreshQueued = false; if (dialog.open) dialog.close(); }
+function clearSession() { clearSensitiveDialog(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; refreshQueued = false; if (dialog.open) dialog.close(); }
 const state = { session: null, wallets: [], selected: null, view: 'overview', data: {}, config: {}, polling: false };
 let pairingView = null;
 let refreshQueued = false;
+let sensitiveCleanup = null;
 const networks = { bitcoin: 'Mainnet', regtest: 'Regtest', signet: 'Signet', testnet: 'Testnet' };
 const integer = value => {
   if (typeof value === 'number' && Number.isSafeInteger(value)) return BigInt(value);
@@ -37,8 +38,9 @@ const available = method => state.data.info?.capabilities?.includes(method);
 
 async function api(route, options = {}) {
   const requestSession = state.session;
-  const response = await fetch(`/api${route}`, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.session?.csrf || '', 'X-Session-Proof': sessionProof }, ...options, body: options.body === undefined ? undefined : JSON.stringify(options.body) });
-  const data = await response.json();
+  const { binary = false, ...requestOptions } = options;
+  const response = await fetch(`/api${route}`, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.session?.csrf || '', 'X-Session-Proof': sessionProof }, ...requestOptions, body: options.body === undefined ? undefined : JSON.stringify(options.body) });
+  const data = response.ok && binary ? await response.blob() : await response.json();
   if (!response.ok) {
     if (response.status === 401 && route !== '/login' && state.session === requestSession) { clearSession(); login(); }
     throw new Error(data.error?.message || 'Request failed');
@@ -56,7 +58,7 @@ async function copy(value) {
   try {
     if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(String(value));
     else {
-      const area = el('textarea'); area.value = String(value); area.setAttribute('readonly', ''); area.className = 'clipboard-helper'; document.body.append(area); area.select();
+      const area = el('textarea'); area.value = String(value); area.setAttribute('readonly', ''); area.className = 'clipboard-helper'; (dialog.open ? dialog : document.body).append(area); area.select();
       try { if (!document.execCommand('copy')) throw new Error('Clipboard unavailable'); } finally { area.remove(); }
     }
     toast('Copied');
@@ -68,7 +70,7 @@ function card(title, child, actions) { const node = el('section', 'card'); add(n
 function empty(title, description, action) { return add(el('div', 'empty'), el('h3', '', title), el('p', '', description), action); }
 function detail(rows) { const node = el('dl', 'detail-list'); for (const [label, value] of rows) add(node, el('dt', '', label), el('dd', '', value)); return node; }
 function table(headers, rows) { const node = el('table'); const heading = el('tr'); for (const header of headers) heading.append(el('th', '', header)); node.append(add(el('thead'), heading)); const body = el('tbody'); for (const row of rows) { const tr = el('tr'); for (const value of row) tr.append(value instanceof Node ? add(el('td'), value) : el('td', '', value)); body.append(tr); } node.append(body); return add(el('div', 'table-wrap'), node); }
-function modal(title) { dialog.replaceChildren(); add(dialog, add(el('div', 'dialog-head'), el('h2', '', title), button('×', () => dialog.close(), 'ghost icon'))); const body = el('div', 'dialog-body'); dialog.append(body); if (!dialog.open) dialog.showModal(); return body; }
+function modal(title) { clearSensitiveDialog(); dialog.replaceChildren(); add(dialog, add(el('div', 'dialog-head'), el('h2', '', title), button('×', () => dialog.close(), 'ghost icon'))); const body = el('div', 'dialog-body'); dialog.append(body); if (!dialog.open) dialog.showModal(); return body; }
 function field(form, name, label, { type = 'text', value = '', options, help, required = false, min, max, wide = false } = {}) {
   const box = el('div', `field${wide ? ' wide' : ''}`); const id = `field-${name}`;
   const control = el(type === 'textarea' ? 'textarea' : options ? 'select' : 'input'); control.id = id; control.name = name;
@@ -177,7 +179,7 @@ function renderWallets(content) {
   }
   if (!state.wallets.length) rows.append(empty('Your first node starts here', 'Choose your Bitcoin network and chain source. Every wallet has its own native identity and private storage.'));
   content.append(card('Your wallets', rows, badge(`${state.wallets.length} of 8`)));
-  add(content, add(el('div', 'grid'), card('Made for your own infrastructure', el('p', '', 'Use your Umbrel Bitcoin Core, Electrum, or Esplora server. Configure Chicory liquidity and offline settlement for each wallet.')), card('Keep the whole wallet safe', el('p', '', 'Back up the complete data directory with every wallet stopped. A seed alone cannot restore current Lightning channel state. The local package includes backup instructions.'))));
+  add(content, add(el('div', 'grid'), card('Made for your own infrastructure', el('p', '', 'Use your Umbrel Bitcoin Core, Electrum, or Esplora server. Configure Chicory liquidity and offline settlement for each wallet.')), card('Keep the whole wallet safe', add(el('div'), el('p', '', 'Download an encrypted backup of all wallets, including current Lightning channel state. Wallets remain stopped after the backup.'), button('Back up all wallets', backupAll)))));
 }
 function renderOverview(content, wallet) {
   const balance = state.data.balance || {}; const channels = state.data.channels || [];
@@ -252,8 +254,68 @@ function renderOffline(content, wallet) {
 function renderSettings(content, wallet) {
   const summary = detail([['Wallet', wallet.name], ['Network', networks[wallet.network]], ['Chain backend', wallet.chain_source.type], ['Autostart', wallet.autostart ? 'Enabled' : 'Disabled'], ['Chicory provider', wallet.chicory.enabled ? 'Enabled' : 'Disabled'], ['Offline settlement', wallet.chicory.offline_enabled ? 'Enabled' : 'Disabled'], ['Iroh', wallet.iroh.enabled ? 'Enabled' : 'Disabled'], ['Flat fee', `${fmt(wallet.chicory.flat_fee_sat)} sats`], ['Proportional fee', `${fmt(wallet.chicory.fee_ppm)} ppm`], ['Client funding cap', `${fmt(wallet.chicory.max_client_funding_sats)} sats`]]);
   content.append(card('Configuration', summary, button('Edit configuration', () => walletForm(wallet), 'small')));
+  content.append(card('Recovery & backup', add(el('div'), el('p', '', wallet.recovery_kind === 'mnemonic' ? 'Save your 24-word recovery phrase somewhere private. Make a full backup to preserve Lightning channel state as well.' : 'This wallet was created with a binary seed and has no recovery phrase. An encrypted full backup preserves its existing seed, identity and channel state.'), add(el('div', 'actions'), button('Recovery phrase', () => recoveryPhrase(wallet)), button('Back up all wallets', backupAll)))));
   content.append(card('Node lifecycle', add(el('div'), el('p', '', 'Stop the wallet before changing settings or making a full backup. Restart preserves its native identity and channel state.'), add(el('div', 'actions'), button('Sync now', () => run(() => rpc('sync'), 'Synchronization completed')), button('Stop wallet', () => confirmAction('Stop this wallet?', 'Payments and offline settlement need this node online. You can start it again from the dashboard.', () => api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {} })), 'danger')))));
   content.append(notice('This local build is experimental. The qualification report in the package records supported paths and remaining interoperability limits, including the installed wallet commitment fee policy.'));
+}
+
+// Sensitive values live only in an open dialog, never in dashboard state or storage.
+// Closing, replacing or hiding the dialog also invalidates any pending response.
+function clearSensitiveDialog() { const cleanup = sensitiveCleanup; sensitiveCleanup = null; cleanup?.(); }
+function recoveryPhrase(wallet) {
+  const body = modal('Recovery phrase'); const session = state.session;
+  const controller = new AbortController(); let phrase = ''; let timer;
+  sensitiveCleanup = () => { controller.abort(); clearTimeout(timer); phrase = ''; body.replaceChildren(); };
+  if (wallet.recovery_kind !== 'mnemonic') {
+    add(body, notice('This existing wallet uses a binary seed. No mnemonic phrase was generated, and creating one now would change the wallet identity.'), el('p', '', 'Use an encrypted full backup to preserve this wallet. Your existing funds and keys stay unchanged.'), button('Back up all wallets', backupAll, 'primary'));
+    return;
+  }
+  add(body, notice('Anyone with this phrase can spend your Bitcoin. Keep it private. A phrase alone cannot restore current Lightning channels; save an encrypted full backup too.'), el('p', '', `Reveal the 24-word phrase for ${wallet.name}. It is hidden again after one minute, when you close this dialog, or when you leave this tab.`));
+  const reveal = button('Reveal recovery phrase', async () => {
+    reveal.disabled = true; error.textContent = '';
+    try {
+      const result = await api(`/wallets/${wallet.id}/recovery`, { method: 'POST', body: { confirm: true }, signal: controller.signal });
+      if (controller.signal.aborted || state.session !== session || !dialog.open || !body.isConnected) return;
+      if (result.kind !== 'mnemonic' || typeof result.mnemonic !== 'string' || result.mnemonic.split(' ').length !== 24) throw new Error('Recovery phrase is unavailable. Make a full backup instead.');
+      phrase = result.mnemonic; result.mnemonic = '';
+      const words = el('ol', 'recovery-words'); words.setAttribute('aria-label', 'Recovery phrase words');
+      for (const word of phrase.split(' ')) words.append(el('li', '', word));
+      body.replaceChildren(notice('Write these words down in order and store them privately. Clipboard history and other apps may retain a copied phrase. This phrase does not replace a full Lightning backup.'), words, add(el('div', 'actions'), button('Copy phrase', () => copy(phrase)), button('I have saved it', () => { clearSensitiveDialog(); dialog.close(); }, 'primary')));
+      timer = setTimeout(() => { clearSensitiveDialog(); dialog.close(); }, 60_000);
+    } catch (failure) { if (!controller.signal.aborted) { error.textContent = failure.message; reveal.disabled = false; } }
+  }, 'primary');
+  const error = el('div', 'form-error'); error.role = 'alert'; add(body, error, reveal);
+}
+
+function backupAll() {
+  const body = modal('Back up all wallets'); const session = state.session;
+  const controller = new AbortController(); const form = el('form');
+  add(body, notice('This stops every wallet and pauses payments and offline settlement. Wallets stay stopped after download. Start them again when your backup is stored safely.'), el('p', '', 'The encrypted backup contains every wallet, its keys and current channel state, connection credentials and dashboard sign-in. Keep both the file and its password safe. The password cannot be recovered.'));
+  const password = field(form, 'backup_password', 'Backup password', { type: 'password', required: true, help: 'At least 12 characters. Use a strong, unique password.' });
+  const confirmation = field(form, 'backup_confirmation', 'Confirm backup password', { type: 'password', required: true });
+  for (const control of [password, confirmation]) { control.minLength = 12; control.maxLength = 512; control.autocomplete = 'new-password'; }
+  const consent = field(form, 'backup_consent', 'I agree to stop all wallets and keep the backup private', { type: 'checkbox', required: true });
+  sensitiveCleanup = () => { controller.abort(); password.value = ''; confirmation.value = ''; body.replaceChildren(); };
+  submit(form, 'Stop wallets and download backup', async () => {
+    if (!consent.checked) throw new Error('Confirm that all wallets can stop');
+    if (password.value.length < 12) throw new Error('Use at least 12 characters for the backup password');
+    if (password.value !== confirmation.value) throw new Error('Backup passwords do not match');
+    const wallets = await api('/wallets', { signal: controller.signal });
+    for (const wallet of wallets) {
+      if (controller.signal.aborted) return;
+      await api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {}, signal: controller.signal });
+    }
+    if (controller.signal.aborted) return;
+    const download = api('/backup/export', { method: 'POST', body: { confirm: true, passphrase: password.value }, binary: true, signal: controller.signal });
+    password.value = ''; confirmation.value = '';
+    const archive = await download;
+    if (controller.signal.aborted || state.session !== session || !dialog.open || !body.isConnected) return;
+    const url = URL.createObjectURL(archive); const link = el('a');
+    link.href = url; link.download = `ldk-node-backup-${new Date().toISOString().slice(0, 10)}.ldkbackup`; document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    clearSensitiveDialog(); dialog.close(); toast('Backup download started. Wallets are stopped.'); await refresh();
+  });
+  add(body, form, el('p', '', 'Restore offline with the restore-backup script included in the release. Restore the complete state with the app stopped and never run two copies of the same wallet.'));
 }
 async function renderLogs(content, wallet) { const pre = el('pre', 'log', 'Loading recent process diagnostics...'); content.append(card('Recent native diagnostics', pre)); try { pre.textContent = (await api(`/wallets/${wallet.id}/logs`)).text || 'No recent process diagnostics. Native file logs remain in this wallet data directory.'; } catch (error) { pre.textContent = error.message; } }
 
@@ -323,6 +385,7 @@ function walletForm(wallet) {
     const config = { name: data.get('name'), network: wallet?.network || data.get('network'), chain_source, advertised_host: data.get('advertised_host'), tor_onion_address: data.get('tor_onion_address'), autostart: data.has('autostart'), chicory: { enabled: data.has('provider'), offline_enabled: data.has('offline'), flat_fee_sat: Number(data.get('flat')), fee_ppm: Number(data.get('ppm')), max_client_funding_sats: Number(data.get('clientcap')), max_total_fronted_sats: Number(data.get('totalcap')) }, iroh: { enabled: data.has('iroh'), discovery: data.has('discovery'), default_relays: data.has('relay') } };
     const result = await api(wallet ? `/wallets/${wallet.id}` : '/wallets', { method: wallet ? 'PUT' : 'POST', body: config });
     dialog.close(); state.selected = result.id; state.view = 'overview'; toast(wallet ? 'Configuration saved. Start the wallet when ready.' : 'Wallet created'); await refresh();
+    if (!wallet && active()?.id === result.id && state.session?.authenticated) recoveryPhrase(active());
   }); body.append(form);
 }
 function confirmAction(title, description, action) { const body = modal(title); body.append(el('p', '', description)); const form = el('form'); submit(form, 'Confirm', async () => { await action(); dialog.close(); toast('Operation accepted'); await refresh(); }); body.append(form); }
@@ -384,6 +447,9 @@ function channelForm(channel) {
   }); body.append(form);
 }
 
-dialog.addEventListener('close', () => refresh());
+dialog.addEventListener('close', () => { if (!dialog.open) { clearSensitiveDialog(); dialog.replaceChildren(); refresh(); } });
+dialog.addEventListener('cancel', () => clearSensitiveDialog());
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && sensitiveCleanup) { clearSensitiveDialog(); dialog.close(); } });
+window.addEventListener('pagehide', () => { if (sensitiveCleanup) { clearSensitiveDialog(); dialog.close(); } });
 try { acceptSession(await api('/session')); if (state.session.authenticated) await start(); else login(); } catch (error) { login(error.message); }
 setInterval(() => { if (document.visibilityState === 'visible' && !dialog.open) refresh(); }, 5000);

@@ -170,7 +170,7 @@ test('legacy Electrum trailing slashes normalize only at native startup without 
   const wallet = await initial.create({ name: 'Existing', chain_source: { type: 'electrum', url: 'tcp://mint.local:50002' }, autostart: false });
   const registryFile = path.join(dir, 'wallets.json'); const registry = JSON.parse(await fs.readFile(registryFile, 'utf8'));
   registry[0].chain_source.url += '/'; const originalRegistry = `${JSON.stringify(registry)}\n`; await fs.writeFile(registryFile, originalRegistry);
-  const nodeDirectory = path.join(dir, 'wallets', wallet.id, 'node'); await fs.mkdir(nodeDirectory);
+  const nodeDirectory = path.join(dir, 'wallets', wallet.id, 'node'); await fs.mkdir(nodeDirectory, { recursive: true });
   const persisted = ['keys-fixture', 'channels-fixture', 'payments-fixture'];
   for (const name of persisted) await fs.writeFile(path.join(nodeDirectory, name), `retained-${name}`, { mode: 0o600 });
   let nativeConfig; let checked;

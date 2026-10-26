@@ -14,6 +14,8 @@ Where an upstream crate omits repository license text, the manifest records the 
 
 The Node runtime, Debian base packages and dashboard npm dependencies retain their license notices in their usual installed locations. The base image package copyright notices are under /usr/share/doc. Dashboard npm notices remain alongside their packages in /opt/ldk/manager/node_modules.
 
+The new BIP39 dependencies are pinned in the manager lockfile. Their MIT notices and npm source integrity records are also copied under `manager/` in this bundle.
+
 ## MPL source availability
 
 The unmodified Source Code Form for every MPL-2.0 package in the selected dependency graphs is included in `sources/` as its exact original published .crate archive. These are gzip-compressed tar archives and can be extracted with tar. The full MPL license is present with the corresponding package notices. Recipients may obtain, use, modify and redistribute these source files under MPL-2.0. No additional restriction is imposed on that source by the dashboard license or image delivery.

@@ -36,6 +36,8 @@ Enable provider funding and offline settlement only after reviewing the configur
 
 ## Back up and restore
 
+For the dashboard download and phrase controls, see [Recovery phrases and encrypted dashboard backups](#recovery-phrases-and-encrypted-dashboard-backups-014) below.
+
 Stop every wallet and stop the Umbrel app before copying its data directory. Back up the complete app-data `ldk-node-wallet/data` directory, preserving permissions. It contains funds-controlling channel state, RPC credentials, transport identities and dashboard authentication. Store the backup securely. A wallet seed is not a substitute for current Lightning channel state.
 
 For a standalone Compose installation, stop the container and run `./scripts/backup.sh /absolute/path/to/backup.tar.gz` from the package. The script operates on that package's local `data` directory, not Umbrel's managed app-data directory.
@@ -49,3 +51,27 @@ Do not uninstall the app as a way to restart it or reset its password. Uninstall
 The manager uses no Docker socket and cannot create arbitrary containers. Each wallet is a child process in the app container, with private storage and its own native port. The entrypoint prepares the volume, then runs the manager as UID/GID 1000. Independent manager and wallet locks prevent concurrent use of the same state. Container shutdown allows 75 seconds for native processes to stop.
 
 The app has been tested in Docker on both CPU architectures. A physical Umbrel installation has not yet been tested. If installation fails, retain the app data and report the redacted error with your Umbrel version and CPU architecture.
+
+### Recovery phrases and encrypted dashboard backups (0.1.4)
+
+Open a wallet's **Settings > Recovery & backup**. Wallets created in 0.1.4 have a 24-word English BIP39 phrase. Choose **Recovery phrase > Reveal recovery phrase**, then write the words down in order or use **Copy phrase**. The same prompt appears after creating a wallet. The phrase hides after one minute, when the dialog closes, or when the tab becomes hidden. Clipboard history may retain copied words. There is no additional BIP39 passphrase. The server stores the phrase and its derived seed in private files, and verifies that they match before revealing the words or starting the wallet.
+
+Wallets created before 0.1.4 have a random 64-byte binary seed, not an original mnemonic. The update never changes that seed or invents a replacement phrase. Use a full backup for these wallets. A recovery phrase alone cannot restore current Lightning channels for either kind of wallet.
+
+Choose **Back up all wallets** from Settings or All wallets. Enter and confirm a strong backup password of at least 12 characters, acknowledge that the wallets will stop, then choose **Stop wallets and download backup**. Save the `.ldkbackup` download and its password privately. The password cannot be recovered. Check that the download completed before starting wallets again. Closing or hiding the dialog cancels the browser request; any wallets already stopped stay stopped.
+
+The archive includes all wallet seeds, phrases where available, current channel monitors and databases, SQLite journals, configuration, transport keys, logs and dashboard authentication. Only process lock files are excluded. Each export uses a fresh random salt and IV, scrypt password derivation and AES-256-GCM authenticated encryption. Dashboard sessions, origin checks, browser proof and CSRF validation protect export and reveal routes. Other apps on the same hostname cannot authorize them using a shared cookie alone. The snapshot gate refuses running or still-exiting native and Iroh processes and blocks starts and configuration writes while reading files. Secret responses are not cached. JavaScript strings cannot promise immediate erasure from process memory.
+
+Dashboard exports support up to 128 MiB of source file data and 10,000 filesystem entries. Larger installations should use the complete stopped-data backup procedure above. Backups are snapshots, not continuous channel recovery. Make a fresh stopped backup before migration and never restore an old snapshot after the original wallet has continued operating.
+
+### Restore an encrypted download offline
+
+Use Node.js 22 or later and the source archive for the matching release. The restore tool uses built-in Node modules and needs no `npm install`:
+
+```sh
+node scripts/restore-backup.mjs /absolute/path/wallets.ldkbackup /absolute/path/new-restored-data
+```
+
+Enter the backup password at the hidden prompt. For automation, add `--passphrase-file /absolute/path/private-password-file`; that file must be owned by the current user and have mode `0600`. Do not put the password in command arguments or environment variables. The tool authenticates and validates the entire archive before creating the destination, refuses existing destinations, restores private permissions, and starts no processes.
+
+Keep the original installation stopped. Use only its latest snapshot and permanently retire the original copy before starting the restored one. With the destination Umbrel app stopped, preserve its current data elsewhere and install the complete restored directory as its data directory, owned by the app's UID/GID 1000. The archive preserves saved autostart settings, so starting the app may immediately start its wallets. The saved dashboard password hash is also preserved; use the original dashboard password. Confirm the expected wallet network and node identity before operating. Never run both copies.

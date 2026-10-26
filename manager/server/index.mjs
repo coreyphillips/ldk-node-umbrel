@@ -44,6 +44,13 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
         if (url.pathname === '/api/electrum/check' && request.method === 'POST') return send(response, 200, await electrumCheck(await body(request)));
         if (url.pathname === '/api/wallets' && request.method === 'GET') return send(response, 200, wallets.list());
         if (url.pathname === '/api/wallets' && request.method === 'POST') return send(response, 201, await wallets.create(await body(request)));
+        if (url.pathname === '/api/backup/export' && request.method === 'POST') {
+          const input = await body(request);
+          if (input?.confirm !== true) throw failure('Confirm that all wallets will remain stopped during backup');
+          const archive = await wallets.backup(input.passphrase);
+          response.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': `attachment; filename="ldk-node-backup-${new Date().toISOString().slice(0, 10)}.ldkbackup"`, 'Content-Length': archive.length });
+          return response.end(archive);
+        }
         const match = /^\/api\/wallets\/([0-9a-f-]{36})(?:\/([a-z_]+))?$/.exec(url.pathname);
         if (match) {
           const [, id, operation] = match;
@@ -52,6 +59,10 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
           if (operation === 'stop' && request.method === 'POST') return send(response, 200, await wallets.stop(id));
           if (operation === 'pairing' && request.method === 'GET') return send(response, 200, wallets.pairing(id, url.hostname));
           if (operation === 'logs' && request.method === 'GET') return send(response, 200, { text: wallets.logs(id) });
+          if (operation === 'recovery' && request.method === 'POST') {
+            if ((await body(request))?.confirm !== true) throw failure('Confirm that you want to reveal this wallet recovery phrase');
+            return send(response, 200, await wallets.recovery(id));
+          }
           if (operation === 'qr' && request.method === 'POST') {
             const value = (await body(request)).text;
             if (typeof value !== 'string' || value.length > 4096) throw failure('QR value is too long');

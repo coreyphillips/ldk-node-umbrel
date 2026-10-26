@@ -5,7 +5,7 @@ services:
       APP_HOST: ldk-node-wallet_manager_1
       APP_PORT: 3000
   manager:
-    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.3@sha256:b862859393b4343c16cf040a37ccc339979250d6398bfadda8f0740e50facb72
+    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.4@sha256:924331f2a4592126950470d97a9d660791df9a6985261c26cfcc6f18addb5038
     restart: on-failure
     init: true
     stop_grace_period: 75s
