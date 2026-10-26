@@ -1,0 +1,21 @@
+{
+  "version": "0.1.11",
+  "checks": [
+    {
+      "device_domain_name": "mint.local",
+      "extra_hosts": [
+        "mint.local=host-gateway"
+      ],
+      "lightning_port_count": 8
+    },
+    {
+      "device_domain_name": "unset",
+      "extra_hosts": [
+        "umbrel.local=host-gateway"
+      ],
+      "lightning_port_count": 8
+    }
+  ],
+  "scope": "Shipping Compose interpolation with schema-only proxy overlay; no service started",
+  "recorded_at": "2026-10-26T19:42:13.003903+00:00"
+}

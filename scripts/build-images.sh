@@ -23,9 +23,9 @@ PY_MANIFEST
 for architecture in $architectures; do
   case "$architecture" in amd64|arm64) ;; *) echo "Unsupported architecture: $architecture" >&2; exit 1 ;; esac
   docker buildx build --platform "linux/$architecture" --build-context "native=$context/native" \
-    --file "$package_dir/docker/Dockerfile.release" --tag "ldk-node-umbrel:0.1.10-$architecture" \
-    --output "type=docker,dest=$package_dir/dist/ldk-node-umbrel-0.1.10-$architecture.tar" "$package_dir"
+    --file "$package_dir/docker/Dockerfile.release" --tag "ldk-node-umbrel:0.1.11-$architecture" \
+    --output "type=docker,dest=$package_dir/dist/ldk-node-umbrel-0.1.11-$architecture.tar" "$package_dir"
 done
 cd "$package_dir/dist"
-if command -v sha256sum >/dev/null; then sha256sum ldk-node-umbrel-0.1.10-*.tar > SHA256SUMS; else shasum -a 256 ldk-node-umbrel-0.1.10-*.tar > SHA256SUMS; fi
+if command -v sha256sum >/dev/null; then sha256sum ldk-node-umbrel-0.1.11-*.tar > SHA256SUMS; else shasum -a 256 ldk-node-umbrel-0.1.11-*.tar > SHA256SUMS; fi
 echo 'Local image archives are in dist/. No image was published.'

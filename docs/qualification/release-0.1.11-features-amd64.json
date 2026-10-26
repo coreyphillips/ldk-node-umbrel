@@ -1,0 +1,99 @@
+{
+  "version": "0.1.11",
+  "architecture": "amd64",
+  "image_id": "sha256:81898a9e9a371b9215ce904c727bb3cb74f4971d9859baad18a814dc5d57d0ff",
+  "recorded_at": "2026-10-26T19:38:23.626Z",
+  "checks": [
+    "previous release advertises the legacy optional FFOR bits",
+    "in-place image upgrade preserves the native wallet identity and autostart",
+    "encrypted Lightning init advertises only new FFOR pairs and no unimplemented async service",
+    "updated native wallet returns an unfunded balance, regtest address and unpaid invoice",
+    "qualified Iroh native addon loads",
+    "disabling offline settlement removes both feature advertisements after restart"
+  ],
+  "observations": [
+    {
+      "phase": "0.1.10 enabled",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63,
+        561,
+        563
+      ]
+    },
+    {
+      "phase": "updated enabled",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63,
+        441,
+        443
+      ]
+    },
+    {
+      "phase": "updated disabled",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63
+      ]
+    }
+  ],
+  "beignet_source_sha256": {
+    "src/lightning/features/flags.ts": "70a072677464b0f9d435d277b158b2fd99d438fe130c31c971f183983f39b777",
+    "src/lightning/transport/peer.ts": "c07261bf4945997eea018d299d531cb5dcf4008c118eb59a258f6b9ccab49f6d"
+  },
+  "network": "isolated regtest at genesis",
+  "funds_sent": false,
+  "physical_umbrel": false
+}

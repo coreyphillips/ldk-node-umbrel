@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-ARG QUALIFIED_BASE=ghcr.io/coreyphillips/ldk-node-umbrel:0.1.9@sha256:1c994abcf0f63a493bdacc92cf9e762f6735000e716c51ef966dd3fb434bd1fc
+ARG QUALIFIED_BASE=ghcr.io/coreyphillips/ldk-node-umbrel:0.1.10@sha256:b498e951d0f34dec931d204b5b5e68be60692b9024fb706cd6ee65778394659a
 FROM --platform=$BUILDPLATFORM rust:1.90-bookworm@sha256:3914072ca0c3b8aad871db9169a651ccfce30cf58303e5d6f2db16d1d8a7e58f AS native-build
 ARG TARGETARCH
 RUN apt-get update && apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu gcc-x86-64-linux-gnu libc6-dev-arm64-cross libc6-dev-amd64-cross && rm -rf /var/lib/apt/lists/*
@@ -33,4 +33,4 @@ COPY LICENSE /opt/ldk/manager/LICENSE
 COPY licenses/ /opt/ldk/licenses/third-party/
 LABEL org.opencontainers.image.source="https://github.com/coreyphillips/ldk-node-umbrel" \
       org.opencontainers.image.title="LDK Node for Umbrel" \
-      org.opencontainers.image.version="0.1.10"
+      org.opencontainers.image.version="0.1.11"

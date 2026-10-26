@@ -40,6 +40,12 @@ Version 0.1.2 and later also accept a trailing slash in existing Electrum URLs w
 
 The manager runs the Rust `ldk-node-daemon` through private JSONL pipes. Lightning keys and channel state belong to the native daemon. The optional Iroh bridge carries transport bytes and has a separate transport identity.
 
+## Protocol compatibility update
+
+Version 0.1.11 moves the native FFOR offline-receive feature pairs to 440/441 and 442/443, matching Beignet's protocol update and avoiding Eclair's on-the-fly funding assignments. Update both the primary and compatible phone client together before using offline receive. Peers advertising only the former 560-563 bits no longer qualify for FFOR. Ordinary channels and existing wallet custody data are unchanged. The native daemon does not advertise Beignet's separate async receive service at 444/445 because it does not implement that service.
+
+The new native images use the verified 0.1.10 source snapshot with this feature-bit fix. Prior Chicory qualification below used the old feature assignments, so those older phone bundles need the matching protocol update for offline receive. See [client compatibility](docs/client-compatibility.md).
+
 ## Pair with Chicory
 
 The qualified phone builds use Chicory 0.7.4 with local portable-engine fixes for initial commitment fees, shared splice-input fee accounting and reconnect handling. The iOS 27 build also requires the scene lifecycle correction. This dashboard does not install those changes on a phone. An unmodified store build of Chicory is not qualified by this release. [Client compatibility](docs/client-compatibility.md) identifies the builds, upstream issues and the local setup used for testing.

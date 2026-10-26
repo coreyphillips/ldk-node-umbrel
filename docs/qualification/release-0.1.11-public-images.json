@@ -1,0 +1,21 @@
+{
+  "version": "0.1.11",
+  "verified_at": "2026-10-26T19:41:52.621353+00:00",
+  "workflow_run": "https://github.com/coreyphillips/ldk-node-umbrel/actions/runs/40388678666",
+  "index_digest": "sha256:f47da669318d5b0b06de148546ee7b783f1bcfd1f0ba3115bfdbf2224f44c1ca",
+  "anonymous_manifest_access": true,
+  "architectures": {
+    "amd64": {
+      "manifest_digest": "sha256:a1bb618b54b18dc8d89615bfd20c384861df9b8a0f53a7c22fad4ca5381d48d9",
+      "anonymous_pull": true,
+      "packaged_files_match_qualified_archive": true,
+      "verified_files": 65
+    },
+    "arm64": {
+      "manifest_digest": "sha256:815fcacf570818d15a73daeb7f8439f8e65c6a3908b72526c606dec724d2fccd",
+      "anonymous_pull": true,
+      "packaged_files_match_qualified_archive": true,
+      "verified_files": 65
+    }
+  }
+}
