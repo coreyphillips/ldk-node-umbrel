@@ -9,6 +9,8 @@ import { walletConfig, publicConfig, rpcRequest } from './config.mjs';
 import { createRecovery, readRecovery } from './recovery.mjs';
 import { createBackup } from './backup.mjs';
 import { TorProcess } from './tor.mjs';
+import { ReceiveWatcher, MAX_WATCH_ADDRESSES, addressScriptHash } from './receive-watch.mjs';
+import { ReceiveSync } from './receive-sync.mjs';
 
 const liveChild = child => Boolean(child?.pid && child.exitCode == null && child.signalCode == null);
 const unsafeDeletion = () => failure('Wallet deletion refused an unsafe data path. Check its private directory before retrying.', 409, 'WALLET_PATH_UNSAFE');
@@ -43,11 +45,12 @@ async function deletionPath(dataDir, id) {
 }
 
 export class WalletManager {
-  constructor({ dataDir, binary, bridge, torBinary, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), torFactory = options => new TorProcess(options), electrumCheck, backupFactory = createBackup }) {
+  constructor({ dataDir, binary, bridge, torBinary, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), torFactory = options => new TorProcess(options), receiveWatcherFactory = options => new ReceiveWatcher(options), receiveSyncOptions = {}, electrumCheck, backupFactory = createBackup }) {
     this.dataDir = dataDir; this.binary = binary; this.bridge = bridge; this.portBase = portBase; this.publicPortBase = publicPortBase;
     this.electrumCheck = electrumCheck; this.processFactory = processFactory; this.backupFactory = backupFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false; this.backupInProgress = false; this.irohChildren = new Set();
     this.torBinary = torBinary; this.torFactory = torFactory; this.torProcesses = new Set();
     this.deleting = new Set(); this.startupStates = new Map(); this.nativeProcesses = new Map(); this.writerOwners = new WeakMap();
+    this.receiveWatcherFactory = receiveWatcherFactory; this.receiveSyncOptions = receiveSyncOptions;
   }
   async initialize() {
     await privateDir(path.join(this.dataDir, 'wallets'));
@@ -169,6 +172,8 @@ export class WalletManager {
     const wallet = this.get(id); const old = this.state(id);
     if (this.shuttingDown) throw failure('Dashboard is shutting down', 409);
     if (old.startupInFlight || ['starting', 'running', 'stopping'].includes(old.status)) throw failure('Wallet is already active', 409);
+    const nativeActive = process => !process.closed || liveChild(process.child);
+    if ((old.process && nativeActive(old.process)) || [...this.nativeProcesses].some(([process, owner]) => owner === id && nativeActive(process))) throw failure('Wait for this wallet’s native process to exit before restarting', 409, 'STOP_REQUIRED');
     if (old.tor && (!old.tor.closed || old.tor.startupInFlight)) throw failure('Wait for this wallet’s Tor process to stop before restarting', 409);
     clearTimeout(old.restartTimer);
     const state = { status: 'starting', startupInFlight: true, error: null, attempts: old.attempts || [], logs: old.logs || [], intentional: false };
@@ -195,8 +200,9 @@ export class WalletManager {
     this.nativeProcesses.set(process, id);
     const settled = () => { if (process.closed && !liveChild(process.child)) this.nativeProcesses.delete(process); };
     process.once('exit', settled);
-    process.once('fault', message => { state.noRestart = true; state.error = message; state.status = 'stopping'; });
+    process.once('fault', message => { state.noRestart = true; state.error = message; state.status = 'stopping'; this.stopReceiveWatch(state); });
     process.once('exit', () => {
+      this.stopReceiveWatch(state);
       state.logs = process.logs || []; state.iroh?.child?.kill('SIGTERM'); state.iroh = null;
       state.status = state.intentional || this.shuttingDown ? 'stopped' : 'failed';
       if (state.status === 'failed') state.error ||= 'Native node stopped unexpectedly. Check logs before retrying an operation.';
@@ -212,13 +218,20 @@ export class WalletManager {
       const ready = await startup; state.ready = ready;
       if (state.intentional || this.shuttingDown) { await process.stop(); return { status: 'stopped' }; }
       if (process.closed) throw failure('Native node stopped during startup', 503);
+      // A previous generation may still be committing its last address. Read
+      // after that serialized writer so a quick restart cannot lose its watch.
+      await this.exclusive(() => this.loadReceiveAddresses(wallet, state));
+      if (state.intentional || this.shuttingDown) { await process.stop(); return { status: 'stopped' }; }
+      if (process.closed) throw failure('Native node stopped during startup', 503);
+      if (process.faulted || state.noRestart) throw failure('Native node faulted during startup. Check logs before restarting.', 503, 'NODE_FAULT');
       state.status = 'running';
+      this.startReceiveWatch(wallet, state);
       if (wallet.tor?.enabled) this.startTor(wallet, state);
       if (wallet.iroh.enabled) await this.startIroh(wallet, state).catch(() => { state.iroh = { status: 'failed' }; });
       return { status: state.status };
     } catch (error) {
-      state.status = state.intentional || this.shuttingDown ? 'stopped' : 'failed';
-      state.error = state.status === 'failed' ? state.error || error.message : null;
+      state.status = state.intentional || this.shuttingDown ? 'stopped' : state.noRestart && !state.process?.closed ? 'stopping' : 'failed';
+      state.error = state.status === 'stopped' ? null : state.error || error.message;
       if (state.status === 'failed' && !state.process) this.scheduleRestart(wallet, state);
       throw error;
     } finally { state.startupInFlight = false; if (this.startupStates.get(id) === state) this.startupStates.delete(id); }
@@ -231,6 +244,7 @@ export class WalletManager {
     this.requireWritable(); this.requireAvailable(id);
     this.get(id); const state = this.state(id); state.intentional = true; clearTimeout(state.restartTimer);
     state.status = 'stopping';
+    this.stopReceiveWatch(state);
     await this.stopTor(state);
     if (!state.process || state.process.closed) { state.status = 'stopped'; return { status: 'stopped' }; }
     if (state.iroh?.child) {
@@ -253,6 +267,57 @@ export class WalletManager {
     tor.start().catch(() => {}).finally(settled);
   }
   async stopTor(state) { if (state.tor?.stop) await state.tor.stop(); }
+  receiveActive(wallet, state) {
+    return !this.shuttingDown && !state.intentional && !this.deleting.has(wallet.id) && !wallet.deletion_pending &&
+      this.runtime.get(wallet.id) === state && state.status === 'running' && !state.process.closed;
+  }
+  // Only the native address RPC adds entries. Keep a small private watch list
+  // across restart; ordinary native periodic scanning still covers every other
+  // wallet address. No watcher result supplies a balance or authorizes a payment.
+  async loadReceiveAddresses(wallet, state) {
+    state.receiveAddresses = [];
+    try {
+      const saved = await readJson(path.join(this.directory(wallet.id), 'receive-addresses.json'), null);
+      if (saved !== null) {
+        if (saved.version !== 1 || saved.network !== wallet.network || !Array.isArray(saved.addresses) || saved.addresses.length > MAX_WATCH_ADDRESSES || new Set(saved.addresses).size !== saved.addresses.length) throw new Error('Invalid receive monitor state');
+        for (const address of saved.addresses) addressScriptHash(address, wallet.network);
+        state.receiveAddresses = saved.addresses;
+      }
+    } catch { state.receiveWarning = 'Saved receive monitoring could not be loaded. Native periodic scanning remains active.'; state.receiveStorageInvalid = true; }
+  }
+  startReceiveWatch(wallet, state) {
+    if (!this.receiveActive(wallet, state) || wallet.chain_source.type === 'bitcoind') return;
+    try {
+      const active = () => this.receiveActive(wallet, state);
+      const sync = new ReceiveSync({ ...this.receiveSyncOptions, process: state.process, active });
+      state.receiveSync = sync;
+      state.receiveWatcher = this.receiveWatcherFactory({ chainSource: wallet.chain_source, network: wallet.network, addresses: state.receiveAddresses, onChange: () => sync.hint() });
+      state.receiveWatcher.start();
+    } catch { this.stopReceiveWatch(state); state.receiveWarning = 'Fast receive monitoring is unavailable. Native periodic scanning remains active.'; }
+  }
+  stopReceiveWatch(state) {
+    const watcher = state.receiveWatcher; const sync = state.receiveSync;
+    state.receiveWatcher = null; state.receiveSync = null;
+    // Optional observation must never prevent native shutdown or leave its
+    // scheduler active if a transport cleanup unexpectedly fails.
+    sync?.close();
+    try { watcher?.close(); } catch { state.receiveWarning = 'Receive monitoring could not close cleanly. Native periodic scanning remains active.'; }
+  }
+  async rememberReceiveAddress(wallet, state, address) {
+    try {
+      addressScriptHash(address, wallet.network);
+      await this.exclusive(async () => {
+        if (!this.receiveActive(wallet, state)) return;
+        const addresses = [...(state.receiveAddresses || []).filter(item => item !== address), address].slice(-MAX_WATCH_ADDRESSES);
+        state.receiveAddresses = addresses;
+        state.receiveWatcher?.update(addresses);
+        // An invalid cache must not be silently overwritten. In-memory watches
+        // still work, while the original file remains available for inspection.
+        if (state.receiveStorageInvalid) return;
+        await atomicJson(path.join(this.directory(wallet.id), 'receive-addresses.json'), { version: 1, network: wallet.network, addresses });
+      });
+    } catch { state.receiveWarning = 'Receive monitoring could not be saved. Native periodic scanning remains active.'; }
+  }
   async startIroh(wallet, state) {
     if (!this.bridge) throw failure('Iroh bridge is not installed', 503);
     state.iroh = { status: 'starting' };
@@ -282,9 +347,11 @@ export class WalletManager {
     });
   }
   call(id, method, params = {}) {
-    this.get(id); const state = this.state(id);
+    const wallet = this.get(id); const state = this.state(id);
     if (state.status !== 'running') throw failure('Start this wallet first', 409, 'NODE_STOPPED');
-    return state.process.call(method, rpcRequest(method, params));
+    const result = state.process.call(method, rpcRequest(method, params));
+    if (method === 'address') return result.then(async value => { await this.rememberReceiveAddress(wallet, state, value?.address); return value; });
+    return result;
   }
   pairing(id, hostname) {
     const wallet = this.get(id); const state = this.state(id);
@@ -319,6 +386,6 @@ export class WalletManager {
       });
     } finally { this.backupInProgress = false; }
   }
-  logs(id) { this.get(id); const state = this.state(id); return (state.process?.logs || state.logs || []).join('').slice(-64 * 1024); }
+  logs(id) { this.get(id); const state = this.state(id); return ((state.process?.logs || state.logs || []).join('') + (state.receiveWarning ? `\n${state.receiveWarning}\n` : '')).slice(-64 * 1024); }
   async close() { this.shuttingDown = true; await this.serial; await Promise.all(this.wallets.map(wallet => this.stop(wallet.id).catch(() => {}))); }
 }

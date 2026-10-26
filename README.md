@@ -56,6 +56,10 @@ Version 0.1.4 adds **Settings > Recovery & backup**. New wallets have a 24-word 
 
 The primary needs liquidity for its enabled funding and routing functions. Never reuse another live node's storage. Back up complete stopped wallet state; a seed alone cannot restore current Lightning channels.
 
+## Automatic receive updates
+
+Balances and payment status refresh while the receive QR stays open and when you return to the dashboard. For Electrum and Esplora wallets, the app watches recently generated receive addresses through the configured backend and requests a native sync when their activity changes. Bitcoin Core wallets already sync the chain and mempool automatically. Incoming transactions can appear before confirmation; spendable balance still follows the native wallet's rules. See [automatic receive updates](docs/umbrel.md#automatic-receive-updates).
+
 ## Delete a wallet
 
 Stop the selected wallet, then open **Settings > Delete wallet**. Type its exact name, acknowledge the permanent loss of its data, and choose **Permanently delete wallet**. This removes that wallet's local keys, recovery phrase, Lightning state, configuration and transport identities. Other wallets and previously downloaded backups remain unchanged. Save a current full backup and complete any fund recovery first; a recovery phrase alone cannot restore Lightning channels. If cleanup fails, the wallet stays blocked in a pending-deletion state until you confirm a retry. See [wallet deletion and recovery limits](docs/umbrel.md#delete-a-wallet).

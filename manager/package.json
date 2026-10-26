@@ -1,6 +1,6 @@
 {
   "name": "ldk-node-umbrel-manager",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -12,6 +12,7 @@
     "test": "node --test server/*.test.mjs"
   },
   "dependencies": {
+    "@scure/base": "2.2.0",
     "@scure/bip39": "2.2.0",
     "qrcode": "1.5.4"
   }

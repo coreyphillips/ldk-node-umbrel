@@ -7,6 +7,7 @@ export class NativeProcess extends EventEmitter {
     super(); this.binary = binary; this.config = config; this.timeout = timeout; this.spawnProcess = spawnProcess;
     this.faulted = false; this.readySeen = false;
     this.pending = new Map(); this.nextId = 1; this.buffer = ''; this.logs = []; this.closed = false;
+    this.syncPending = null;
   }
   async start() {
     if (this.child) throw failure('Node is already running');
@@ -46,6 +47,7 @@ export class NativeProcess extends EventEmitter {
       else if (message.id !== undefined) {
         const pending = this.pending.get(message.id); if (!pending) continue;
         this.pending.delete(message.id); clearTimeout(pending.timer);
+        if (this.syncPending?.id === message.id) { this.syncPending = null; this.emit('sync_settled'); }
         if (message.error) pending.reject(failure(String(message.error.message || 'Native operation failed').slice(0, 512), 400, message.error.code || 'NATIVE_ERROR'));
         else pending.resolve(message.result);
       }
@@ -62,23 +64,37 @@ export class NativeProcess extends EventEmitter {
     if (this.faulted) return Promise.reject(failure('Native node is faulted. Inspect storage and diagnostics before restarting.', 503, 'NODE_FAULT'));
 
     if (!this.child || this.closed) return Promise.reject(failure('Start this wallet first', 409, 'NODE_STOPPED'));
+    // A timeout does not cancel work in the daemon's serial request loop. Keep
+    // the sync slot until its actual response or process exit, including for
+    // manual requests, so automatic hints cannot queue duplicate native scans.
+    if (method === 'sync' && this.syncPending) return this.syncPending.promise;
     if (this.pending.size >= 32) return Promise.reject(failure('Node is busy. Try again shortly.', 429, 'NODE_BUSY'));
     const id = this.nextId++;
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        this.pending.delete(id);
-        reject(failure('Native operation timed out. Check activity before retrying any payment.', 504, 'OUTCOME_UNKNOWN'));
-      }, this.timeout);
-      this.pending.set(id, { resolve, reject, timer });
-      this.child.stdin.write(`${JSON.stringify({ id, method, params })}\n`, error => {
-        if (error) { const item = this.pending.get(id); this.pending.delete(id); clearTimeout(timer); item?.reject(failure('Node connection closed. Check activity before retrying.', 503, 'OUTCOME_UNKNOWN')); }
-      });
-    });
+    let resolve; let reject;
+    const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+    const timer = setTimeout(() => {
+      if (method !== 'sync') this.pending.delete(id);
+      reject(failure('Native operation timed out. Check activity before retrying any payment.', 504, 'OUTCOME_UNKNOWN'));
+    }, this.timeout);
+    this.pending.set(id, { resolve, reject, timer });
+    if (method === 'sync') { this.syncPending = { id, promise }; this.emit('sync_started'); }
+    const written = error => {
+      if (error) {
+        const item = this.pending.get(id); clearTimeout(timer);
+        // A stream error cannot establish that a partially written sync request
+        // was never executed. Preserve its slot until reply/exit as above.
+        if (method !== 'sync') this.pending.delete(id);
+        item?.reject(failure('Node connection closed. Check activity before retrying.', 503, 'OUTCOME_UNKNOWN'));
+      }
+    };
+    try { this.child.stdin.write(`${JSON.stringify({ id, method, params })}\n`, written); }
+    catch (error) { written(error); }
+    return promise;
   }
   finish() {
     if (this.closed) return; this.closed = true; clearTimeout(this.faultTimer);
     for (const pending of this.pending.values()) { clearTimeout(pending.timer); pending.reject(failure('Node exited. Check activity before retrying.', 503, 'OUTCOME_UNKNOWN')); }
-    this.pending.clear(); this.emit('exit');
+    this.pending.clear(); this.syncPending = null; this.emit('exit');
   }
   async stop() {
     if (!this.child || this.closed) return;

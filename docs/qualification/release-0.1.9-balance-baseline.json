@@ -1,0 +1,48 @@
+{
+  "frontend_sha256": "6d16e7dce2a9d14f866b3f90903bfcea845d31eb82293dc88cd6e6884dab80f4",
+  "real_wallet_accessed": false,
+  "funds_sent": false,
+  "cases": [
+    {
+      "name": "receive_modal_pauses_polling",
+      "wait_ms": 11000,
+      "simulated_balance_sats": 23456,
+      "balance_reads_before": 1,
+      "balance_reads_after": 1,
+      "visible_balance": "0sats",
+      "receive_modal_open": true
+    },
+    {
+      "name": "closing_receive_modal_recovers_balance_without_reload",
+      "visible_balance": "23,456sats"
+    },
+    {
+      "name": "slow_payments_blocks_fast_balance_and_future_polls",
+      "held_ms": 6000,
+      "simulated_balance_sats": 34567,
+      "fresh_balance_reads": 1,
+      "visible_balance": "23,456sats"
+    },
+    {
+      "name": "resume_events_have_no_immediate_refresh",
+      "timer_disabled_to_isolate_handlers": true,
+      "events": [
+        "visibilitychange hidden",
+        "visibilitychange visible",
+        "focus",
+        "online"
+      ],
+      "balance_reads_before": 4,
+      "balance_reads_after": 4,
+      "visible_balance": "34,567sats"
+    },
+    {
+      "name": "late_address_response_reopens_cancelled_modal_under_other_wallet",
+      "selected_wallet": "22222222-2222-4222-8222-222222222222",
+      "requested_address_wallet": "11111111-1111-4111-8111-111111111111",
+      "qr_request_wallet": "/api/wallets/22222222-2222-4222-8222-222222222222/qr",
+      "stale_modal_reopened": true
+    }
+  ],
+  "browser_errors": []
+}
