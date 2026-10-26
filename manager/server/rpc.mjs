@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { EventEmitter } from 'node:events';
 import { failure } from './files.mjs';
+import { redactDiagnostics } from './logs.mjs';
 
 export class NativeProcess extends EventEmitter {
   constructor({ binary, config, timeout = 60_000, spawnProcess = spawn }) {
@@ -8,6 +9,7 @@ export class NativeProcess extends EventEmitter {
     this.faulted = false; this.readySeen = false;
     this.pending = new Map(); this.nextId = 1; this.buffer = ''; this.logs = []; this.closed = false;
     this.syncPending = null;
+    this.diagnosticBuffer = ''; this.diagnosticDiscarding = false;
   }
   async start() {
     if (this.child) throw failure('Node is already running');
@@ -20,13 +22,28 @@ export class NativeProcess extends EventEmitter {
     this.child.stdin.on('error', () => this.finish());
     this.child.stdout.setEncoding('utf8'); this.child.stderr.setEncoding('utf8');
     this.child.stdout.on('data', chunk => this.consume(chunk));
-    this.child.stderr.on('data', chunk => {
-      // Native diagnostics may name payments, so logs are authenticated and bounded.
-      this.logs.push(chunk.slice(0, 8192).replace(/\b(?:[0-9a-f]{64})\b/gi, '[redacted]'));
-      if (this.logs.length > 200) this.logs.shift();
-    });
+    this.child.stderr.on('data', chunk => this.consumeDiagnostics(chunk));
     this.child.on('error', () => this.finish()); this.child.on('exit', () => this.finish());
     return ready;
+  }
+  consumeDiagnostics(chunk) {
+    let offset = 0;
+    while (offset < chunk.length) {
+      const newline = chunk.indexOf('\n', offset);
+      const part = chunk.slice(offset, newline < 0 ? chunk.length : newline);
+      if (!this.diagnosticDiscarding) {
+        if (Buffer.byteLength(this.diagnosticBuffer) + Buffer.byteLength(part) > 8192) {
+          this.diagnosticBuffer = ''; this.diagnosticDiscarding = true;
+        } else this.diagnosticBuffer += part;
+      }
+      if (newline < 0) break;
+      // Redact only complete lines. Cutting arbitrary chunks can leak the
+      // unrecognizable prefix or suffix of a secret at a capture boundary.
+      this.logs.push(this.diagnosticDiscarding ? '[Oversized diagnostic line omitted.]\n' : redactDiagnostics(this.diagnosticBuffer + '\n'));
+      if (this.logs.length > 200) this.logs.shift();
+      this.diagnosticBuffer = ''; this.diagnosticDiscarding = false;
+      offset = newline + 1;
+    }
   }
   consume(chunk) {
     this.buffer += chunk;
@@ -93,6 +110,7 @@ export class NativeProcess extends EventEmitter {
   }
   finish() {
     if (this.closed) return; this.closed = true; clearTimeout(this.faultTimer);
+    this.diagnosticBuffer = ''; this.diagnosticDiscarding = false;
     for (const pending of this.pending.values()) { clearTimeout(pending.timer); pending.reject(failure('Node exited. Check activity before retrying.', 503, 'OUTCOME_UNKNOWN')); }
     this.pending.clear(); this.syncPending = null; this.emit('exit');
   }

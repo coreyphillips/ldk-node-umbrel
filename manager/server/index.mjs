@@ -59,7 +59,10 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
           if (operation === 'start' && request.method === 'POST') return send(response, 200, await wallets.start(id));
           if (operation === 'stop' && request.method === 'POST') return send(response, 200, await wallets.stop(id));
           if (operation === 'pairing' && request.method === 'GET') return send(response, 200, wallets.pairing(id, url.hostname));
-          if (operation === 'logs' && request.method === 'GET') return send(response, 200, { text: wallets.logs(id) });
+          if (operation === 'logs' && request.method === 'GET') {
+            if (url.search) throw failure('Log requests do not accept path or limit parameters.');
+            return send(response, 200, await wallets.logs(id));
+          }
           if (operation === 'recovery' && request.method === 'POST') {
             if ((await body(request))?.confirm !== true) throw failure('Confirm that you want to reveal this wallet recovery phrase');
             return send(response, 200, await wallets.recovery(id));

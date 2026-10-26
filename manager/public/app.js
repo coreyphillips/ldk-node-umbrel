@@ -18,9 +18,10 @@ function acceptSession(session) {
   const { proof, ...publicSession } = session;
   state.session = publicSession;
 }
-function clearSession() { clearSensitiveDialog(); invalidateReceive(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; pairingSelections.clear(); refreshQueued = false; if (dialog.open) dialog.close(); }
+function clearSession() { clearSensitiveDialog(); invalidateReceive(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; logsView = null; pairingSelections.clear(); refreshQueued = false; if (dialog.open) dialog.close(); }
 const state = { session: null, wallets: [], selected: null, view: 'overview', data: {}, config: {}, polling: false };
 let pairingView = null;
+let logsView = null;
 const pairingSelections = new Map();
 let refreshQueued = false;
 let walletRevision = 0;
@@ -217,14 +218,18 @@ function pairingRenderKey() {
 function render() {
   const wallet = active();
   const pairingKey = pairingRenderKey();
+  const logsKey = wallet && state.view === 'logs' ? JSON.stringify([state.selected, state.wallets, state.data.error || null]) : null;
   // Polling keeps the mounted pairing controls, QR and selection intact. Only
   // visible wallet state or changed connection details need new content.
   if (pairingKey && pairingView?.key === pairingKey && pairingView.root.isConnected) { updatePairing(pairingView, wallet); return; }
+  // Keep a readable, selectable snapshot until Refresh or a wallet change.
+  if (logsKey && logsView?.key === logsKey && logsView.root.isConnected) return;
   const { balance, balanceError, balanceUpdated, ...renderData } = state.data;
   const nextKey = JSON.stringify([state.selected, state.view, state.wallets, renderData]);
-  if (renderKey === nextKey && app.querySelector('.layout')) { updateBalance(); return; }
+  if (state.view !== 'logs' && renderKey === nextKey && app.querySelector('.layout')) { updateBalance(); return; }
   renderKey = nextKey;
   pairingView = null;
+  logsView = null;
   const layout = el('div', 'layout'); const sidebar = el('aside', 'sidebar'); add(sidebar, brand());
   add(sidebar, add(el('div', 'nav'), button('◫   All wallets', () => navigate('overview', null), !wallet ? 'active' : '')));
   if (state.wallets.length) {
@@ -244,7 +249,7 @@ function render() {
   }
   add(sidebar, add(el('div', 'sidebar-bottom'), el('p', '', 'Native LDK Node\nLocal, self-custodial infrastructure.'), button('+ New wallet', () => walletForm(), 'small'), button('Sign out', () => run(async () => { try { await api('/logout', { method: 'POST', body: {} }); } finally { clearSession(); login(); } }), 'small ghost')));
   const main = el('main', 'main'); const menu = button('☰', () => sidebar.classList.toggle('open'), 'ghost mobile-menu'); menu.setAttribute('aria-label', 'Open navigation');
-  add(main, add(el('header', 'topbar'), add(el('div', 'actions'), menu, el('span', 'crumb', wallet ? `Wallets / ${wallet.name}` : 'Your workspace')), add(el('div', 'top-actions'), badge('Local installation', 'green'), button('Refresh', () => refresh(), 'small'))));
+  add(main, add(el('header', 'topbar'), add(el('div', 'actions'), menu, el('span', 'crumb', wallet ? `Wallets / ${wallet.name}` : 'Your workspace')), add(el('div', 'top-actions'), badge('Local installation', 'green'), button('Refresh', () => { logsView = null; refresh(); }, 'small'))));
   const content = el('div', 'content');
   if (!wallet) renderWallets(content); else {
     const titles = { overview: wallet.name, channels: 'Channels & peers', activity: 'Activity', pairing: 'Pair Chicory', offline: 'Offline receive', settings: 'Wallet settings', logs: 'Node logs' };
@@ -574,7 +579,44 @@ function backupAll() {
   });
   add(body, form, el('p', '', 'Restore offline with the restore-backup script included in the release. Restore the complete state with the app stopped and never run two copies of the same wallet.'));
 }
-async function renderLogs(content, wallet) { const pre = el('pre', 'log', 'Loading recent process diagnostics...'); content.append(card('Recent native diagnostics', pre)); try { pre.textContent = (await api(`/wallets/${wallet.id}/logs`)).text || 'No recent process diagnostics. Native file logs remain in this wallet data directory.'; } catch (error) { pre.textContent = error.message; } }
+async function renderLogs(content, wallet) {
+  const session = state.session;
+  logsView = { key: JSON.stringify([state.selected, state.wallets, state.data.error || null]), root: content };
+  const native = el('pre', 'log', 'Loading native wallet log...');
+  const diagnostics = el('pre', 'log', 'Loading process diagnostics...');
+  const status = el('p', '', 'Loading the latest log snapshot.'); status.role = 'status';
+  let snapshot = '';
+  const current = () => content.isConnected && state.session === session && state.selected === wallet.id && state.view === 'logs';
+  const copyLogs = button('Copy logs', () => { if (current() && snapshot) copy(snapshot); }, 'small');
+  const download = button('Download logs', () => {
+    if (!current() || !snapshot) return;
+    const blob = new Blob([snapshot], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob); const link = el('a');
+    link.href = url; link.download = `ldk-node-${wallet.id}-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`;
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    toast('Log download started');
+  }, 'small');
+  copyLogs.disabled = true; download.disabled = true;
+  content.append(card('Log snapshot', add(el('div'), status,
+    el('p', '', 'Latest 256 KiB of native logs and 64 KiB of process diagnostics. Use Refresh to load newer entries. Sensitive values are redacted. Review logs before sharing.'),
+    add(el('div', 'actions'), copyLogs, download))));
+  content.append(card('Native wallet log', native), card('Process diagnostics', diagnostics));
+  try {
+    const logs = await api(`/wallets/${wallet.id}/logs`);
+    if (!current()) return;
+    native.textContent = logs.native.text || (logs.native.available ? 'The native log is empty.' : 'No native log yet. Start this wallet to create it.');
+    diagnostics.textContent = logs.process.text || 'No recent process diagnostics.';
+    const hasLogs = Boolean(logs.native.text || logs.process.text);
+    snapshot = logs.text;
+    copyLogs.disabled = !hasLogs; download.disabled = !hasLogs;
+    status.textContent = logs.native.truncated || logs.process.truncated ? 'Showing the newest complete log lines. Older content was omitted.' : 'Latest log snapshot loaded.';
+  } catch (error) {
+    if (!current()) return;
+    native.textContent = ''; diagnostics.textContent = '';
+    status.textContent = error.message;
+  }
+}
 
 function walletForm(wallet) {
   if (wallet && !['stopped', 'failed'].includes(wallet.status)) { toast('Stop the wallet before editing settings', true); return; }

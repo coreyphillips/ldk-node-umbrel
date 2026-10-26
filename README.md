@@ -35,6 +35,7 @@ Version 0.1.2 and later also accept a trailing slash in existing Electrum URLs w
 - Chicory primary pairing with selectable TCP, Tor and Iroh URIs and QR codes. Optional managed Tor creates a persistent onion address; Iroh public relays and endpoint discovery are enabled explicitly.
 - Separate controls for liquidity provisioning, funding budgets, fees and offline settlement.
 - Confirmed deletion of an individual stopped wallet, preserving the other wallets and their identities.
+- Authenticated native wallet logs and process diagnostics with copy and plain-text download controls.
 - Password sessions, CSRF and Origin validation, private files, bounded administration queues, explicit uncertain transaction outcomes and supervised native processes.
 
 The manager runs the Rust `ldk-node-daemon` through private JSONL pipes. Lightning keys and channel state belong to the native daemon. The optional Iroh bridge carries transport bytes and has a separate transport identity.
@@ -85,6 +86,12 @@ LDK_SOURCE_DIR=/absolute/path/to/ldk-node ./scripts/build-images.sh
 This exports both architecture archives to `dist/` without pushing them. `scripts/load-local.sh` and `compose.local.yml` support a standalone local Docker installation. Set `.env` with the exact `PUBLIC_ORIGIN` and `ALLOWED_HOSTS` before starting it. The standalone generated password is in `data/dashboard-password`.
 
 Release archives and checksums are available on the [Releases page](https://github.com/coreyphillips/ldk-node-umbrel/releases). The manually dispatched `Publish qualified images` workflow verifies those archives and publishes both architectures to GHCR. It does not rebuild or modify the native binaries. Store updates require an explicit reviewed image digest change.
+
+## Wallet logs
+
+Open the selected wallet's **Logs** page to read its native file log and process diagnostics. **Copy logs** and **Download logs** export the displayed snapshot as plain text. **Refresh** loads newer entries; background polling preserves the current selection and snapshot. Native file logs remain available when the process diagnostic buffer is empty or the wallet is stopped.
+
+The view includes the newest complete records, up to 256 KiB of native logs and 64 KiB of process diagnostics. Sensitive values are redacted, and a truncation notice identifies omitted older content. These controls use the authenticated wallet context and do not accept arbitrary file paths. Copy also works on a normal HTTP LAN connection.
 
 ## Verification and support
 

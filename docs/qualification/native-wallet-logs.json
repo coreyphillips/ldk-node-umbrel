@@ -1,0 +1,40 @@
+{
+  "branch": "fix/native-wallet-logs",
+  "base_commit": "5391c48",
+  "manager_tests": {
+    "passed": 173,
+    "failed": 0,
+    "skipped": 0
+  },
+  "linux_log_tests": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "checks": [
+      "1440: native and process logs, literal HTML, redaction and mobile fit",
+      "1440: real HTTP clipboard fallback and matching plain-text download",
+      "1440: background polling preserves snapshot and explicit Refresh loads new logs",
+      "1440: switching wallets clears previous logs and disables empty exports",
+      "1440: late log responses cannot populate another wallet",
+      "390: native and process logs, literal HTML, redaction and mobile fit",
+      "390: real HTTP clipboard fallback and matching plain-text download",
+      "390: background polling preserves snapshot and explicit Refresh loads new logs",
+      "390: switching wallets clears previous logs and disables empty exports",
+      "390: late log responses cannot populate another wallet"
+    ],
+    "browser_errors": [],
+    "funds_sent": false,
+    "physical_umbrel": false,
+    "frontend_sha256": "6f32f8f252db63af6fd2be1c8b1fb12a5c9db90d61030a9717bb896897e7d6d2"
+  },
+  "packaged_runtime_checks": {
+    "native_file_available": true,
+    "process_log_empty": true,
+    "splice_and_settlement_records_present": true,
+    "unauthenticated_status": 401
+  },
+  "published": false,
+  "physical_umbrel": false
+}
