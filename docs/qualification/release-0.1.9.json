@@ -26,7 +26,8 @@
       "unchanged native Iroh addon loads",
       "manager shuts down gracefully on container stop",
       "Tor binary, dependencies and distribution copyright notices match 0.1.8",
-      "Tor linked libraries and every regular file from the Tor, libevent and runit-helper packages match 0.1.8"
+      "Tor linked libraries and every regular file from the Tor, libevent and runit-helper packages match 0.1.8",
+      "every installed JavaScript dependency file matches 0.1.8; only root dependency metadata changed"
     ],
     "manager_files": {
       "/opt/ldk/manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
@@ -134,7 +135,8 @@
       "unchanged native Iroh addon loads",
       "manager shuts down gracefully on container stop",
       "Tor binary, dependencies and distribution copyright notices match 0.1.8",
-      "Tor linked libraries and every regular file from the Tor, libevent and runit-helper packages match 0.1.8"
+      "Tor linked libraries and every regular file from the Tor, libevent and runit-helper packages match 0.1.8",
+      "every installed JavaScript dependency file matches 0.1.8; only root dependency metadata changed"
     ],
     "manager_files": {
       "/opt/ldk/manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
@@ -237,5 +239,26 @@
     "node scripts/receive-container-test.mjs arm64"
   ],
   "receive_test_script_sha256": "9cc2e3075e2c570ebef15e0d07bf174776c0983276dbc0e764173c8bebbf9deb",
-  "receive_test_scope": "Disposable internal-network Bitcoin Core and real Electrs with 101 mined regtest blocks per architecture, real shipping native daemons and a transparent TCP observation proxy. Incoming amounts total 150000 regtest sats per architecture. No user data, existing fixtures or deployments. Zero explicit native sync requests."
+  "receive_test_scope": "Disposable internal-network Bitcoin Core and real Electrs with 101 mined regtest blocks per architecture, real shipping native daemons and a transparent TCP observation proxy. Incoming amounts total 150000 regtest sats per architecture. No user data, existing fixtures or deployments. Zero explicit native sync requests.",
+  "browser_qualification": {
+    "checks": 97,
+    "frontend_sha256": "900f65be98f89cf4b6972725119ad509675266439fb7ac6d655145b38e45cc63",
+    "records": [
+      "release-0.1.9-balance-browser.json",
+      "release-0.1.9-browser.json",
+      "release-0.1.9-tor-browser.json",
+      "release-0.1.9-delete-browser.json"
+    ]
+  },
+  "live_funds_used": false,
+  "existing_wallet_data_accessed": false,
+  "test_coins": "150000 disposable regtest sats per architecture; never mainnet funds",
+  "scheduler_qualification": "release-0.1.9-receive-sync.json",
+  "build_input_sha256": {
+    "VERSION": "e358d84552808a5c0bd6679d690c283b938ebe15c2bd843c898681d093213107",
+    "docker/Dockerfile.release": "edab1bc7b2a43d530e8dd5da167310d0b76bd426770e9d21b6ec49c4cbb75aa9",
+    "manager/package.json": "dcd49d59a3d15bf0059fa43a1bb4f55efa84888a12eb0cc0eabce223075283f3",
+    "manager/package-lock.json": "f8db5699f278709efa7373280c70558af3d92601e8d63ce22b9c7b873e528eb1",
+    "scripts/receive-container-test.mjs": "9cc2e3075e2c570ebef15e0d07bf174776c0983276dbc0e764173c8bebbf9deb"
+  }
 }
