@@ -75,7 +75,7 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
       }
       if (request.method !== 'GET') throw failure('Method not allowed', 405);
       const name = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
-      if (!['index.html', 'app.js', 'style.css', 'icon.svg'].includes(name)) throw failure('Not found', 404);
+      if (!['index.html', 'app.js', 'pairing.js', 'style.css', 'icon.svg'].includes(name)) throw failure('Not found', 404);
       response.writeHead(200, { 'Content-Type': TYPES[path.extname(name)] }); response.end(await fs.readFile(path.join(PUBLIC, name)));
     } catch (error) {
       if (!response.headersSent) send(response, error.status || 500, { error: { code: error.code || 'INTERNAL_ERROR', message: error.status ? error.message : 'The dashboard could not complete this operation' } });

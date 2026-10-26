@@ -13,7 +13,7 @@ if (!['amd64', 'arm64'].includes(architecture)) throw new Error('Usage: node scr
 const port = Number(process.env.REGTEST_PORT || 60001);
 if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error('REGTEST_PORT must be a TCP port');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const version = '0.1.5';
+const version = '0.1.6';
 const image = `ldk-node-umbrel:${version}-${architecture}`;
 const name = `ldk-electrum-qa-${architecture}-${randomBytes(6).toString('hex')}`;
 const volume = `${name}-data`;

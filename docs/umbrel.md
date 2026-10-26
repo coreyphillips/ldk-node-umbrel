@@ -36,7 +36,13 @@ For a saved failed wallet, open **Settings > Edit configuration**, select the in
 
 No chain app is automatically installed. Backend passwords are stored privately on the server and redacted from dashboard reads.
 
-Enable provider funding and offline settlement only after reviewing the configured limits. For Iroh phone pairing, enable the transport, public relays and discovery explicitly. TCP pairing requires the phone to reach the displayed host and Lightning port.
+Enable provider funding and offline settlement only after reviewing the configured limits.
+
+## Choose a phone connection
+
+Open **Pair Chicory > Connection method** to choose **Iroh**, **Local network (TCP)**, or **Tor** from the available addresses. The selected method controls the displayed URI and QR code. Copy or scan that address in the client. This choice does not enable or disable a transport, so one client can use Tor while another uses Iroh.
+
+For Iroh, enable the transport, public relays and discovery explicitly in wallet Settings. TCP requires the phone to reach the configured host and public Lightning port. For Tor, enter an existing v3 onion address in wallet Settings and map its onion port to this wallet's native Lightning listener. The dashboard does not create or verify an onion service. The same Tor URI remains available separately as a fallback for Iroh clients that support it.
 
 ## Back up and restore
 

@@ -32,7 +32,7 @@ Version 0.1.2 and later also accept a trailing slash in existing Electrum URLs w
 
 - Up to eight independent native nodes with persistent identities and storage.
 - Bitcoin and Lightning balances, addresses, invoices, payments, channels, peers, splice operations, native events and offline voucher summaries.
-- Chicory primary pairing by TCP URI/QR or optional Iroh transport, with public relays and endpoint discovery enabled explicitly.
+- Chicory primary pairing with selectable TCP, Tor and Iroh URIs and QR codes, with Iroh public relays and endpoint discovery enabled explicitly.
 - Separate controls for liquidity provisioning, funding budgets, fees and offline settlement.
 - Password sessions, CSRF and Origin validation, private files, bounded administration queues, explicit uncertain transaction outcomes and supervised native processes.
 
@@ -45,8 +45,8 @@ The qualified phone builds use Chicory 0.7.4 with local portable-engine fixes fo
 1. Use the same Bitcoin network on the phone and the primary.
 2. In wallet Settings, choose a reachable LAN hostname or IP for TCP pairing. The wallet's public Lightning port is displayed by the dashboard.
 3. Enable the Chicory provider if this node should fund phone channels. Review funding caps and fees. Offline settlement is a separate setting.
-4. Open **Pair Chicory** and scan or paste the URI as an external primary.
-5. For Iroh pairing, explicitly enable Iroh, public relays and endpoint discovery. An existing v3 onion service can be configured as a same-key fallback. The dashboard does not create an onion service.
+4. Open **Pair Chicory > Connection method**, choose an available connection, then scan its QR code or paste its URI as an external primary. Switching this view does not change enabled transports, so you can pair one client over Tor while Iroh remains enabled for another.
+5. For Iroh pairing, explicitly enable Iroh, public relays and endpoint discovery. For Tor pairing, configure an existing v3 onion address in wallet Settings, mapped to this wallet's native Lightning port. The same address can also be used as a Tor fallback. The dashboard does not create or verify an onion service.
 
 Version 0.1.4 adds **Settings > Recovery & backup**. New wallets have a 24-word recovery phrase with reveal and copy controls. Existing wallets keep their binary seeds and use an encrypted full backup. **Back up all wallets** stops wallet processes and downloads keys, configuration and complete Lightning channel state. Save the file and its password privately, then restart the wallets. See the [backup and offline restore instructions](docs/umbrel.md#back-up-and-restore). Reload the dashboard tab after updating the app.
 

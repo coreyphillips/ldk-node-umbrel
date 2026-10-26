@@ -1,0 +1,43 @@
+{
+  "apps": [
+    "ldk-node-wallet"
+  ],
+  "issues": [
+    {
+      "severity": "warning",
+      "rule": "access.security_opt",
+      "file": "ldk-node-wallet/docker-compose.yml",
+      "line": 15,
+      "message": "Service `manager` sets security options; justify this in the PR."
+    },
+    {
+      "severity": "warning",
+      "rule": "package.review_assets",
+      "file": "ldk-node-wallet/icon.svg",
+      "line": null,
+      "message": "Do not commit App Store screenshots, gallery assets, or icon/logo assets; include them in the PR body instead."
+    }
+  ],
+  "validator": {
+    "repository": "https://github.com/getumbrel/umbrel-apps",
+    "commit": "00c981c39ddc040c7252b260a3c5c5a6d2b114ce",
+    "tool": ".tools/lint-apps.mjs",
+    "options": [
+      "ldk-node-wallet",
+      "--check-images",
+      "--format",
+      "json"
+    ]
+  },
+  "recorded_at": "2026-10-26T14:54:04.997077+00:00",
+  "release_version": "0.1.6",
+  "exit_code": 0,
+  "error_count": 0,
+  "warning_count": 2,
+  "image_reference": "ghcr.io/coreyphillips/ldk-node-umbrel:0.1.6@sha256:f2f0548527699b138417622554c54e65a8f2826357d9b345dd3436b41f25f785",
+  "public_manifest_and_architecture_checks": "passed",
+  "required_platforms": [
+    "linux/amd64",
+    "linux/arm64"
+  ]
+}

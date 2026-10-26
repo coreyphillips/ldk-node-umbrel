@@ -1,7 +1,7 @@
 name: ldk-node-local
 services:
   manager:
-    image: ldk-node-umbrel:0.1.5-${LDK_ARCH:-arm64}
+    image: ldk-node-umbrel:0.1.6-${LDK_ARCH:-arm64}
     pull_policy: never
     init: true
     restart: unless-stopped
