@@ -628,8 +628,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.10.json",
-    "source_manifest_sha256": "3800a2f7084224a022dd8d8f0b5edb97ada50f88e69b180badf47b7b9490676a"
+    "source_manifest": "native-source-0.1.11.json",
+    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
   },
   {
     "name": "bdk_chain",
@@ -5074,8 +5074,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.10.json",
-    "source_manifest_sha256": "3800a2f7084224a022dd8d8f0b5edb97ada50f88e69b180badf47b7b9490676a"
+    "source_manifest": "native-source-0.1.11.json",
+    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
   },
   {
     "name": "ldk-node-daemon",
@@ -5098,8 +5098,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.10.json",
-    "source_manifest_sha256": "3800a2f7084224a022dd8d8f0b5edb97ada50f88e69b180badf47b7b9490676a"
+    "source_manifest": "native-source-0.1.11.json",
+    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
   },
   {
     "name": "libc",
@@ -5241,8 +5241,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.10.json",
-    "source_manifest_sha256": "3800a2f7084224a022dd8d8f0b5edb97ada50f88e69b180badf47b7b9490676a"
+    "source_manifest": "native-source-0.1.11.json",
+    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
   },
   {
     "name": "lightning-background-processor",
@@ -5387,8 +5387,8 @@
     "license_note": "Published package declares this SPDX license and omits the license text. Canonical SPDX text is supplied with the package author and available source copyright notices.",
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.10.json",
-    "source_manifest_sha256": "3800a2f7084224a022dd8d8f0b5edb97ada50f88e69b180badf47b7b9490676a"
+    "source_manifest": "native-source-0.1.11.json",
+    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
   },
   {
     "name": "lightning-macros",

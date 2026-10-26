@@ -2,6 +2,14 @@
 
 The public dashboard image includes the native primary protocol implementation. It does not update Chicory on a phone. The qualification runs used Chicory 0.7.4 with reviewed local client corrections. Those source branches remain local and are not published by this dashboard release.
 
+## Feature-bit migration in 0.1.11
+
+Release 0.1.11 advertises optional FFOR bits 441 and 443 and recognizes both required and optional variants of the new 440/441 and 442/443 pairs. It intentionally stops interpreting 560-563 as FFOR because Eclair uses those assignments for different protocols. Upgrade both endpoints before enabling offline receive. No wire-message encoding or stored wallet custody format changes.
+
+The historical phone bundles listed below predate this migration and are not sufficient for offline receive with 0.1.11. Use a phone build containing the matching Beignet feature-bit update or the matching native Bitkit update. Ordinary Lightning connectivity is independent of the FFOR capability. This native implementation does not implement or advertise async receive service bits 444/445.
+
+The 0.1.11 native source starts from the complete, hash-verified 0.1.10 source snapshot and changes only feature advertisement, FFOR peer negotiation and related regression tests. `licenses/native-source-0.1.11.json` identifies every source file used in the release build. The original base Git commit alone does not describe that snapshot.
+
 ## Qualified local inputs
 
 - Native runtime source: `35b49a99bdff7edbe3c97dd5a605edf6e878ead4` in the local `chicory-primary-compatibility` LDK branch.
