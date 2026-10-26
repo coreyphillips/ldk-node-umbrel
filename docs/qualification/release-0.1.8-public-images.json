@@ -1,0 +1,52 @@
+{
+  "version": "0.1.8",
+  "image": "ghcr.io/coreyphillips/ldk-node-umbrel:0.1.8",
+  "index_digest": "sha256:aa35ba40741caac800e641cfa3a128b9d940e0a3a4edd991593e83b86a3db803",
+  "index_media_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+  "anonymous_index_access": true,
+  "workflow": "https://github.com/coreyphillips/ldk-node-umbrel/actions/runs/40354904036",
+  "recorded_at": "2026-10-26T16:02:56.684606+00:00",
+  "verification": {
+    "amd64": {
+      "manifest_digest": "sha256:454df5e7436cc3f9408a7b360364de0c5ffe81497c2b8a1f020564867ed4e77b",
+      "anonymous_docker_pull": true,
+      "empty_docker_client_configuration": true,
+      "image_id": "sha256:454df5e7436cc3f9408a7b360364de0c5ffe81497c2b8a1f020564867ed4e77b",
+      "qualified_local_image_id": "sha256:232ffa99278fd8d08086312f50159ec3ab8efb036b0d638f203c20c412986b4f",
+      "image_ids_equal": false,
+      "runtime_config_matches": true,
+      "uncompressed_layers_match": true,
+      "architecture_and_version_match": true,
+      "manager_files_match_qualified_archive": true,
+      "manager_file_count": 29,
+      "native_files_match_qualified_archive": true,
+      "license_manifest_sha256": "0ce4df36c7452ef9540f01673a1ac78713fce8bbcc01ce808b815dc8601dba79",
+      "license_file_count": 1060,
+      "license_files_match_qualified_archive": true,
+      "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59",
+      "notice_bundle_matches": true,
+      "tor_binary_and_notices_match_qualified_archive": true
+    },
+    "arm64": {
+      "manifest_digest": "sha256:54a45df9f69be3141c21715956e585f14947fe2420a303d662361624b1019d27",
+      "anonymous_docker_pull": true,
+      "empty_docker_client_configuration": true,
+      "image_id": "sha256:54a45df9f69be3141c21715956e585f14947fe2420a303d662361624b1019d27",
+      "qualified_local_image_id": "sha256:91bcfef1c75930007ef1a7185dccccfa8c3aca6699c377f4cf7a00c96a861e82",
+      "image_ids_equal": false,
+      "runtime_config_matches": true,
+      "uncompressed_layers_match": true,
+      "architecture_and_version_match": true,
+      "manager_files_match_qualified_archive": true,
+      "manager_file_count": 29,
+      "native_files_match_qualified_archive": true,
+      "license_manifest_sha256": "0ce4df36c7452ef9540f01673a1ac78713fce8bbcc01ce808b815dc8601dba79",
+      "license_file_count": 1060,
+      "license_files_match_qualified_archive": true,
+      "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59",
+      "notice_bundle_matches": true,
+      "tor_binary_and_notices_match_qualified_archive": true
+    }
+  },
+  "scope": "Anonymous registry pulls with a temporary empty Docker client configuration. Read-only disposable containers inspect image files with networking disabled. No wallet data or live node was accessed."
+}
