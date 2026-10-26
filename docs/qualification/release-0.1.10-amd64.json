@@ -1,0 +1,23 @@
+{
+  "architecture": "amd64",
+  "authentication": "Umbrel app password",
+  "image_id": "sha256:89fcc1a2749e49e0dd7afbd7291d97af90b9de7fa39c94073f4098e982ad9abf",
+  "checks": [
+    "image architecture verified",
+    "unauthenticated access denied",
+    "shared-host cookie replay cannot authorize dashboard access",
+    "Umbrel app password, custom hostname and session binding",
+    "mainnet first-run default",
+    "native regtest sync",
+    "native address and unpaid invoice",
+    "authenticated pairing and QR",
+    "native Iroh addon loads",
+    "native stop/start retains identity",
+    "container restart autostarts same native identity",
+    "Docker termination reaches graceful native shutdown"
+  ],
+  "network": "regtest",
+  "funds_sent": false,
+  "physical_umbrel": false,
+  "date": "2026-10-26T17:04:58.306Z"
+}

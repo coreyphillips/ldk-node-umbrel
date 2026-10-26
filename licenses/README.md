@@ -2,7 +2,7 @@
 
 This bundle accompanies the LDK Node Umbrel runtime images. The dashboard manager has its own MIT license. The root LDK licenses are retained separately in the image. These records preserve third-party licenses and copyright notices for the native LDK daemon and the optional Iroh native addon.
 
-`package-manifest.json` lists each selected Rust package version, declared license, upstream repository, available source revision, published source archive URL and SHA-256, and copied notice files. Registry source archive hashes were verified against the corresponding locked Cargo dependency checksum. Local modified LDK packages are identified separately by the qualified native runtime commit; they are not represented as unchanged published crates.
+`package-manifest.json` lists each selected Rust package version, declared license, upstream repository, available source revision, published source archive URL and SHA-256, and copied notice files. Registry source archive hashes were verified against the corresponding locked Cargo dependency checksum. Local modified LDK packages are identified separately by their source base commit and exact build-source manifest; they are not represented as unchanged published crates. Version 0.1.10 uses the local `feat/lfbw-wallet-client` working tree, identified by `native-source-0.1.10.json`, rather than the base commit alone. The native branch remains unpublished.
 
 The manifest covers the union of normal and build dependency graphs resolved for both x86_64-unknown-linux-gnu and aarch64-unknown-linux-gnu. Development-only and other-platform dependencies are excluded. Build-time notices are conservatively retained, so an entry is not a claim that every listed package is linked into the final executable.
 

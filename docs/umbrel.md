@@ -38,6 +38,20 @@ No chain app is automatically installed. Backend passwords are stored privately 
 
 Enable provider funding and offline settlement only after reviewing the configured limits.
 
+## Larger primary payments in 0.1.10
+
+Version 0.1.10 updates the native primary engine so a compatible private client channel can grow when an incoming payment exceeds its original capacity. The primary still needs sufficient spendable on-chain funds and configured funding limits. A successful quote does not itself reserve a settled payment or bypass the configured receive fee.
+
+The Bitkit Primary Regtest version 197 already includes the matching client changes. Update this primary before testing a fresh channel. Channels opened by the older provider retain their saved payment limit after an upgrade. For one of those channels, complete a controlled normal close and reopen with the updated primary and client. Preserve wallet data and current channel state; deleting the wallet or its storage is not an upgrade procedure.
+
+The 50,000 sat qualification used a Beignet sender, the packaged native primary and Bitkit's native client engine on regtest. It grew a 40,000 sat channel to 110,000 sats and credited 49,850 sats after a 150 sat receive fee. The test did not exercise the Android UI or a physical Umbrel installation.
+
+## Read and export wallet logs
+
+Open the selected wallet's **Logs** page for its native file log and process diagnostics. **Refresh** loads the latest snapshot; **Copy logs** and **Download logs** export the displayed snapshot as plain text. The native log remains available when process diagnostics are empty or the wallet is stopped.
+
+The snapshot contains the newest complete records, capped at 256 KiB of native logs plus 64 KiB of process diagnostics. Sensitive values are redacted, and omitted older content is identified. Review the exported text before sharing it. The controls require the existing authenticated wallet session and work over a normal HTTP LAN connection.
+
 ## Choose a phone connection
 
 Open **Pair Chicory > Connection method** to choose **Iroh**, **Local network (TCP)**, or **Tor** from the available addresses. The selected method controls the displayed URI and QR code. Copy or scan that address in the client. This choice does not enable or disable a transport, so one client can use Tor while another uses Iroh.

@@ -3,15 +3,15 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.9"
+version: "0.1.10"
 port: 2114
 description: >-
-  Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
+  Manage independent native LDK Node wallets and pair Chicory or a compatible Bitkit Primary client as your phone wallet.
   View Bitcoin and Lightning balances, channels, payments and peers, and configure
   liquidity, offline settlement and optional Tor and Iroh connections. Each wallet keeps its
   own identity and storage. Mainnet is the initial network selection; choose your
   chain backend before starting a wallet. This experimental release requires the
-  compatible Chicory client described in the repository. Funded qualification used
+  compatible phone clients described in the repository. Funded qualification used
   disposable regtest funds. Read the installation and qualification notes before use.
 developer: Corey Phillips
 website: https://github.com/coreyphillips/ldk-node-umbrel
@@ -30,8 +30,9 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Balances and payment status refresh automatically while a receive QR is open
-  and when you return to the dashboard. New receive addresses are watched through
-  the wallet's configured Electrum or Esplora server, prompting a native wallet
-  sync when activity changes. Watching resumes after a wallet restart. Bitcoin
-  Core wallets retain their native automatic chain and mempool synchronization.
+  Incoming primary payments can now grow compatible private client channels beyond
+  their original capacity. Existing channels keep their saved limit and need a
+  controlled normal close and reopen with the updated primary and client. Preserve
+  wallet data. The Logs page now shows native wallet logs and process diagnostics,
+  with Copy logs, Download logs and Refresh controls. Automatic receive and balance
+  updates from 0.1.9 remain available.

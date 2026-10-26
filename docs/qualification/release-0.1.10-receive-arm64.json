@@ -1,0 +1,54 @@
+{
+  "architecture": "arm64",
+  "image": "ldk-node-umbrel:0.1.10-arm64",
+  "image_id": "sha256:d014c1a6f05e10b5a8bc6bebbb2b64e6c5588531a636f6522bb000a8320ddd03",
+  "version": "0.1.10",
+  "checks": [
+    "new internal-only Core and real Electrs index 101 disposable regtest blocks; no existing fixture is used",
+    "real Electrs verifies regtest and both real native wallets complete initial synchronization",
+    "generated receive addresses persist privately and subscribe on separate live wallet watchers",
+    "closing only subscription sockets causes the real Electrum watcher to reconnect and resubscribe",
+    "manager restart preserves native identity and restores subscriptions from the private address list without generating an address",
+    "stopping receiver closes only its watcher; the running sibling retains its subscription and identity",
+    "deleting disposable receiver removes its saved addresses and leaves sibling data unchanged",
+    "stopping all wallets closes all subscription connections"
+  ],
+  "rounds": [
+    {
+      "phase": "initial",
+      "amount_sats": 100000,
+      "deposit_to_balance_ms": 885,
+      "native_start_to_balance_ms": 1525,
+      "notification_to_history_read_ms": 12,
+      "latest_onchain_sync": 1793034301,
+      "explicit_sync_requests": 0
+    },
+    {
+      "phase": "subscription-reconnect",
+      "amount_sats": 120000,
+      "deposit_to_balance_ms": 13790,
+      "native_start_to_balance_ms": 16442,
+      "notification_to_history_read_ms": 12783,
+      "latest_onchain_sync": 1793034316,
+      "explicit_sync_requests": 0
+    },
+    {
+      "phase": "manager-restart",
+      "amount_sats": 150000,
+      "deposit_to_balance_ms": 15050,
+      "native_start_to_balance_ms": 15147,
+      "notification_to_history_read_ms": 13962,
+      "latest_onchain_sync": 1793034331,
+      "explicit_sync_requests": 0
+    }
+  ],
+  "backend": "real Electrs v0.10.2 and Bitcoin Core 26.0",
+  "observation": "transparent TCP forwarding proxy; no fabricated backend replies",
+  "funds": "disposable regtest only",
+  "sats_received": 150000,
+  "blocks_mined": 101,
+  "explicit_sync_requests": 0,
+  "native_background_onchain_interval_seconds": 80,
+  "physical_umbrel": false,
+  "date": "2026-10-26T17:05:32.000Z"
+}

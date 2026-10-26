@@ -75,7 +75,7 @@ npm test
 
 Use Node 24. Set `LDK_NODE_BIN` to the native daemon, `DATA_DIR` to an unused private directory, and `PUBLIC_ORIGIN` to the exact browser origin before `npm start`.
 
-The container release packages previously qualified native daemon and Iroh binaries with this dashboard. The native LDK compatibility fork and phone patches remain separate local projects and are not published in this repository. Consequently, the complete native release is not reproducible from this repository alone. The [qualification record](docs/qualification.md) includes exact native binary and build-input hashes; [third-party notices](licenses/README.md) include applicable source archives and license texts.
+The container release rebuilds the native daemon from the selected local LDK source and preserves the qualified 0.1.9 Iroh, Tor, system libraries and locked JavaScript dependencies. The native LDK compatibility fork and phone patches remain separate local projects and are not published in this repository. Consequently, the complete native release is not reproducible from this repository alone. The [qualification record](docs/qualification.md) includes exact native binary and build-input hashes; [third-party notices](licenses/README.md) include applicable source archives and license texts.
 
 If you have that native source checkout, the full build path is:
 
@@ -83,7 +83,7 @@ If you have that native source checkout, the full build path is:
 LDK_SOURCE_DIR=/absolute/path/to/ldk-node ./scripts/build-images.sh
 ```
 
-This exports both architecture archives to `dist/` without pushing them. `scripts/load-local.sh` and `compose.local.yml` support a standalone local Docker installation. Set `.env` with the exact `PUBLIC_ORIGIN` and `ALLOWED_HOSTS` before starting it. The standalone generated password is in `data/dashboard-password`.
+The release recipe uses the named `native` build context and packages the newly built daemon for each architecture. The script records the native Git revision and a SHA-256 manifest of all copied native source files, including local changes. It exports both architecture archives and their checksums to `dist/` without pushing them. `scripts/load-local.sh` and `compose.local.yml` support a standalone local Docker installation. Set `.env` with the exact `PUBLIC_ORIGIN` and `ALLOWED_HOSTS` before starting it. The standalone generated password is in `data/dashboard-password`.
 
 Release archives and checksums are available on the [Releases page](https://github.com/coreyphillips/ldk-node-umbrel/releases). The manually dispatched `Publish qualified images` workflow verifies those archives and publishes both architectures to GHCR. It does not rebuild or modify the native binaries. Store updates require an explicit reviewed image digest change.
 
