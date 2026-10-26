@@ -11,6 +11,7 @@ import { createBackup } from './backup.mjs';
 import { TorProcess } from './tor.mjs';
 import { ReceiveWatcher, MAX_WATCH_ADDRESSES, addressScriptHash } from './receive-watch.mjs';
 import { ReceiveSync } from './receive-sync.mjs';
+import { nativeDiagnostics, processDiagnostics } from './logs.mjs';
 
 const liveChild = child => Boolean(child?.pid && child.exitCode == null && child.signalCode == null);
 const unsafeDeletion = () => failure('Wallet deletion refused an unsafe data path. Check its private directory before retrying.', 409, 'WALLET_PATH_UNSAFE');
@@ -386,6 +387,16 @@ export class WalletManager {
       });
     } finally { this.backupInProgress = false; }
   }
-  logs(id) { this.get(id); const state = this.state(id); return ((state.process?.logs || state.logs || []).join('') + (state.receiveWarning ? `\n${state.receiveWarning}\n` : '')).slice(-64 * 1024); }
+  async logs(id) {
+    const wallet = this.get(id); this.requireAvailable(id);
+    const secrets = wallet.chain_source.type === 'bitcoind' ? [wallet.chain_source.password] : [];
+    const state = this.state(id);
+    const native = await nativeDiagnostics(this.dataDir, id, secrets);
+    const diagnostics = [...(state.process?.logs || state.logs || [])];
+    if (state.receiveWarning) diagnostics.push(`\n${state.receiveWarning}\n`);
+    const process = processDiagnostics(diagnostics, secrets);
+    return { text: `Native wallet log\n${native.text}\nProcess diagnostics\n${process.text}`, native, process };
+  }
+
   async close() { this.shuttingDown = true; await this.serial; await Promise.all(this.wallets.map(wallet => this.stop(wallet.id).catch(() => {}))); }
 }

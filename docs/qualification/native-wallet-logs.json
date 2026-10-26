@@ -1,0 +1,94 @@
+{
+  "branch": "fix/native-wallet-logs",
+  "base_commit": "ffc6a16",
+  "manager_tests": {
+    "passed": 266,
+    "failed": 0,
+    "skipped": 0
+  },
+  "linux_log_tests": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "checks": [
+      "1440: native and process logs, literal HTML, redaction and mobile fit",
+      "1440: real HTTP clipboard fallback and matching plain-text download",
+      "1440: background polling preserves snapshot and explicit Refresh loads new logs",
+      "1440: switching wallets clears previous logs and disables empty exports",
+      "1440: late log responses cannot populate another wallet",
+      "390: native and process logs, literal HTML, redaction and mobile fit",
+      "390: real HTTP clipboard fallback and matching plain-text download",
+      "390: background polling preserves snapshot and explicit Refresh loads new logs",
+      "390: switching wallets clears previous logs and disables empty exports",
+      "390: late log responses cannot populate another wallet"
+    ],
+    "browser_errors": [],
+    "funds_sent": false,
+    "physical_umbrel": false,
+    "frontend_sha256": "cd9f61a0a409188d706c065914dc52d4ac82f1194d83993f720a61ba359b7619"
+  },
+  "packaged_runtime_checks": {
+    "native_file_available": true,
+    "process_log_empty": true,
+    "splice_and_settlement_records_present": true,
+    "unauthenticated_status": 401
+  },
+  "published": false,
+  "physical_umbrel": false,
+  "balance_browser": {
+    "timing_checks": {
+      "polling_interval_ms": 5000,
+      "observed_stale_delay_ms": 15000,
+      "native_deadline_ms": 65000,
+      "deadline_method": "Invoked the recorded 65-second callback after observing the real 15-second stale threshold"
+    },
+    "checks": [
+      "1440: natural five-second polling applies incoming on-chain balance through the receive modal with stable QR, focus, selection and scroll",
+      "1440: historical incoming payment does not mark this request paid; QR and Copy match the generated request without overflow",
+      "1440: a held payments read does not delay fresh balances or overlap the same resource",
+      "1440: transient balance failure retains last good sats and clears stale status after a successful retry",
+      "1440: backgrounding preserves the public request and visible, focus and online resume as one immediate refresh",
+      "1440: stopping pauses reads and restarting resumes the same public request without generating another address",
+      "1440: Lightning receives update the wallet balance without recreating or claiming payment of the invoice",
+      "1440: QR errors preserve the request and Copy; QR retry never generates another address",
+      "1440: delayed address and invoice replies after Cancel and wallet navigation cannot reopen the modal or issue a QR request",
+      "1440: delayed QR results keep their captured wallet and cannot replace a newer receive form",
+      "1440: a delayed balance response cannot overwrite a newly selected wallet",
+      "1440: a prior-session receive response cannot alter a newer login",
+      "1440: polling during a receive draft preserves the mounted form and entered values",
+      "1440: a lifecycle change closes the old receive draft and a fresh form works after restart",
+      "1440: a real 15-second delayed balance retains its last value without overlapping reads; the configured 65-second deadline releases the request and permits recovery",
+      "1440: invoice creation failure preserves entered fields and requires an explicit retry",
+      "1440: large integer balances stay exact and malformed balances preserve the last good value",
+      "1440: stop discards an older balance response and pending deletion closes its receive view",
+      "1440: a delayed 401 from an old balance session cannot sign out a newer session",
+      "1440: pending deletion invalidates in-flight balance data and no polling path calls sync",
+      "390: natural five-second polling applies incoming on-chain balance through the receive modal with stable QR, focus, selection and scroll",
+      "390: historical incoming payment does not mark this request paid; QR and Copy match the generated request without overflow",
+      "390: a held payments read does not delay fresh balances or overlap the same resource",
+      "390: transient balance failure retains last good sats and clears stale status after a successful retry",
+      "390: backgrounding preserves the public request and visible, focus and online resume as one immediate refresh",
+      "390: stopping pauses reads and restarting resumes the same public request without generating another address",
+      "390: Lightning receives update the wallet balance without recreating or claiming payment of the invoice",
+      "390: QR errors preserve the request and Copy; QR retry never generates another address",
+      "390: delayed address and invoice replies after Cancel and wallet navigation cannot reopen the modal or issue a QR request",
+      "390: delayed QR results keep their captured wallet and cannot replace a newer receive form",
+      "390: a delayed balance response cannot overwrite a newly selected wallet",
+      "390: a prior-session receive response cannot alter a newer login",
+      "390: polling during a receive draft preserves the mounted form and entered values",
+      "390: a lifecycle change closes the old receive draft and a fresh form works after restart",
+      "390: invoice creation failure preserves entered fields and requires an explicit retry",
+      "390: large integer balances stay exact and malformed balances preserve the last good value",
+      "390: stop discards an older balance response and pending deletion closes its receive view",
+      "390: a delayed 401 from an old balance session cannot sign out a newer session",
+      "390: pending deletion invalidates in-flight balance data and no polling path calls sync"
+    ],
+    "browser_errors": [],
+    "real_wallet_accessed": false,
+    "funds_sent": false,
+    "physical_umbrel": false,
+    "frontend_sha256": "cd9f61a0a409188d706c065914dc52d4ac82f1194d83993f720a61ba359b7619"
+  }
+}

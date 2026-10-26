@@ -1,0 +1,66 @@
+{
+  "version": "0.1.10",
+  "date": "2026-10-26T17:05:16.057883+00:00",
+  "result": "passed",
+  "network": "regtest",
+  "architecture": "arm64",
+  "provider": {
+    "image": "ldk-node-umbrel:0.1.10-arm64",
+    "image_id": "sha256:d014c1a6f05e10b5a8bc6bebbb2b64e6c5588531a636f6522bb000a8320ddd03",
+    "native_binary_sha256": "c30b16fe9e0d746daae450a41ddcfb28f1c3d3237c282376972ba7e09c41eb73"
+  },
+  "sender": {
+    "implementation": "Beignet",
+    "revision": "2f77580554fa7543189ee2c3a0a3d0dad82cc22b",
+    "channel_open": "Public openChannelV2, 1000 sat/kw funding and commitment feerates"
+  },
+  "recipient": {
+    "implementation": "Bitkit native LDK client engine",
+    "binary_sha256": "1cea7eaee94bb5ba9b724d4ce2d8556082fba1e01894929be9dc00ef16c9b87f",
+    "android_ui_exercised": false
+  },
+  "checks": [
+    "Regtest chain and wallet addresses verified before funding",
+    "Unfunded primary pairing succeeds while receive quote remains refused",
+    "Confirmed funding for fresh provider and payer wallets",
+    "Beignet sender opens a usable upstream channel",
+    "Receive fee ceiling rejects insufficient authorization",
+    "Initial 20,000 sat receive credits 19,880 sats and opens a 40,000 sat private channel",
+    "Initial channel funding and provider change confirmed before growth",
+    "50,000 sat receive quotes 150 sat receive fee and 70,000 sat funding contribution",
+    "Beignet payment succeeds and same private channel splices from 40,000 to 110,000 sats",
+    "Recipient is credited 49,850 sats",
+    "Subsequent 1,000 sat outgoing payment succeeds",
+    "Authenticated native logs include splice and settlement records while process diagnostics are empty",
+    "Unauthenticated log request returns 401",
+    "Native export contains redaction markers and no raw 64-character hex values",
+    "Owned nodes stopped and fixture container and volume removed"
+  ],
+  "receive": {
+    "invoice_sats": 50000,
+    "receive_fee_sats": 150,
+    "credited_sats": 49850,
+    "sender_routing_fee_sats": 1,
+    "opening_capacity_sats": 40000,
+    "final_capacity_sats": 110000,
+    "same_channel": true
+  },
+  "native_logs": {
+    "unauthenticated_status": 401,
+    "native_available": true,
+    "native_bytes": 48531,
+    "native_truncated": false,
+    "process_bytes": 0,
+    "redacted_fields": 239,
+    "raw_64hex_values": 0,
+    "splice_and_settlement_present": true
+  },
+  "funds_sent": true,
+  "physical_umbrel": false,
+  "mainnet": false,
+  "existing_channel_migration_tested": false,
+  "owned_resources_stopped": true,
+  "raw_result_sha256": "1324e1163828768721c79e0ee2a99531bd107b2b8b829bc05a049a0be4a329bd",
+  "runner_sha256": "82d4b98a24251c96fa67542569306b73571d5f4261ac423bbcba50eda29cafdf",
+  "provider_adapter_sha256": "b7f4f80a5b014005900de5becb2e42a1773b20d1f027aec78d3aa660e57fc214"
+}

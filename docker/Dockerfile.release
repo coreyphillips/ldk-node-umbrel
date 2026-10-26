@@ -1,15 +1,36 @@
-# Preserve the qualified native daemon, Iroh addon and Tor bytes from the selected release.
-# Update the dashboard and its locked JavaScript dependencies.
-ARG QUALIFIED_BASE=ghcr.io/coreyphillips/ldk-node-umbrel:0.1.8@sha256:aa35ba40741caac800e641cfa3a128b9d940e0a3a4edd991593e83b86a3db803
-FROM ${QUALIFIED_BASE}
+# syntax=docker/dockerfile:1.7
+ARG QUALIFIED_BASE=ghcr.io/coreyphillips/ldk-node-umbrel:0.1.9@sha256:1c994abcf0f63a493bdacc92cf9e762f6735000e716c51ef966dd3fb434bd1fc
+FROM --platform=$BUILDPLATFORM rust:1.90-bookworm@sha256:3914072ca0c3b8aad871db9169a651ccfce30cf58303e5d6f2db16d1d8a7e58f AS native-build
+ARG TARGETARCH
+RUN apt-get update && apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu gcc-x86-64-linux-gnu libc6-dev-arm64-cross libc6-dev-amd64-cross && rm -rf /var/lib/apt/lists/*
+RUN rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
+COPY --from=native / /source/
+WORKDIR /source/tools/ldk-node-daemon
+ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-linux-gnu-gcc \
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
+    CC_x86_64_unknown_linux_gnu=x86_64-linux-gnu-gcc \
+    CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
+    CARGO_BUILD_JOBS=2
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/source/tools/ldk-node-daemon/target \
+    case "$TARGETARCH" in amd64) native_target=x86_64-unknown-linux-gnu ;; arm64) native_target=aarch64-unknown-linux-gnu ;; *) exit 1 ;; esac && \
+    cargo build --locked --release --target "$native_target" && \
+    install -Dm755 "target/$native_target/release/ldk-node-daemon" /out/ldk-node-daemon
+
+# Keep the qualified Iroh, Tor, system libraries and locked JavaScript dependencies.
+# The native daemon must be rebuilt from the selected compatibility source.
+FROM ${QUALIFIED_BASE} AS runtime
 ENV TOR_BIN=/usr/bin/tor
+COPY --from=native-build /out/ldk-node-daemon /opt/ldk/bin/ldk-node-daemon
 COPY manager/server/ /opt/ldk/manager/server/
 COPY manager/public/ /opt/ldk/manager/public/
+# Fail if dependency metadata changes without a newly qualified dependency set.
+RUN --mount=type=bind,source=manager,target=/release-manager,readonly \
+    node -e "const fs = require('node:fs'); const assert = require('node:assert/strict'); for (const name of ['package.json', 'package-lock.json']) { const before = JSON.parse(fs.readFileSync('/opt/ldk/manager/' + name)); const after = JSON.parse(fs.readFileSync('/release-manager/' + name)); for (const value of [before, after]) { delete value.version; if (value.packages?.['']) delete value.packages[''].version; } assert.deepEqual(after, before, 'Dependency metadata changed: qualify a new dependency set before reuse'); }"
 COPY manager/package.json manager/package-lock.json /opt/ldk/manager/
-RUN cd /opt/ldk/manager && npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY scripts/restore-backup.mjs /opt/ldk/scripts/restore-backup.mjs
 COPY LICENSE /opt/ldk/manager/LICENSE
 COPY licenses/ /opt/ldk/licenses/third-party/
 LABEL org.opencontainers.image.source="https://github.com/coreyphillips/ldk-node-umbrel" \
       org.opencontainers.image.title="LDK Node for Umbrel" \
-      org.opencontainers.image.version="0.1.9"
+      org.opencontainers.image.version="0.1.10"

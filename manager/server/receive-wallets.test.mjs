@@ -54,7 +54,7 @@ test('only native-generated addresses enter a private bounded persisted watch li
   assert.equal((await fs.stat(file)).mode & 0o777, 0o600); assert.deepEqual(watchers[0].updates.at(-1), expected);
   assert.equal(expected.includes(address(99)), false); assert.equal(native.calls.every(call => call.method === 'address'), true);
   native.nextAddress = 'invalid'; assert.deepEqual(await manager.call(wallet.id, 'address'), { address: 'invalid' });
-  assert.deepEqual(JSON.parse(await fs.readFile(file)).addresses, expected); assert.match(manager.logs(wallet.id), /could not be saved/);
+  assert.deepEqual(JSON.parse(await fs.readFile(file)).addresses, expected); assert.match((await manager.logs(wallet.id)).process.text, /could not be saved/);
 });
 
 test('manager restart restores selected wallet watches with no cross-wallet registration', async t => {
@@ -77,7 +77,7 @@ test('Bitcoin Core retains receive addresses without adding a watcher or sync sc
 for (const saved of ['invalid json', JSON.stringify({ version: 1, network: 'bitcoin', addresses: [address(1)] }), JSON.stringify({ version: 1, network: 'regtest', addresses: [address(1), address(1)] })]) {
   test(`corrupt or mismatched watch state is preserved and native startup still succeeds: ${saved.slice(0, 30)}`, async t => {
     const { manager, wallet, file, watchers } = await fixture(t); await fs.writeFile(file, saved, { mode: 0o600 });
-    await manager.start(wallet.id); assert.equal(manager.state(wallet.id).status, 'running'); assert.match(manager.logs(wallet.id), /could not be loaded/);
+    await manager.start(wallet.id); assert.equal(manager.state(wallet.id).status, 'running'); assert.match((await manager.logs(wallet.id)).process.text, /could not be loaded/);
     await manager.call(wallet.id, 'address'); assert.deepEqual(watchers[0].updates, [[address(1)]]); assert.equal(await fs.readFile(file, 'utf8'), saved);
   });
 }
@@ -119,8 +119,8 @@ test('queued cache writes recheck liveness after stop and do not interfere with 
 
 test('watcher startup and cleanup failures cannot prevent native lifecycle operations', async t => {
   const { manager, wallet } = await fixture(t, { receiveWatcherFactory: () => ({ start() { throw new Error('private backend URL'); }, close() { throw new Error('cleanup failed'); } }) });
-  await manager.start(wallet.id); assert.equal(manager.state(wallet.id).status, 'running'); assert.match(manager.logs(wallet.id), /Fast receive monitoring is unavailable/);
-  assert.doesNotMatch(manager.logs(wallet.id), /private backend URL|cleanup failed/); assert.equal(manager.state(wallet.id).process.listenerCount('sync_started'), 0);
+  await manager.start(wallet.id); assert.equal(manager.state(wallet.id).status, 'running'); assert.match((await manager.logs(wallet.id)).process.text, /Fast receive monitoring is unavailable/);
+  assert.doesNotMatch((await manager.logs(wallet.id)).process.text, /private backend URL|cleanup failed/); assert.equal(manager.state(wallet.id).process.listenerCount('sync_started'), 0);
   await manager.stop(wallet.id); assert.equal(manager.state(wallet.id).process.closed, true);
 });
 
