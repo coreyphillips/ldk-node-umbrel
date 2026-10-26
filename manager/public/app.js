@@ -130,7 +130,11 @@ async function refresh() {
   }
 }
 function navigate(view, id = state.selected) { state.view = view; state.selected = id; state.data = {}; render(); refresh(); }
-function pairingRenderKey() { return active() && state.view === 'pairing' ? JSON.stringify([state.selected, state.wallets, state.data.error || null]) : null; }
+function pairingRenderKey() {
+  // Tor progress updates its notice without remounting the selected QR or URI.
+  const wallets = state.wallets.map(({ tor_status, tor_bootstrap, tor_error, tor_address, ...wallet }) => wallet);
+  return active() && state.view === 'pairing' ? JSON.stringify([state.selected, wallets, state.data.error || null]) : null;
+}
 function render() {
   const wallet = active();
   const pairingKey = pairingRenderKey();
@@ -217,6 +221,25 @@ function renderPairing(content, wallet, key) {
 function currentPairing(view) {
   return pairingView === view && state.session === view.session && state.session?.authenticated && state.view === 'pairing' && state.selected === view.walletId && active()?.status === 'running' && view.key === pairingRenderKey();
 }
+function torStatus(value) {
+  const labels = { disabled: 'Disabled', external: 'Existing onion service', stopped: 'Stopped', starting: 'Starting Tor', bootstrapping: `Connecting to Tor (${value.tor_bootstrap || 0}%)`, ready: 'Connected to Tor', failed: 'Tor unavailable' };
+  return labels[value.tor_status] || 'Disabled';
+}
+function torNotice(value) {
+  if (value.tor_managed || value.tor?.enabled) {
+    if (value.tor_status === 'failed') return notice(`${torStatus(value)}. ${value.tor_error || 'Stop and start the wallet to retry.'} Local TCP and Iroh remain available.`, true);
+    if (value.tor_status === 'stopped') return notice('Tor is enabled. Start the wallet to create its onion address.');
+    return notice(`${torStatus(value)}. ${value.tor_address ? 'Your onion address is available. It can take a few minutes to become reachable.' : 'Your onion address will appear automatically.'} This enables incoming Tor connections; outgoing node connections keep their existing routing.`);
+  }
+  if (value.tor_status === 'external' || value.tor_onion_address) return notice('Using an existing onion service. It must forward to this wallet’s native Lightning port.');
+  return notice('To connect a client over Tor, stop the wallet and choose Settings > Edit configuration > Enable Tor connections, then start it again. Local TCP and Iroh can stay enabled.');
+}
+function updateTorNotice(view) {
+  const pairing = view.pairing;
+  const signature = JSON.stringify([pairing.tor_managed, pairing.tor_status, pairing.tor_bootstrap, pairing.tor_error, pairing.tor_address]);
+  if (signature === view.torSignature) return;
+  view.torNoticeRoot.replaceChildren(torNotice(pairing)); view.torSignature = signature;
+}
 function pairingQr(image, label) {
   const qr = el('img', 'qr'); qr.src = image; qr.alt = `${label} connection QR code`; return qr;
 }
@@ -246,6 +269,8 @@ function showPairingConnection(view) {
   // address disappears or changes during a background refresh.
   view.qrRequest++; view.qrLoading = false; view.connection = connection;
   const replacement = el('div'); const body = el('div'); replacement.append(card('Connect Chicory to this primary', body));
+  view.torNoticeRoot = el('div', 'tor-connection-status'); view.torSignature = null;
+  replacement.append(view.torNoticeRoot); updateTorNotice(view);
   if (connection) {
     pairingSelections.set(view.walletId, connection.type);
     const selector = field(body, 'connection_method', 'Connection method', { value: connection.type, options: connections.map(item => [item.type, item.label]), help: 'Choose the address to scan or copy for this client. Enabled connections stay available.' });
@@ -264,7 +289,7 @@ function showPairingConnection(view) {
     add(body, view.qrSlot, copyValue(connection.uri), el('p', 'connection-help', connection.help));
     add(body, el('hr', 'divider'), detail([['Network', networks[pairing.network]], ['Transport', connection.label], ['Node ID', pairing.node_id]]));
     const steps = el('ol', 'instructions'); for (const step of ['Open Chicory on the same Bitcoin network.', 'Choose an external primary and scan this QR code or paste the connection URI.', 'Fund this node if you enable liquidity provisioning, then complete pairing in Chicory.']) steps.append(el('li', '', step)); body.append(steps);
-    if (pairing.tor_uri && connection.type !== 'tor') replacement.append(card('Optional Tor fallback', add(el('div'), copyValue(pairing.tor_uri), el('p', '', 'Paste this separately into Chicory’s Tor fallback field, or choose Tor above to scan it as the primary connection. Your onion service must forward to this wallet’s native Lightning port.'))));
+    if (pairing.tor_uri && connection.type !== 'tor') replacement.append(card('Optional Tor fallback', add(el('div'), copyValue(pairing.tor_uri), el('p', '', 'Paste this separately into Chicory’s Tor fallback field, or choose Tor above to scan it as the primary connection.'))));
   } else body.append(empty('No connection addresses available', 'Connection details will update when an address becomes available.'));
   // A local selection cannot make a failed pairing refresh current again.
   if (view.error) replacement.append(view.error);
@@ -279,8 +304,9 @@ async function updatePairing(view, wallet) {
   try {
     const pairing = await api(`/wallets/${wallet.id}/pairing`);
     if (!currentPairing(view)) return;
-    const signature = JSON.stringify([pairing.network, pairing.node_id, pairing.iroh_uri, pairing.tcp_uri, pairing.tor_uri]);
-    if (signature === view.signature) { view.error?.remove(); view.error = null; updatePairingQr(view); return; }
+    const signature = JSON.stringify([pairing.network, pairing.node_id, pairing.iroh_uri, pairing.tcp_uri, pairing.tor_uri, pairing.tor_managed]);
+    view.pairing = pairing;
+    if (signature === view.signature) { view.error?.remove(); view.error = null; updateTorNotice(view); updatePairingQr(view); return; }
     view.error?.remove(); view.error = null;
     Object.assign(view, { signature, pairing });
     showPairingConnection(view);
@@ -300,6 +326,8 @@ function renderOffline(content, wallet) {
 function renderSettings(content, wallet) {
   const summary = detail([['Wallet', wallet.name], ['Network', networks[wallet.network]], ['Chain backend', wallet.chain_source.type], ['Autostart', wallet.autostart ? 'Enabled' : 'Disabled'], ['Chicory provider', wallet.chicory.enabled ? 'Enabled' : 'Disabled'], ['Offline settlement', wallet.chicory.offline_enabled ? 'Enabled' : 'Disabled'], ['Iroh', wallet.iroh.enabled ? 'Enabled' : 'Disabled'], ['Flat fee', `${fmt(wallet.chicory.flat_fee_sat)} sats`], ['Proportional fee', `${fmt(wallet.chicory.fee_ppm)} ppm`], ['Client funding cap', `${fmt(wallet.chicory.max_client_funding_sats)} sats`]]);
   content.append(card('Configuration', summary, button('Edit configuration', () => walletForm(wallet), 'small')));
+  const tor = add(el('div'), detail([['Tor connections', torStatus(wallet)], ['Onion address', wallet.tor_address || 'Not available yet']]), el('hr', 'divider'), torNotice(wallet));
+  content.append(card('Tor connections', tor));
   content.append(card('Recovery & backup', add(el('div'), el('p', '', wallet.recovery_kind === 'mnemonic' ? 'Save your 24-word recovery phrase somewhere private. Make a full backup to preserve Lightning channel state as well.' : 'This wallet was created with a binary seed and has no recovery phrase. An encrypted full backup preserves its existing seed, identity and channel state.'), add(el('div', 'actions'), button('Recovery phrase', () => recoveryPhrase(wallet)), button('Back up all wallets', backupAll)))));
   content.append(card('Node lifecycle', add(el('div'), el('p', '', 'Stop the wallet before changing settings or making a full backup. Restart preserves its native identity and channel state.'), add(el('div', 'actions'), button('Sync now', () => run(() => rpc('sync'), 'Synchronization completed')), button('Stop wallet', () => confirmAction('Stop this wallet?', 'Payments and offline settlement need this node online. You can start it again from the dashboard.', () => api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {} })), 'danger')))));
   content.append(notice('This local build is experimental. The qualification report in the package records supported paths and remaining interoperability limits, including the installed wallet commitment fee policy.'));
@@ -374,7 +402,6 @@ function walletForm(wallet) {
   const network = field(grid, 'network', 'Bitcoin network', { value: wallet?.network || 'bitcoin', options: Object.entries(networks) }); if (wallet) network.disabled = true;
   const source = field(grid, 'source', 'Chain source', { value: wallet?.chain_source.type || 'electrum', options: [['electrum','Electrum'],['bitcoind','Bitcoin Core RPC'],['esplora','Esplora']] });
   field(grid, 'advertised_host', 'Server LAN host', { value: wallet?.advertised_host || '', help: 'For TCP pairing, such as 192.168.1.20 or umbrel.local.' });
-  field(grid, 'tor_onion_address', 'Optional Tor onion address', { value: wallet?.tor_onion_address || '', help: 'v3-onion-host.onion:port, already mapped to this native wallet. No Tor service is created automatically.', wide: true });
   const chainFields = el('div'); form.append(chainFields);
   const renderSource = () => {
     chainFields.replaceChildren();
@@ -422,13 +449,22 @@ function walletForm(wallet) {
   field(fees, 'clientcap', 'Per-client funding cap (sats)', { type: 'number', min: 10000, max: 100000000, value: wallet?.chicory.max_client_funding_sats ?? 200000 });
   field(fees, 'totalcap', 'Total funding cap (sats)', { type: 'number', min: 10000, value: wallet?.chicory.max_total_fronted_sats ?? 1000000 });
   add(form, el('hr', 'divider'), el('h3', '', 'Phone transport & startup'));
+  const tor = field(form, 'tor', 'Enable Tor connections', { type: 'checkbox', value: wallet?.tor?.enabled || false, help: 'Automatically creates a persistent onion address for this wallet. Local TCP and Iroh stay available. Applies to incoming connections only.' });
+  if (!state.config.tor_available) {
+    tor.disabled = !wallet?.tor?.enabled;
+    form.append(notice('Managed Tor is not installed in this dashboard. Update the app to use automatic Tor, or provide an existing onion service below.'));
+  }
+  const externalTor = el('div'); form.append(externalTor);
+  const onion = field(externalTor, 'tor_onion_address', 'Existing Tor onion address (optional)', { value: wallet?.tor_onion_address || '', help: 'Advanced: use a separately managed v3-onion-host.onion:port. Leave automatic Tor off when using this.' });
+  const toggleTor = () => { externalTor.hidden = tor.checked; onion.disabled = tor.checked; };
+  tor.addEventListener('change', toggleTor); toggleTor();
   field(form, 'iroh', 'Enable Iroh phone link', { type: 'checkbox', value: wallet?.iroh.enabled || false, help: 'Phone pairing requires both relay and discovery options below.' });
   field(form, 'relay', 'Allow public Iroh relays', { type: 'checkbox', value: wallet?.iroh.default_relays || false, help: 'Contacts the n0 relay service. Your network address may be visible to the relay and peer.' });
   field(form, 'discovery', 'Allow n0 endpoint discovery', { type: 'checkbox', value: wallet?.iroh.discovery || false });
   field(form, 'autostart', 'Start automatically with the dashboard', { type: 'checkbox', value: wallet?.autostart ?? true });
   submit(form, wallet ? 'Save settings' : 'Create wallet', async data => {
     const chain_source = data.get('source') === 'bitcoind' ? { type: 'bitcoind', host: data.get('host'), port: Number(data.get('port')), user: data.get('user'), password: data.get('password') } : { type: data.get('source'), url: data.get('url') };
-    const config = { name: data.get('name'), network: wallet?.network || data.get('network'), chain_source, advertised_host: data.get('advertised_host'), tor_onion_address: data.get('tor_onion_address'), autostart: data.has('autostart'), chicory: { enabled: data.has('provider'), offline_enabled: data.has('offline'), flat_fee_sat: Number(data.get('flat')), fee_ppm: Number(data.get('ppm')), max_client_funding_sats: Number(data.get('clientcap')), max_total_fronted_sats: Number(data.get('totalcap')) }, iroh: { enabled: data.has('iroh'), discovery: data.has('discovery'), default_relays: data.has('relay') } };
+    const config = { name: data.get('name'), network: wallet?.network || data.get('network'), chain_source, advertised_host: data.get('advertised_host'), tor: { enabled: tor.checked }, tor_onion_address: tor.checked ? '' : data.get('tor_onion_address'), autostart: data.has('autostart'), chicory: { enabled: data.has('provider'), offline_enabled: data.has('offline'), flat_fee_sat: Number(data.get('flat')), fee_ppm: Number(data.get('ppm')), max_client_funding_sats: Number(data.get('clientcap')), max_total_fronted_sats: Number(data.get('totalcap')) }, iroh: { enabled: data.has('iroh'), discovery: data.has('discovery'), default_relays: data.has('relay') } };
     const result = await api(wallet ? `/wallets/${wallet.id}` : '/wallets', { method: wallet ? 'PUT' : 'POST', body: config });
     dialog.close(); state.selected = result.id; state.view = 'overview'; toast(wallet ? 'Configuration saved. Start the wallet when ready.' : 'Wallet created'); await refresh();
     if (!wallet && active()?.id === result.id && state.session?.authenticated) recoveryPhrase(active());

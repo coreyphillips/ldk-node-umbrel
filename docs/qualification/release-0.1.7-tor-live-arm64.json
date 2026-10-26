@@ -1,0 +1,29 @@
+{
+  "image": "ldk-node-umbrel:0.1.7-arm64",
+  "image_id": "sha256:3290f2e815533dcbec6e7e468b71fbb4fc54762eafa29a87324ac6c00015b864",
+  "architecture": "arm64",
+  "recorded_at": "2026-10-26T15:33:16.735Z",
+  "event": "result",
+  "result": "pass",
+  "elapsed_seconds": 16,
+  "service_bootstrap": 100,
+  "service_status": "ready",
+  "client_bootstrap": 100,
+  "attempts": 1,
+  "last_connection_error": null,
+  "checks": [
+    "Real managed TorProcess generated a disposable onion identity and mapped port 9735 to a loopback fixture listener",
+    "A separate Tor client reached the managed onion service through SOCKS and received the exact random 32-byte fixture nonce"
+  ],
+  "onion_reachable": true,
+  "local_identity_created": true,
+  "fixture_bytes": 32,
+  "valid_echoes": 1,
+  "accepted_fixture_connections": 1,
+  "tor_module_sha256": "ce566d224be55495a0d8a4c675cad98cd4ee781f69a453e88000ba651a173109",
+  "limitation": null,
+  "user_wallet_accessed": false,
+  "funds_sent": false,
+  "host_ports_published": false,
+  "cleanup_complete": true
+}

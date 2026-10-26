@@ -1,0 +1,32 @@
+{
+  "architecture": "arm64",
+  "image": "ldk-node-umbrel:0.1.7-arm64",
+  "image_id": "sha256:3290f2e815533dcbec6e7e468b71fbb4fc54762eafa29a87324ac6c00015b864",
+  "version": "0.1.7",
+  "checks": [
+    "candidate release architecture and version verified",
+    "shipping manager advertises bundled Tor after authenticated login",
+    "served UI exposes Enable Tor connections with exact packaged asset bytes",
+    "empty default installation runs no Tor process",
+    "disposable internal-only Bitcoin Core starts at genesis without mining",
+    "real native regtest wallet starts with zero funds and Tor disabled by default",
+    "real Tor creates private v3 keys while native TCP and the Iroh fixture stay available",
+    "Tor remains bootstrapping with network disabled and exposes no SOCKS or control listeners",
+    "backup and restart remain blocked until a real paused Tor child exits and cache cleanup completes",
+    "normal stop/start preserves native, onion and Iroh fixture identities",
+    "unexpected real Tor exit clears the onion without stopping native or Iroh connections",
+    "unexpected native exit stops real Tor and the Iroh child before explicit stopped-state backup admission",
+    "disabling Tor launches no Tor process and retains its identity for later re-enablement",
+    "encrypted full backup restores native keys, onion keys and complete Tor state byte-for-byte after source removal",
+    "restored real native node and Tor retain their identities with zero funds"
+  ],
+  "native_wallet_created": true,
+  "iroh_network_boundary": "subprocess fixture",
+  "tor_network": "disabled",
+  "entry_guard_selection_tested": false,
+  "live_onion_reachability_tested": false,
+  "funds_sent": false,
+  "blocks_mined": false,
+  "physical_umbrel": false,
+  "date": "2026-10-26T15:33:03.216Z"
+}

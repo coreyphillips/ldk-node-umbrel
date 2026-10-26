@@ -17,7 +17,8 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     install -Dm755 "target/$native_target/release/ldk-node-daemon" /out/ldk-node-daemon
 
 FROM node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 AS runtime
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates gosu util-linux && rm -rf /var/lib/apt/lists/*
+ARG TOR_VERSION=0.4.9.11-0+deb12u1
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates gosu util-linux tor=${TOR_VERSION} && rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/ldk/manager
 COPY manager/package.json manager/package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
@@ -34,11 +35,11 @@ COPY LICENSE /opt/ldk/manager/LICENSE
 COPY licenses/ /opt/ldk/licenses/third-party/
 LABEL org.opencontainers.image.source="https://github.com/coreyphillips/ldk-node-umbrel" \
       org.opencontainers.image.title="LDK Node for Umbrel" \
-      org.opencontainers.image.version="0.1.6"
+      org.opencontainers.image.version="0.1.7"
 COPY docker/entrypoint.sh /usr/local/bin/ldk-entrypoint
 RUN chmod 755 /usr/local/bin/ldk-entrypoint
 ENV NODE_ENV=production DATA_DIR=/data BIND_ADDRESS=0.0.0.0 PORT=3000 \
-    LDK_NODE_BIN=/opt/ldk/bin/ldk-node-daemon IROH_BRIDGE=/opt/ldk/iroh/bridge.cjs
+    LDK_NODE_BIN=/opt/ldk/bin/ldk-node-daemon IROH_BRIDGE=/opt/ldk/iroh/bridge.cjs TOR_BIN=/usr/bin/tor
 EXPOSE 3000 9735-9742
 VOLUME ["/data"]
 WORKDIR /opt/ldk/manager

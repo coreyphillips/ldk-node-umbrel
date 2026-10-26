@@ -119,7 +119,7 @@ async function keyFor(passphrase, salt) {
 /**
  * Encrypt a complete stopped data directory, including channel state and keys.
  * The caller must hold the manager lifecycle gate and stop every native node
- * and Iroh writer before calling. Links, special files and oversized snapshots
+ * and Iroh or Tor writer before calling. Links, special files and oversized snapshots
  * are refused. No plaintext temporary files or passphrases are written to disk.
  * JavaScript strings are garbage collected and cannot be reliably zeroized.
  */

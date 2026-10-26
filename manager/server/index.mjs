@@ -40,7 +40,7 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
         const mutation = request.method !== 'GET'; auth.require(request, mutation);
         if (['POST', 'PUT'].includes(request.method) && !String(request.headers['content-type'] || '').startsWith('application/json')) throw failure('JSON request required', 415);
         if (url.pathname === '/api/logout' && request.method === 'POST') { auth.logout(request, response); return send(response, 200, { ok: true }); }
-        if (url.pathname === '/api/config' && request.method === 'GET') return send(response, 200, { version: packageMetadata.version, default_network: 'bitcoin', max_wallets: 8, backend: 'native-ldk-node', mainnet_experimental: true, iroh_available: Boolean(wallets.bridge), ...electrumConfig });
+        if (url.pathname === '/api/config' && request.method === 'GET') return send(response, 200, { version: packageMetadata.version, default_network: 'bitcoin', max_wallets: 8, backend: 'native-ldk-node', mainnet_experimental: true, iroh_available: Boolean(wallets.bridge), tor_available: Boolean(wallets.torBinary), ...electrumConfig });
         if (url.pathname === '/api/electrum/check' && request.method === 'POST') return send(response, 200, await electrumCheck(await body(request)));
         if (url.pathname === '/api/wallets' && request.method === 'GET') return send(response, 200, wallets.list());
         if (url.pathname === '/api/wallets' && request.method === 'POST') return send(response, 201, await wallets.create(await body(request)));
@@ -97,7 +97,9 @@ async function main() {
   bootstrapPassword = undefined;
   const electrumCheck = createElectrumChecker();
   const electrumConfig = electrumSettings();
-  const wallets = new WalletManager({ dataDir, binary: process.env.LDK_NODE_BIN || '/opt/ldk/bin/ldk-node-daemon', bridge: process.env.IROH_BRIDGE || undefined,
+  const torBinary = process.env.TOR_BIN || '/usr/bin/tor';
+  const torAvailable = await fs.access(torBinary).then(() => true, () => false);
+  const wallets = new WalletManager({ dataDir, binary: process.env.LDK_NODE_BIN || '/opt/ldk/bin/ldk-node-daemon', bridge: process.env.IROH_BRIDGE || undefined, torBinary: torAvailable ? torBinary : undefined,
     portBase: Number(process.env.LIGHTNING_PORT_BASE || 9735), publicPortBase: Number(process.env.PUBLIC_PORT_BASE || 19351), electrumCheck });
   await wallets.initialize();
   const allowedHosts = new Set((process.env.ALLOWED_HOSTS || (publicOrigin ? new URL(publicOrigin).hostname : 'localhost,127.0.0.1,umbrel.local')).split(','));

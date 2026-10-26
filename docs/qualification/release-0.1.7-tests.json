@@ -1,0 +1,54 @@
+{
+  "version": "0.1.7",
+  "recorded_at": "2026-10-26T15:33:19.258080+00:00",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "node": "v24.22.1",
+  "command": "npm test",
+  "working_directory": "manager",
+  "tests": 123,
+  "passed": 123,
+  "failed": 0,
+  "skipped": 0,
+  "test_output_sha256": "50f2155ee02cd67efdba80e2286af0199e988592e2736b92acf362b440f3314c",
+  "source_sha256": {
+    "manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
+    "manager/server/backup.mjs": "1c3a68b2d45d0e4134f4576617dca317af8f692e69910ae38bc1c8d474584af3",
+    "manager/server/backup.test.mjs": "86f8cb1d74d06253f86dfd5160b793b3f66b2b05f8fea5e7f014cc10ba5d382f",
+    "manager/server/config.mjs": "dcc41230539c1124c3b463cc31702fe2df432348bf111ae058098505b8e133b2",
+    "manager/server/electrum.mjs": "23fcf22267961765774ffcf154acf8c97083555229963725088f8dc68fe1544f",
+    "manager/server/electrum.test.mjs": "dd45f3e32b493574dcd04d905b3328e1f308d09bf087a47dfcfa1e79d84413cd",
+    "manager/server/files.mjs": "af4b64c38ffc746cdc187722a0ad501314185450f23004129841cb86481391b8",
+    "manager/server/index.mjs": "7a98430deb3b8822e207aa8f462f62a49a59f6ca18b76084271809dc86194b6d",
+    "manager/server/pairing.test.mjs": "f7d3d695e66c11b00de7223bbfedc8fff604e887ad996ccd34a3b54c716b8b5b",
+    "manager/server/process.test.mjs": "be9555f1fb9527767fc5aa79ec2ec1e7508165b7413cfc46368d8c51dcee5516",
+    "manager/server/recovery-api.test.mjs": "d15b56695c8d00fde4a78688db7407cc2a72db7142cf8eb11fa1926a2dfe98fc",
+    "manager/server/recovery.mjs": "e89a2628fb42d4a5fe5e6121b529cfcfaf2a2e56ead9446ead78cd680ef5527c",
+    "manager/server/recovery.test.mjs": "5f02f57ef961d82d801517c3c3a69b2e8b3f6c002ae93390e276426033033b5d",
+    "manager/server/request-security.mjs": "90a0225665d74fe40b370288d4fec8c4c2c7afb82d4fac86a55dc6da77aa07fd",
+    "manager/server/rpc.mjs": "3dbae8021b220581feb5455a75d5051a133bda5605a4691a595222272bd5d9a4",
+    "manager/server/security.test.mjs": "f881bcb27d47b5371c204a2064b056f929be68318cef24971779d01ee0789efe",
+    "manager/server/tor-wallets.test.mjs": "82bf1a658f6d18c774055651f8b93f227ce533086cd86d0c14f59109ae5e1e6d",
+    "manager/server/tor.mjs": "ce566d224be55495a0d8a4c675cad98cd4ee781f69a453e88000ba651a173109",
+    "manager/server/tor.test.mjs": "36fbeaf60f47623181c4126a383232a7ceb72acd188ea34d9814c95ca9d52c1e",
+    "manager/server/wallets.mjs": "00b849eeff06cad993efddd171365e7a52761edb0a3a300662e5ab969684a39e",
+    "manager/public/app.js": "51d8f68b5a073c909956cc262f6fb9b7fe7d063641a9a4da89ab1ea181464f68",
+    "manager/public/icon.svg": "e5e2d9686ba0c8903056ee5a4050db8754040ed19c3ab96b31d25c40d0d267a9",
+    "manager/public/index.html": "0a5d2d2225f25fa13e28172081a291e21434ad3c22b29bf7b08033fe54243982",
+    "manager/public/pairing.js": "42fe2a4d49f6718b7fc1b322bde4961a53b7f3b089076067f0bed7ce1ffa9e22",
+    "manager/public/style.css": "d42ce79407c113933b56a2bfd1e5da0371097d0daf355b0cc67f916f2a488efb"
+  },
+  "coverage": {
+    "command": "node --experimental-test-coverage --test server/tor.test.mjs server/pairing.test.mjs",
+    "public/pairing.js": {
+      "line": 100,
+      "branch": 100,
+      "function": 100
+    },
+    "server/tor.mjs": {
+      "line": 100,
+      "branch": 89.94,
+      "function": 100
+    }
+  },
+  "scope": "Local Node unit and API tests with disposable localhost listeners and temporary wallet storage. Native and public Tor checks are recorded separately."
+}
