@@ -1,0 +1,157 @@
+{
+  "version": "0.1.6",
+  "qualified_base": {
+    "version": "0.1.4",
+    "index_digest": "sha256:924331f2a4592126950470d97a9d660791df9a6985261c26cfcc6f18addb5038"
+  },
+  "native_runtime_commit": "35b49a99bdff7edbe3c97dd5a605edf6e878ead4",
+  "recorded_at": "2026-10-26T14:46:10.234282+00:00",
+  "physical_umbrel": false,
+  "funds_sent": false,
+  "native_wallet_created": false,
+  "amd64": {
+    "image_id": "sha256:2cfc20c87fcdf8d8d37b9628bd97d780e12549905f1451c2f4534beb8871a376",
+    "architecture": "amd64",
+    "checks": [
+      "image architecture and version labels verified",
+      "every packaged manager source matches workspace",
+      "native daemon, Iroh bridge and addon match 0.1.4",
+      "all license files match 0.1.4",
+      "actual manager startup with isolated empty storage",
+      "unauthenticated wallet access denied",
+      "served JavaScript modules, HTML and styles match packaged source with correct MIME types",
+      "authenticated configuration and empty wallet registry verified",
+      "cookie-only access denied without browser proof",
+      "packaged selector and authenticated QR generation support Iroh, IPv6 TCP and Tor",
+      "unchanged native Iroh addon loads",
+      "manager shuts down gracefully on container stop"
+    ],
+    "manager_files": {
+      "/opt/ldk/manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
+      "/opt/ldk/manager/server/backup.mjs": "8b6ef7550241a7199addc0f1b27ab0a8ebff32870d482c447cdc0465a356e263",
+      "/opt/ldk/manager/server/backup.test.mjs": "86f8cb1d74d06253f86dfd5160b793b3f66b2b05f8fea5e7f014cc10ba5d382f",
+      "/opt/ldk/manager/server/config.mjs": "77412234d32dd53014c80dd47531a402d0a4365916584baf4071c229c1bc5dc0",
+      "/opt/ldk/manager/server/electrum.mjs": "23fcf22267961765774ffcf154acf8c97083555229963725088f8dc68fe1544f",
+      "/opt/ldk/manager/server/electrum.test.mjs": "dd45f3e32b493574dcd04d905b3328e1f308d09bf087a47dfcfa1e79d84413cd",
+      "/opt/ldk/manager/server/files.mjs": "af4b64c38ffc746cdc187722a0ad501314185450f23004129841cb86481391b8",
+      "/opt/ldk/manager/server/index.mjs": "696322249ecf5cf1e575e7f7d890b0fe71614c10afc4d79f61f12a061829a0a8",
+      "/opt/ldk/manager/server/pairing.test.mjs": "c8f2ce4f6669255c5867a12de6b383b15f2fa4fd0133be8eb5962974ccbb997a",
+      "/opt/ldk/manager/server/process.test.mjs": "be9555f1fb9527767fc5aa79ec2ec1e7508165b7413cfc46368d8c51dcee5516",
+      "/opt/ldk/manager/server/recovery-api.test.mjs": "d15b56695c8d00fde4a78688db7407cc2a72db7142cf8eb11fa1926a2dfe98fc",
+      "/opt/ldk/manager/server/recovery.mjs": "e89a2628fb42d4a5fe5e6121b529cfcfaf2a2e56ead9446ead78cd680ef5527c",
+      "/opt/ldk/manager/server/recovery.test.mjs": "5f02f57ef961d82d801517c3c3a69b2e8b3f6c002ae93390e276426033033b5d",
+      "/opt/ldk/manager/server/request-security.mjs": "90a0225665d74fe40b370288d4fec8c4c2c7afb82d4fac86a55dc6da77aa07fd",
+      "/opt/ldk/manager/server/rpc.mjs": "3dbae8021b220581feb5455a75d5051a133bda5605a4691a595222272bd5d9a4",
+      "/opt/ldk/manager/server/security.test.mjs": "f881bcb27d47b5371c204a2064b056f929be68318cef24971779d01ee0789efe",
+      "/opt/ldk/manager/server/wallets.mjs": "ca89e955a9097d080626250f59651195f0e30357d51eb2add8309a10f8d6c913",
+      "/opt/ldk/manager/public/app.js": "342134b8d9e732a4f7a24f29b90ee3fb24b5526d8c53a4edda81d0d3b01e99f9",
+      "/opt/ldk/manager/public/icon.svg": "e5e2d9686ba0c8903056ee5a4050db8754040ed19c3ab96b31d25c40d0d267a9",
+      "/opt/ldk/manager/public/index.html": "0a5d2d2225f25fa13e28172081a291e21434ad3c22b29bf7b08033fe54243982",
+      "/opt/ldk/manager/public/pairing.js": "cc2d898d82ad579084cb26a770d87701fef9fa7794efd45bd655b760a8bcaae4",
+      "/opt/ldk/manager/public/style.css": "d42ce79407c113933b56a2bfd1e5da0371097d0daf355b0cc67f916f2a488efb",
+      "/opt/ldk/manager/package.json": "f25c708f59de606d59f6c5fb4ea5dd0b64894c14031c879f7542dc9d37694c7a",
+      "/opt/ldk/manager/package-lock.json": "80967560a6f00444c84bfc701f37ee81648a007fd592ba18abb80d73e7f3a9f1",
+      "/opt/ldk/scripts/restore-backup.mjs": "f39c92837540c2b9835edee9330ffd2b5c0d0556debb6d6c5e8ef3df098faa8a"
+    },
+    "native_files": {
+      "/opt/ldk/bin/ldk-node-daemon": "a733a3e805426f11a59be85bae414bb8807c7a8eded2a8da6b64287605a7ba1b",
+      "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+      "/opt/ldk/iroh/node_modules/@number0/iroh-linux-x64-gnu/iroh.linux-x64-gnu.node": "d660aa1abbc2b65b99a970e8da094339256725078b75ed1201b49e0b0acbda55"
+    },
+    "native_files_match_0_1_4": true,
+    "license_files_match_0_1_4": true,
+    "license_file_count": 1060,
+    "license_manifest_sha256": "0ce4df36c7452ef9540f01673a1ac78713fce8bbcc01ce808b815dc8601dba79",
+    "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59",
+    "archive": {
+      "file": "ldk-node-umbrel-0.1.6-amd64.tar",
+      "sha256": "3a7490be50eb47b0f2abd6504d1808a43329a90b2a5974eab768a1d4677f2324",
+      "bytes": 110464000
+    }
+  },
+  "arm64": {
+    "image_id": "sha256:2fd369e321db7e05b8928024e8327852d3ae2372fae303911991902da9d2da25",
+    "architecture": "arm64",
+    "checks": [
+      "image architecture and version labels verified",
+      "every packaged manager source matches workspace",
+      "native daemon, Iroh bridge and addon match 0.1.4",
+      "all license files match 0.1.4",
+      "actual manager startup with isolated empty storage",
+      "unauthenticated wallet access denied",
+      "served JavaScript modules, HTML and styles match packaged source with correct MIME types",
+      "authenticated configuration and empty wallet registry verified",
+      "cookie-only access denied without browser proof",
+      "packaged selector and authenticated QR generation support Iroh, IPv6 TCP and Tor",
+      "unchanged native Iroh addon loads",
+      "manager shuts down gracefully on container stop"
+    ],
+    "manager_files": {
+      "/opt/ldk/manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
+      "/opt/ldk/manager/server/backup.mjs": "8b6ef7550241a7199addc0f1b27ab0a8ebff32870d482c447cdc0465a356e263",
+      "/opt/ldk/manager/server/backup.test.mjs": "86f8cb1d74d06253f86dfd5160b793b3f66b2b05f8fea5e7f014cc10ba5d382f",
+      "/opt/ldk/manager/server/config.mjs": "77412234d32dd53014c80dd47531a402d0a4365916584baf4071c229c1bc5dc0",
+      "/opt/ldk/manager/server/electrum.mjs": "23fcf22267961765774ffcf154acf8c97083555229963725088f8dc68fe1544f",
+      "/opt/ldk/manager/server/electrum.test.mjs": "dd45f3e32b493574dcd04d905b3328e1f308d09bf087a47dfcfa1e79d84413cd",
+      "/opt/ldk/manager/server/files.mjs": "af4b64c38ffc746cdc187722a0ad501314185450f23004129841cb86481391b8",
+      "/opt/ldk/manager/server/index.mjs": "696322249ecf5cf1e575e7f7d890b0fe71614c10afc4d79f61f12a061829a0a8",
+      "/opt/ldk/manager/server/pairing.test.mjs": "c8f2ce4f6669255c5867a12de6b383b15f2fa4fd0133be8eb5962974ccbb997a",
+      "/opt/ldk/manager/server/process.test.mjs": "be9555f1fb9527767fc5aa79ec2ec1e7508165b7413cfc46368d8c51dcee5516",
+      "/opt/ldk/manager/server/recovery-api.test.mjs": "d15b56695c8d00fde4a78688db7407cc2a72db7142cf8eb11fa1926a2dfe98fc",
+      "/opt/ldk/manager/server/recovery.mjs": "e89a2628fb42d4a5fe5e6121b529cfcfaf2a2e56ead9446ead78cd680ef5527c",
+      "/opt/ldk/manager/server/recovery.test.mjs": "5f02f57ef961d82d801517c3c3a69b2e8b3f6c002ae93390e276426033033b5d",
+      "/opt/ldk/manager/server/request-security.mjs": "90a0225665d74fe40b370288d4fec8c4c2c7afb82d4fac86a55dc6da77aa07fd",
+      "/opt/ldk/manager/server/rpc.mjs": "3dbae8021b220581feb5455a75d5051a133bda5605a4691a595222272bd5d9a4",
+      "/opt/ldk/manager/server/security.test.mjs": "f881bcb27d47b5371c204a2064b056f929be68318cef24971779d01ee0789efe",
+      "/opt/ldk/manager/server/wallets.mjs": "ca89e955a9097d080626250f59651195f0e30357d51eb2add8309a10f8d6c913",
+      "/opt/ldk/manager/public/app.js": "342134b8d9e732a4f7a24f29b90ee3fb24b5526d8c53a4edda81d0d3b01e99f9",
+      "/opt/ldk/manager/public/icon.svg": "e5e2d9686ba0c8903056ee5a4050db8754040ed19c3ab96b31d25c40d0d267a9",
+      "/opt/ldk/manager/public/index.html": "0a5d2d2225f25fa13e28172081a291e21434ad3c22b29bf7b08033fe54243982",
+      "/opt/ldk/manager/public/pairing.js": "cc2d898d82ad579084cb26a770d87701fef9fa7794efd45bd655b760a8bcaae4",
+      "/opt/ldk/manager/public/style.css": "d42ce79407c113933b56a2bfd1e5da0371097d0daf355b0cc67f916f2a488efb",
+      "/opt/ldk/manager/package.json": "f25c708f59de606d59f6c5fb4ea5dd0b64894c14031c879f7542dc9d37694c7a",
+      "/opt/ldk/manager/package-lock.json": "80967560a6f00444c84bfc701f37ee81648a007fd592ba18abb80d73e7f3a9f1",
+      "/opt/ldk/scripts/restore-backup.mjs": "f39c92837540c2b9835edee9330ffd2b5c0d0556debb6d6c5e8ef3df098faa8a"
+    },
+    "native_files": {
+      "/opt/ldk/bin/ldk-node-daemon": "9c32115bcd926489690c5c063dd261f3eebb541c8f34593e1a865de765c510ab",
+      "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+      "/opt/ldk/iroh/node_modules/@number0/iroh-linux-arm64-gnu/iroh.linux-arm64-gnu.node": "e19d9da4111f5e35b630317c281b575e81c7f0abf6e3cd09dd1ba15d074eec82"
+    },
+    "native_files_match_0_1_4": true,
+    "license_files_match_0_1_4": true,
+    "license_file_count": 1060,
+    "license_manifest_sha256": "0ce4df36c7452ef9540f01673a1ac78713fce8bbcc01ce808b815dc8601dba79",
+    "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59",
+    "archive": {
+      "file": "ldk-node-umbrel-0.1.6-arm64.tar",
+      "sha256": "397f87e87d38d3b3cc9d12c1d5ba016e551e5fe6d28644b22279c8c20051ae43",
+      "bytes": 109648384
+    }
+  },
+  "manager_tests": {
+    "passed": 72,
+    "failed": 0
+  },
+  "source_checks": [
+    "git diff --check",
+    "docker compose -f compose.local.yml config --quiet",
+    "node --check scripts/container-smoke.mjs",
+    "node --check scripts/electrum-container-test.mjs",
+    "bash -n scripts/build-images.sh scripts/load-local.sh"
+  ],
+  "build_commands": [
+    "docker buildx build --platform linux/amd64 --file docker/Dockerfile.release --tag ldk-node-umbrel:0.1.6-amd64 --output type=docker,dest=dist/ldk-node-umbrel-0.1.6-amd64.tar .",
+    "docker buildx build --platform linux/arm64 --file docker/Dockerfile.release --tag ldk-node-umbrel:0.1.6-arm64 --output type=docker,dest=dist/ldk-node-umbrel-0.1.6-arm64.tar ."
+  ],
+  "qualification_scope": "Disposable containers with isolated storage and no external network; no existing wallet, Bitcoin or Electrum container was changed. Native binaries are unchanged, and funded protocol tests were not repeated.",
+  "selector_helper_tests": {
+    "passed": 11,
+    "failed": 0,
+    "line_coverage_percent": 100,
+    "branch_coverage_percent": 100,
+    "function_coverage_percent": 100,
+    "coverage_scope": "manager/public/pairing.js"
+  },
+  "browser_evidence": "release-0.1.6-browser.json"
+}

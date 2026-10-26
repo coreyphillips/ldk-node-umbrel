@@ -1,3 +1,5 @@
+import { pairingConnections, selectedPairingConnection } from './pairing.js';
+
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#dialog');
 // Cookies are shared across ports. This second secret stays in browser storage
@@ -16,9 +18,10 @@ function acceptSession(session) {
   const { proof, ...publicSession } = session;
   state.session = publicSession;
 }
-function clearSession() { clearSensitiveDialog(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; refreshQueued = false; if (dialog.open) dialog.close(); }
+function clearSession() { clearSensitiveDialog(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; pairingSelections.clear(); refreshQueued = false; if (dialog.open) dialog.close(); }
 const state = { session: null, wallets: [], selected: null, view: 'overview', data: {}, config: {}, polling: false };
 let pairingView = null;
+const pairingSelections = new Map();
 let refreshQueued = false;
 let sensitiveCleanup = null;
 const networks = { bitcoin: 'Mainnet', regtest: 'Regtest', signet: 'Signet', testnet: 'Testnet' };
@@ -205,7 +208,7 @@ function renderChannels(content, wallet) {
 function renderPairing(content, wallet, key) {
   const root = el('div'); content.append(root);
   const body = el('div'); root.append(card('Connect Chicory to this primary', body));
-  const view = { root, key, walletId: wallet.id, session: state.session, signature: null, qrUri: null, qrImage: null, loading: false, error: null };
+  const view = { root, key, walletId: wallet.id, session: state.session, signature: null, qrUri: null, qrImage: null, qrRequest: 0, qrLoading: false, loading: false, error: null };
   pairingView = view;
   if (wallet.status !== 'running') { body.append(empty('Start this wallet first', 'Pairing uses the live node identity.')); return; }
   body.append(el('p', '', 'Loading connection details...'));
@@ -214,6 +217,62 @@ function renderPairing(content, wallet, key) {
 function currentPairing(view) {
   return pairingView === view && state.session === view.session && state.session?.authenticated && state.view === 'pairing' && state.selected === view.walletId && active()?.status === 'running' && view.key === pairingRenderKey();
 }
+function pairingQr(image, label) {
+  const qr = el('img', 'qr'); qr.src = image; qr.alt = `${label} connection QR code`; return qr;
+}
+// A selection replaces the old QR immediately. Request revisions prevent a late
+// response for another transport from being shown beside the current URI.
+async function updatePairingQr(view) {
+  if (!currentPairing(view) || !view.connection || view.qrLoading || (view.qrUri === view.connection.uri && view.qrImage)) return;
+  const { uri, label } = view.connection; const request = ++view.qrRequest;
+  view.qrLoading = true;
+  const pending = el('div', 'qr qr-loading', 'Loading QR code...'); pending.role = 'status'; view.qrSlot.replaceChildren(pending);
+  try {
+    const { image } = await api(`/wallets/${view.walletId}/qr`, { method: 'POST', body: { text: uri } });
+    if (!currentPairing(view) || view.qrRequest !== request) return;
+    view.qrSlot.replaceChildren(pairingQr(image, label));
+    Object.assign(view, { qrUri: uri, qrImage: image });
+  } catch (error) {
+    if (!currentPairing(view) || view.qrRequest !== request) return;
+    const failed = add(el('div', 'qr qr-loading'), el('p', '', `Unable to load QR code: ${error.message} Copy the connection URI or retry.`), button('Retry QR code', () => updatePairingQr(view)));
+    failed.role = 'status'; view.qrSlot.replaceChildren(failed);
+  } finally { if (view.qrRequest === request) view.qrLoading = false; }
+}
+function showPairingConnection(view) {
+  const pairing = view.pairing; const connections = pairingConnections(pairing);
+  const preferred = pairingSelections.get(view.walletId);
+  const connection = selectedPairingConnection(connections, preferred);
+  // Invalidate requests before replacing their destination, including when an
+  // address disappears or changes during a background refresh.
+  view.qrRequest++; view.qrLoading = false; view.connection = connection;
+  const replacement = el('div'); const body = el('div'); replacement.append(card('Connect Chicory to this primary', body));
+  if (connection) {
+    pairingSelections.set(view.walletId, connection.type);
+    const selector = field(body, 'connection_method', 'Connection method', { value: connection.type, options: connections.map(item => [item.type, item.label]), help: 'Choose the address to scan or copy for this client. Enabled connections stay available.' });
+    selector.addEventListener('change', () => {
+      if (!currentPairing(view)) return;
+      pairingSelections.set(view.walletId, selector.value); showPairingConnection(view);
+      view.root.querySelector('[name="connection_method"]').focus({ preventScroll: true });
+    });
+    if (preferred && preferred !== connection.type) {
+      const label = { iroh: 'Iroh', tcp: 'Local network (TCP)', tor: 'Tor' }[preferred];
+      body.append(notice(`${label} is no longer available. Showing ${connection.label}.`));
+    }
+    view.qrSlot = el('div', 'pairing-qr');
+    if (view.qrUri === connection.uri && view.qrImage) view.qrSlot.append(pairingQr(view.qrImage, connection.label));
+    else view.qrSlot.append(el('div', 'qr qr-loading', 'Loading QR code...'));
+    add(body, view.qrSlot, copyValue(connection.uri), el('p', 'connection-help', connection.help));
+    add(body, el('hr', 'divider'), detail([['Network', networks[pairing.network]], ['Transport', connection.label], ['Node ID', pairing.node_id]]));
+    const steps = el('ol', 'instructions'); for (const step of ['Open Chicory on the same Bitcoin network.', 'Choose an external primary and scan this QR code or paste the connection URI.', 'Fund this node if you enable liquidity provisioning, then complete pairing in Chicory.']) steps.append(el('li', '', step)); body.append(steps);
+    if (pairing.tor_uri && connection.type !== 'tor') replacement.append(card('Optional Tor fallback', add(el('div'), copyValue(pairing.tor_uri), el('p', '', 'Paste this separately into Chicory’s Tor fallback field, or choose Tor above to scan it as the primary connection. Your onion service must forward to this wallet’s native Lightning port.'))));
+  } else body.append(empty('No connection addresses available', 'Connection details will update when an address becomes available.'));
+  // A local selection cannot make a failed pairing refresh current again.
+  if (view.error) replacement.append(view.error);
+  const scroll = { left: window.scrollX, top: window.scrollY, behavior: 'instant' };
+  view.root.replaceChildren(...replacement.childNodes);
+  window.scrollTo(scroll);
+  updatePairingQr(view);
+}
 async function updatePairing(view, wallet) {
   if (view.loading || !currentPairing(view)) return;
   view.loading = true;
@@ -221,23 +280,10 @@ async function updatePairing(view, wallet) {
     const pairing = await api(`/wallets/${wallet.id}/pairing`);
     if (!currentPairing(view)) return;
     const signature = JSON.stringify([pairing.network, pairing.node_id, pairing.iroh_uri, pairing.tcp_uri, pairing.tor_uri]);
-    if (signature === view.signature) { view.error?.remove(); view.error = null; return; }
-    const uri = pairing.iroh_uri || pairing.tcp_uri;
-    const image = uri === view.qrUri ? view.qrImage : (await api(`/wallets/${wallet.id}/qr`, { method: 'POST', body: { text: uri } })).image;
-    if (!currentPairing(view)) return;
-    // Assemble the complete replacement before touching the displayed page, so
-    // an asynchronous QR request never collapses its height between polls.
-    const replacement = el('div'); const body = el('div'); replacement.append(card('Connect Chicory to this primary', body));
-    const qr = el('img', 'qr'); qr.src = image; qr.alt = 'Chicory primary connection QR code'; add(body, qr, copyValue(uri));
-    add(body, el('hr', 'divider'), detail([['Network', networks[pairing.network]], ['Transport', pairing.iroh_uri ? 'Iroh' : 'Lightning TCP'], ['Node ID', pairing.node_id]]));
-    const steps = el('ol', 'instructions'); for (const step of ['Open Chicory on the same Bitcoin network.', 'Choose an external primary and scan this QR code or paste the connection URI.', 'Fund this node if you enable liquidity provisioning, then complete pairing in Chicory.']) steps.append(el('li', '', step)); body.append(steps);
-    if (pairing.tor_uri) replacement.append(card('Optional Tor fallback', add(el('div'), copyValue(pairing.tor_uri), el('p', '', 'Paste this separately into Chicory’s Tor fallback field. Your onion service must forward to this wallet’s native Lightning port. This dashboard does not create or verify an onion service.'))));
-    if (pairing.iroh_uri) { replacement.append(card('Local network address', copyValue(pairing.tcp_uri))); replacement.append(notice('Iroh uses the relay and endpoint discovery services you enabled. The TCP address remains available for local network connections.')); }
-    else replacement.append(notice('This address must be reachable from your phone. For a local Docker installation, use the server LAN address in Settings. Iroh is configured separately and never enabled automatically.'));
-    const scroll = { left: window.scrollX, top: window.scrollY, behavior: 'instant' };
-    view.root.replaceChildren(...replacement.childNodes);
-    window.scrollTo(scroll);
-    Object.assign(view, { signature, qrUri: uri, qrImage: image, error: null });
+    if (signature === view.signature) { view.error?.remove(); view.error = null; updatePairingQr(view); return; }
+    view.error?.remove(); view.error = null;
+    Object.assign(view, { signature, pairing });
+    showPairingConnection(view);
   } catch (error) {
     if (!currentPairing(view)) return;
     if (!view.error) { view.error = notice('', true); view.root.append(view.error); }

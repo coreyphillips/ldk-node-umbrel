@@ -3,7 +3,7 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.5"
+version: "0.1.6"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
@@ -30,8 +30,9 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Fixes connections to Electrum servers on the same Umbrel using the device's
-  local hostname, including custom names such as mint.local. No fixed LAN IP is
-  needed. Accepts host:port:t for TCP and host:port:s for TLS alongside tcp:// and
-  ssl:// URLs. Saved settings retain the hostname, and TLS certificate checks
-  remain enabled.
+  Choose Iroh, Local network (TCP), or Tor in Pair Chicory to view and scan each
+  available connection address. Pair a client over Tor while Iroh remains enabled
+  for another. Tor requires an existing v3 onion service mapped to the wallet's
+  Lightning port. Also fixes Electrum connections through this Umbrel's own local
+  hostname without a fixed LAN IP, and accepts host:port:t for TCP and host:port:s
+  for TLS. Wallet identities and existing settings are preserved.
