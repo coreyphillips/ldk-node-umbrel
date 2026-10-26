@@ -1,9 +1,7 @@
-# Preserve the qualified native daemon and Iroh addon bytes from the selected release.
+# Preserve the qualified native daemon, Iroh addon and Tor bytes from the selected release.
 # Update the dashboard and its locked JavaScript dependencies.
-ARG QUALIFIED_BASE=ghcr.io/coreyphillips/ldk-node-umbrel:0.1.6@sha256:f2f0548527699b138417622554c54e65a8f2826357d9b345dd3436b41f25f785
+ARG QUALIFIED_BASE=ghcr.io/coreyphillips/ldk-node-umbrel:0.1.7@sha256:036a68102bf160bf2fa5162dd0339e6212d6cb43e226a1794ff635eea715a4e4
 FROM ${QUALIFIED_BASE}
-ARG TOR_VERSION=0.4.9.11-0+deb12u1
-RUN apt-get update && apt-get install -y --no-install-recommends tor=${TOR_VERSION} && rm -rf /var/lib/apt/lists/*
 ENV TOR_BIN=/usr/bin/tor
 COPY manager/server/ /opt/ldk/manager/server/
 COPY manager/public/ /opt/ldk/manager/public/
@@ -14,4 +12,4 @@ COPY LICENSE /opt/ldk/manager/LICENSE
 COPY licenses/ /opt/ldk/licenses/third-party/
 LABEL org.opencontainers.image.source="https://github.com/coreyphillips/ldk-node-umbrel" \
       org.opencontainers.image.title="LDK Node for Umbrel" \
-      org.opencontainers.image.version="0.1.7"
+      org.opencontainers.image.version="0.1.8"

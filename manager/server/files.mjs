@@ -21,12 +21,18 @@ export async function atomicJson(file, value) {
   const temporary = `${file}.${randomBytes(8).toString('hex')}.tmp`;
   const handle = await fs.open(temporary, 'wx', 0o600);
   try {
-    await handle.writeFile(`${JSON.stringify(value, null, 2)}\n`);
-    await handle.sync();
-  } finally { await handle.close(); }
-  await fs.rename(temporary, file);
-  const directory = await fs.open(path.dirname(file), 'r');
-  try { await directory.sync(); } finally { await directory.close(); }
+    try {
+      await handle.writeFile(`${JSON.stringify(value, null, 2)}\n`);
+      await handle.sync();
+    } finally { await handle.close(); }
+    await fs.rename(temporary, file);
+    const directory = await fs.open(path.dirname(file), 'r');
+    try { await directory.sync(); } finally { await directory.close(); }
+  } finally {
+    // Only this call's exclusively created temporary file belongs to us. A
+    // rename may already have committed even if the directory sync failed.
+    await fs.unlink(temporary).catch(() => {});
+  }
 }
 
 export function failure(message, status = 400, code = 'INVALID_REQUEST') {

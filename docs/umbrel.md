@@ -66,6 +66,16 @@ To restore, stop the destination app, retain its existing data separately, and r
 
 Do not uninstall the app as a way to restart it or reset its password. Uninstallation can remove funds-controlling state. Preserve a full stopped backup before any migration or repair.
 
+## Delete a wallet
+
+First finish any required fund recovery, including closing channels and withdrawing funds, and save a current **Back up all wallets** download. Verify that you have the file and its password before continuing. Deletion does not close channels, withdraw funds, or move them to another wallet. A recovery phrase alone cannot restore current Lightning channel state.
+
+Stop the wallet you intend to remove. Open its **Settings > Delete wallet** card and choose **Delete wallet**. The confirmation shows the wallet's name and network. Type the exact wallet name, select **I understand this permanently deletes this wallet’s data from this app**, then choose **Permanently delete wallet**. A running or still-stopping wallet cannot be deleted; the app does not stop it automatically for deletion.
+
+Deletion removes only the selected wallet's private directory and registry entry, including its native keys, recovery phrase, channel state, configuration, logs, Iroh identity and Tor onion identity and guard state. Other wallets keep their data and identities. A new wallet can use the released slot and ports, but receives a new wallet ID and seed. Previously downloaded backups remain separate and are not erased. This is filesystem removal, not a guarantee of physical secure erasure.
+
+If cleanup fails after deletion begins, the wallet remains visible as pending deletion and keeps its slot reserved. Starting, editing and recovery-phrase access stay blocked, including after the app restarts. Full backup exports are blocked until pending deletion is resolved. The app never silently resumes deletion on startup. Resolve the reported storage problem, choose **Finish deleting wallet**, then confirm the same name and acknowledgment to retry. Do not treat this state as successful deletion or assume partially removed wallet data can still recover funds.
+
 ## Package boundaries
 
 The manager uses no Docker socket and cannot create arbitrary containers. Each wallet is a child process in the app container, with private storage and its own native port. The entrypoint prepares the volume, then runs the manager as UID/GID 1000. Independent manager and wallet locks prevent concurrent use of the same state. Container shutdown allows 75 seconds for native processes to stop.

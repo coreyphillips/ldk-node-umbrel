@@ -1,6 +1,6 @@
 {
   "name": "ldk-node-umbrel-manager",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "type": "module",
   "license": "MIT",

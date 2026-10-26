@@ -3,7 +3,7 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.7"
+version: "0.1.8"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
@@ -30,9 +30,9 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Adds Enable Tor connections in wallet settings. The app creates and retains a
-  private v3 onion address automatically, so no external onion service is needed.
-  Choose Tor in Pair Chicory to scan its QR code while Iroh and local TCP remain
-  available. Tor is optional and disabled by default. It accepts incoming client
-  connections only; outgoing Lightning peers and chain-backend connections keep
-  their existing routing. Full backups retain the onion identity and Tor state.
+  Adds Delete wallet in Settings for permanently removing a stopped wallet from
+  this app. Type the exact wallet name and acknowledge data loss to confirm.
+  Other wallets keep their data and identities. If cleanup is interrupted, the
+  wallet remains blocked until you explicitly retry deletion. Make a current full
+  backup and finish any fund recovery before deleting wallet data; a recovery
+  phrase alone cannot restore Lightning channels.
