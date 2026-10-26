@@ -20,16 +20,22 @@ export const ELECTRUM_PRESETS = Object.freeze([
   Object.freeze({ id: 'rbitcoin', label: 'rbitcoin', url: 'tcp://beignet-rbitcoin_node_1:50001' }),
 ]);
 
+// Normalize explicit URLs and Electrum's host:port:t/s notation through the same
+// strict authority validation. IPv6 hosts must remain bracketed in either form.
 export function electrumUrl(value) {
-  const invalid = () => failure('Use an Electrum URL with a host and port, such as tcp://10.21.21.10:50001 or ssl://your-server:50002', 400, 'ELECTRUM_URL');
+  const invalid = () => failure('Use tcp://host:port or host:port:t for TCP, or ssl://host:port or host:port:s for TLS', 400, 'ELECTRUM_URL');
   if (typeof value !== 'string' || value.length > 2048) throw invalid();
-  const match = /^(tcp|ssl):\/\/([^/?#]+)\/?$/.exec(value.trim());
-  if (!match) throw invalid();
+  const input = value.trim();
+  const explicit = /^(tcp|ssl):\/\/([^/?#]+)\/?$/.exec(input);
+  const shorthand = explicit ? null : /^([^/?#]+):([ts])$/.exec(input);
+  if (!explicit && !shorthand) throw invalid();
+  const scheme = explicit ? explicit[1] : shorthand[2] === 't' ? 'tcp' : 'ssl';
+  const authority = explicit ? explicit[2] : shorthand[1];
   let parsed;
-  try { parsed = canonicalAuthority(match[2]); } catch { throw invalid(); }
+  try { parsed = canonicalAuthority(authority); } catch { throw invalid(); }
   if (parsed.authority === parsed.hostname) throw invalid();
   const port = Number(parsed.authority.slice(parsed.hostname.length + 1));
-  return { url: `${match[1]}://${parsed.authority}`, host: parsed.hostname.replace(/^\[|\]$/g, ''), port, tls: match[1] === 'ssl' };
+  return { url: `${scheme}://${parsed.authority}`, host: parsed.hostname.replace(/^\[|\]$/g, ''), port, tls: scheme === 'ssl' };
 }
 
 export function electrumSettings(environment = process.env) {
