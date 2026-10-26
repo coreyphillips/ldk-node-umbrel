@@ -3,7 +3,7 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.4"
+version: "0.1.5"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
@@ -30,8 +30,8 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Adds 24-word recovery phrases for new wallets with private reveal and Copy phrase
-  controls. Settings now offers encrypted backups of all wallets, including keys
-  and complete stopped Lightning channel state. Existing wallets keep their
-  original binary seeds and identities and use full backups instead of a phrase.
-  Includes an offline restore tool. Wallets remain stopped after backup download.
+  Fixes connections to Electrum servers on the same Umbrel using the device's
+  local hostname, including custom names such as mint.local. No fixed LAN IP is
+  needed. Accepts host:port:t for TCP and host:port:s for TLS alongside tcp:// and
+  ssl:// URLs. Saved settings retain the hostname, and TLS certificate checks
+  remain enabled.

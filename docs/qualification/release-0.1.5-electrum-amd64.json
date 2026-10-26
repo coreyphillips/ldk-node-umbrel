@@ -1,0 +1,32 @@
+{
+  "architecture": "amd64",
+  "image": "ldk-node-umbrel:0.1.5-amd64",
+  "image_id": "sha256:4eceb7214b68892cf68b04105f1ac7a2fe4e371044296740a89b0d103b517c42",
+  "version": "0.1.5",
+  "checks": [
+    "release image architecture and version verified",
+    "container system resolver uses same-server host-gateway mapping",
+    "authenticated connection checks accept hostname URL and TCP shorthand and verify regtest",
+    "new stopped wallets store the canonical hostname URL for both input formats",
+    "native daemon starts and syncs unfunded regtest wallets through hostname",
+    "wallet registry and native configuration preserve hostname",
+    "native stop/start preserves both identities",
+    "container recreation restores hostname resolution and authenticated checks",
+    "cold native restart retains both identities and syncs through hostname"
+  ],
+  "network": "regtest",
+  "endpoint": "tcp://mint.local:60001",
+  "funds_sent": false,
+  "blocks_mined": false,
+  "physical_umbrel": false,
+  "native_wallets_created": 2,
+  "initial_heights": [
+    8188,
+    8188
+  ],
+  "restarted_heights": [
+    8188,
+    8188
+  ],
+  "date": "2026-10-26T03:41:17.168Z"
+}

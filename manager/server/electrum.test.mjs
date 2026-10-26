@@ -47,6 +47,43 @@ test('Electrum URLs and environment defaults validate before connecting and pres
   assert.equal(walletConfig({ name: 'New', chain_source: { type: 'electrum', url: 'tcp://mint.local:50002/' } }).chain_source.url, 'tcp://mint.local:50002');
 });
 
+test('Electrum shorthand normalizes hosts, ports and transports with stable canonical roundtrips', () => {
+  assert.deepEqual(electrumUrl('mint.local:60401:t'), { url: 'tcp://mint.local:60401', host: 'mint.local', port: 60401, tls: false });
+  const hosts = [
+    ['MINT.local.', 'mint.local'], ['127.0.0.1', '127.0.0.1'],
+    ['beignet-rbitcoin_node_1', 'beignet-rbitcoin_node_1'], ['[2001:0DB8:0:0:0:0:0:1]', '[2001:db8::1]'], ['[::1]', '[::1]'],
+  ];
+  for (const [host, canonical] of hosts) for (const [suffix, scheme] of [['t', 'tcp'], ['s', 'ssl']]) for (const port of [1, 50001, 60401, 65535]) {
+    const input = ` ${host}:0${port}:${suffix} `;
+    const endpoint = electrumUrl(input);
+    assert.deepEqual(endpoint, { url: `${scheme}://${canonical}:${port}`, host: canonical.replace(/^\[|\]$/g, ''), port, tls: suffix === 's' });
+    assert.deepEqual(electrumUrl(endpoint.url), endpoint);
+    assert.deepEqual(electrumUrl(`${scheme}://${host}:${port}/`), endpoint);
+    assert.equal(walletConfig({ name: 'Regtest', network: 'regtest', chain_source: { type: 'electrum', url: input } }).chain_source.url, endpoint.url);
+  }
+});
+
+test('Electrum shorthand rejects missing, ambiguous and unsafe authorities before opening a socket', async () => {
+  const invalid = [
+    '', null, {}, 'mint.local', 'mint.local:60401', 'mint.local:t', ':60401:t', 'mint.local::t',
+    'mint.local:0:t', 'mint.local:65536:t', 'mint.local:-1:t', 'mint.local:1.5:t', 'mint.local:1e3:t',
+    'mint.local:60401:x', 'mint.local:60401:T', 'mint.local:60401:ssl', 'mint.local:60401:t:s',
+    'tcp://mint.local:60401:t', 'ssl://mint.local:60401:s', 'mint.local:60401:t/',
+    'user:secret@mint.local:60401:t', 'mint.local:60401/path:t', 'mint.local:60401?q=secret:t', 'mint.local:60401#secret:t',
+    'mint.local:60401\nsecret:t', 'mint.local:60401\u0000:t', 'mint.local\\secret:60401:t', 'mint.local%2fsecret:60401:t',
+    '127.1:60401:t', '0x7f000001:60401:t', '2130706433:60401:t', '2001:db8::1:60401:t', '::1:60401:t',
+    '[127.0.0.1]:60401:t', '[2001:db8::1:60401:t', '[fe80::1%eth0]:60401:t', `${'a'.repeat(2049)}:60401:t`,
+  ];
+  let connections = 0;
+  const connect = () => { connections++; throw new Error('Must validate before connecting'); };
+  const check = createElectrumChecker({ connectTcp: connect, connectTls: connect });
+  for (const url of invalid) {
+    assert.throws(() => electrumUrl(url), error => error.code === 'ELECTRUM_URL' && !error.message.includes('secret'));
+    await assert.rejects(check({ url, network: 'regtest' }), { code: 'ELECTRUM_URL' });
+  }
+  assert.equal(connections, 0);
+});
+
 test('Electrum probe verifies each network from the header with fragmented and out-of-order replies', async t => {
   for (const network of Object.keys(parameters)) {
     const url = await fixture(t, socket => requests(socket, messages => {
@@ -99,6 +136,25 @@ class FakeSocket extends EventEmitter {
   write(value) { this.writes.push(value); }
   destroy() { this.destroyed = true; }
 }
+test('Electrum shorthand selects TCP or verified TLS and reports a canonical endpoint', async () => {
+  for (const [suffix, scheme] of [['t', 'tcp'], ['s', 'ssl']]) {
+    const socket = new FakeSocket(); let selected; let options;
+    const connector = transport => value => {
+      selected = transport; options = value;
+      setImmediate(() => {
+        socket.emit('connect'); if (transport === 'ssl') socket.emit('secureConnect');
+        socket.emit('data', Buffer.from(reply(1, ['fixture', '1.4']) + reply(2, header('regtest')) + reply(3, { height: 250 })));
+      });
+      return socket;
+    };
+    const check = createElectrumChecker({ connectTcp: connector('tcp'), connectTls: connector('ssl') });
+    assert.deepEqual(await check({ url: `MINT.local:60401:${suffix}`, network: 'regtest' }), { url: `${scheme}://mint.local:60401`, network: 'regtest', height: 250 });
+    assert.equal(selected, scheme); assert.equal(options.host, 'mint.local'); assert.equal(options.port, 60401);
+    if (suffix === 's') { assert.equal(options.rejectUnauthorized, true); assert.equal(options.servername, 'mint.local'); }
+    assert.equal(socket.writes.length, 3); assert.equal(socket.destroyed, true);
+  }
+});
+
 test('connection failures have safe DNS, refused and TLS messages and keep TLS verification enabled', async () => {
   for (const [code, expected, url] of [['ENOTFOUND', 'ELECTRUM_DNS', 'tcp://mint.local:50002'], ['ECONNREFUSED', 'ELECTRUM_REFUSED', 'tcp://127.0.0.1:50001'], ['ERR_TLS_CERT_ALTNAME_INVALID', 'ELECTRUM_TLS', 'ssl://server.example:50002']]) {
     let socket; let options;
@@ -188,6 +244,29 @@ test('legacy Electrum trailing slashes normalize only at native startup without 
   assert.equal(manager.list()[0].id, wallet.id); assert.equal(manager.list()[0].public_port, wallet.public_port);
   assert.equal(await fs.readFile(registryFile, 'utf8'), originalRegistry);
   for (const name of persisted) assert.equal(await fs.readFile(path.join(nodeDirectory, name), 'utf8'), `retained-${name}`);
+});
+
+test('Electrum shorthand is persisted canonically and passed unchanged to preflight and native startup', async t => {
+  for (const [suffix, scheme] of [['t', 'tcp'], ['s', 'ssl']]) {
+    const dir = await directory(t); let nativeConfig; let checked;
+    class NativeFixture extends EventEmitter {
+      logs = []; closed = false;
+      constructor(options) { super(); this.options = options; }
+      async start() { nativeConfig = JSON.parse(await fs.readFile(this.options.config, 'utf8')); return { node_id: `02${'ab'.repeat(32)}`, network: 'regtest' }; }
+      async stop() { this.closed = true; this.emit('exit'); }
+    }
+    const manager = new WalletManager({ dataDir: dir, binary: '/unused', processFactory: options => new NativeFixture(options), electrumCheck: async value => { checked = value; } });
+    await manager.initialize(); t.after(() => manager.close());
+    const wallet = await manager.create({ name: 'Regtest', network: 'regtest', chain_source: { type: 'electrum', url: `MINT.local:60401:${suffix}` }, autostart: false });
+    const chainSource = { type: 'electrum', url: `${scheme}://mint.local:60401` };
+    assert.deepEqual(wallet.chain_source, chainSource);
+    const registry = JSON.parse(await fs.readFile(path.join(dir, 'wallets.json'), 'utf8'));
+    assert.deepEqual(registry[0].chain_source, chainSource);
+    await manager.start(wallet.id);
+    assert.deepEqual(checked, { url: chainSource.url, network: 'regtest' });
+    assert.deepEqual(nativeConfig.chain_source, chainSource); assert.equal(nativeConfig.network, 'regtest');
+    assert.equal(manager.list()[0].id, wallet.id);
+  }
 });
 
 test('failed Electrum preflight retains bounded autostart retries and stop cancels them', async t => {

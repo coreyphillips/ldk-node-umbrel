@@ -16,6 +16,10 @@ Umbrel selects the matching architecture automatically. The app manifest pins th
 
 This is an experimental test release. All funded interoperability qualification used disposable regtest funds, and installation on physical Umbrel hardware has not yet been qualified. The compatible local Chicory client described below is required for the tested flows.
 
+## Local Electrum hostnames and shorthand
+
+Version 0.1.5 supports this Umbrel's own hostname, including custom names such as `tcp://mint.local:60401`, without entering a LAN IP. It also accepts `mint.local:60401:t` for TCP and `host:port:s` for TLS. Update the app to apply the hostname mapping, choose the matching Bitcoin network, and use **Test connection** before saving. The server must publish its Electrum port on the same host. Other machines' `.local` names still require working container DNS.
+
 ## Correct an existing Electrum connection
 
 For Fulcrum installed on the same Umbrel, use **`tcp://10.21.21.200:50002`**, with SSL disabled. Electrs uses `tcp://10.21.21.10:50001`. These match Beignet's local Umbrel presets and avoid relying on `.local` name resolution inside containers.

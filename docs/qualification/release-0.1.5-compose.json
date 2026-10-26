@@ -1,0 +1,19 @@
+{
+  "version": "0.1.5",
+  "checks": [
+    {
+      "device_domain_name": "mint.local",
+      "extra_hosts": [
+        "mint.local=host-gateway"
+      ]
+    },
+    {
+      "device_domain_name": "unset",
+      "extra_hosts": [
+        "umbrel.local=host-gateway"
+      ]
+    }
+  ],
+  "scope": "Shipping Compose interpolation with schema-only proxy overlay; no service started",
+  "recorded_at": "2026-10-26T03:41:50.336Z"
+}

@@ -6,6 +6,9 @@ services:
       APP_PORT: 3000
   manager:
     image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.4@sha256:924331f2a4592126950470d97a9d660791df9a6985261c26cfcc6f18addb5038
+    # Use the Docker host for its own LAN hostname in both Node and native clients.
+    extra_hosts:
+      - "${DEVICE_DOMAIN_NAME:-umbrel.local}:host-gateway"
     restart: on-failure
     init: true
     stop_grace_period: 75s

@@ -342,7 +342,7 @@ function walletForm(wallet) {
       const presets = state.config.electrum_presets || [];
       const initial = wallet?.chain_source.type === 'electrum' ? wallet.chain_source.url : state.config.default_electrum_url || '';
       const preset = field(chainFields, 'electrum_preset', 'Electrum server', { value: presets.find(item => item.url === initial)?.id || 'custom', options: [['custom', 'Custom server'], ...presets.map(item => [item.id, item.label])], help: 'Local presets connect to an app installed on this same Umbrel. For another machine, enter its LAN IP or reachable hostname.' });
-      const url = field(chainFields, 'url', 'Electrum URL', { value: initial, required: true, help: 'Umbrel Electrs uses tcp://10.21.21.10:50001. Umbrel Fulcrum uses tcp://10.21.21.200:50002 with SSL disabled. Use ssl:// only for a server that requires TLS.' });
+      const url = field(chainFields, 'url', 'Electrum URL', { value: initial, required: true, help: 'Use tcp://host:port or host:port:t for TCP; ssl://host:port or host:port:s for TLS. The hostname of this Umbrel is supported. Umbrel Electrs and Fulcrum presets use TCP.' });
       const result = el('div'); result.setAttribute('aria-live', 'polite');
       let revision = 0; const clearResult = () => { revision++; result.replaceChildren(); };
       network.addEventListener('change', clearResult);
