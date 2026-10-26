@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "1440: all available transports have matching QR, URI, Copy and label without overflow",
+    "1440: natural polling preserves Tor selection, QR identity, focus and scroll",
+    "1440: selections survive full render and remain independent for each wallet",
+    "1440: unavailable transports disappear with an explicit fallback and returning options preserve choice",
+    "1440: local selection preserves stale-data warning until a successful refresh",
+    "1440: rapid transport changes discard a delayed QR for the previous selection",
+    "1440: QR failure preserves Copy and retry creates the selected QR",
+    "1440: late QR cannot recreate pairing after navigation",
+    "1440: logout rejects stale QR and selectors never mutate wallet configuration",
+    "390: all available transports have matching QR, URI, Copy and label without overflow",
+    "390: natural polling preserves Tor selection, QR identity, focus and scroll",
+    "390: selections survive full render and remain independent for each wallet",
+    "390: unavailable transports disappear with an explicit fallback and returning options preserve choice",
+    "390: local selection preserves stale-data warning until a successful refresh",
+    "390: rapid transport changes discard a delayed QR for the previous selection",
+    "390: QR failure preserves Copy and retry creates the selected QR",
+    "390: late QR cannot recreate pairing after navigation",
+    "390: logout rejects stale QR and selectors never mutate wallet configuration"
+  ],
+  "browser_errors": [],
+  "funds_sent": false,
+  "physical_umbrel": false,
+  "frontend_sha256": "51d8f68b5a073c909956cc262f6fb9b7fe7d063641a9a4da89ab1ea181464f68"
+}

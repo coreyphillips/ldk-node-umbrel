@@ -52,15 +52,17 @@ export function walletConfig(input, previous) {
   if (chicory.max_total_fronted_sats < chicory.max_client_funding_sats) throw failure('Total funding cap must cover the client cap');
   if (chicory.offline_enabled && !chicory.enabled) throw failure('Enable the Chicory provider before offline settlement');
   const iroh = { enabled: input.iroh?.enabled === true, discovery: input.iroh?.discovery === true, default_relays: input.iroh?.default_relays === true };
+  const tor = { enabled: input.tor?.enabled === true };
   if (iroh.enabled && (!iroh.discovery || !iroh.default_relays)) throw failure('Iroh phone pairing requires endpoint discovery and relay consent');
   const advertised_host = input.advertised_host ? text(input.advertised_host, 253, 'advertised host') : '';
   if (advertised_host && /[\s/\\@?#]/.test(advertised_host)) throw failure('Enter a host name or IP address for pairing');
   const tor_onion_address = input.tor_onion_address ? text(input.tor_onion_address, 80, 'Tor onion address') : '';
   if (tor_onion_address) {
+    if (tor.enabled) throw failure('Choose automatic Tor or an existing onion address, not both');
     const match = /^([a-z2-7]{56}\.onion):([0-9]{1,5})$/.exec(tor_onion_address);
     if (!match || Number(match[2]) < 1 || Number(match[2]) > 65535) throw failure('Use a v3 onion host and port mapped to this native wallet');
   }
-  return { name, network, chain_source, chicory, iroh, advertised_host, tor_onion_address, autostart: input.autostart !== false };
+  return { name, network, chain_source, chicory, iroh, tor, advertised_host, tor_onion_address, autostart: input.autostart !== false };
 }
 
 export function publicConfig(value) {

@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "1440: enabling managed Tor clears legacy address and preserves Iroh, chain, provider and startup settings",
+    "1440: saved Tor state reloads and disabling restores external onion configuration independently of Iroh",
+    "1440: new-wallet form can enable Tor and Iroh together with independent defaults",
+    "1440: missing Tor binary blocks new activation with an explanation and preserves existing saved preferences",
+    "1440: managed Tor startup and bootstrap progress remain visible while Iroh pairing stays usable",
+    "1440: failed Tor reports its error and recovery preserves the chosen working transport",
+    "1440: generated Tor URI becomes scannable alongside Iroh and local TCP without changing transport settings",
+    "1440: Tor bootstrap and ready updates preserve mounted QR, URI selection, focus and scroll",
+    "390: enabling managed Tor clears legacy address and preserves Iroh, chain, provider and startup settings",
+    "390: saved Tor state reloads and disabling restores external onion configuration independently of Iroh",
+    "390: new-wallet form can enable Tor and Iroh together with independent defaults",
+    "390: missing Tor binary blocks new activation with an explanation and preserves existing saved preferences",
+    "390: managed Tor startup and bootstrap progress remain visible while Iroh pairing stays usable",
+    "390: failed Tor reports its error and recovery preserves the chosen working transport",
+    "390: generated Tor URI becomes scannable alongside Iroh and local TCP without changing transport settings",
+    "390: Tor bootstrap and ready updates preserve mounted QR, URI selection, focus and scroll"
+  ],
+  "browser_errors": [],
+  "funds_sent": false,
+  "physical_umbrel": false,
+  "actual_tor_process": false,
+  "frontend_sha256": "51d8f68b5a073c909956cc262f6fb9b7fe7d063641a9a4da89ab1ea181464f68",
+  "pairing_sha256": "42fe2a4d49f6718b7fc1b322bde4961a53b7f3b089076067f0bed7ce1ffa9e22"
+}

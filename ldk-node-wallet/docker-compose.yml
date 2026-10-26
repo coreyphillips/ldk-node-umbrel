@@ -5,7 +5,7 @@ services:
       APP_HOST: ldk-node-wallet_manager_1
       APP_PORT: 3000
   manager:
-    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.6@sha256:f2f0548527699b138417622554c54e65a8f2826357d9b345dd3436b41f25f785
+    image: ghcr.io/coreyphillips/ldk-node-umbrel:0.1.7@sha256:036a68102bf160bf2fa5162dd0339e6212d6cb43e226a1794ff635eea715a4e4
     # Use the Docker host for its own LAN hostname in both Node and native clients.
     extra_hosts:
       - "${DEVICE_DOMAIN_NAME:-umbrel.local}:host-gateway"

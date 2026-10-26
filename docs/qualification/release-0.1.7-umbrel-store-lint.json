@@ -1,0 +1,21 @@
+{
+  "apps": [
+    "ldk-node-wallet"
+  ],
+  "issues": [
+    {
+      "severity": "warning",
+      "rule": "access.security_opt",
+      "file": "ldk-node-wallet/docker-compose.yml",
+      "line": 15,
+      "message": "Service `manager` sets security options; justify this in the PR."
+    },
+    {
+      "severity": "warning",
+      "rule": "package.review_assets",
+      "file": "ldk-node-wallet/icon.svg",
+      "line": null,
+      "message": "Do not commit App Store screenshots, gallery assets, or icon/logo assets; include them in the PR body instead."
+    }
+  ]
+}

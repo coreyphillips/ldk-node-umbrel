@@ -3,12 +3,12 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.6"
+version: "0.1.7"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
   View Bitcoin and Lightning balances, channels, payments and peers, and configure
-  liquidity, offline settlement and optional Iroh transport. Each wallet keeps its
+  liquidity, offline settlement and optional Tor and Iroh connections. Each wallet keeps its
   own identity and storage. Mainnet is the initial network selection; choose your
   chain backend before starting a wallet. This experimental release requires the
   compatible Chicory client described in the repository. Funded qualification used
@@ -30,9 +30,9 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Choose Iroh, Local network (TCP), or Tor in Pair Chicory to view and scan each
-  available connection address. Pair a client over Tor while Iroh remains enabled
-  for another. Tor requires an existing v3 onion service mapped to the wallet's
-  Lightning port. Also fixes Electrum connections through this Umbrel's own local
-  hostname without a fixed LAN IP, and accepts host:port:t for TCP and host:port:s
-  for TLS. Wallet identities and existing settings are preserved.
+  Adds Enable Tor connections in wallet settings. The app creates and retains a
+  private v3 onion address automatically, so no external onion service is needed.
+  Choose Tor in Pair Chicory to scan its QR code while Iroh and local TCP remain
+  available. Tor is optional and disabled by default. It accepts incoming client
+  connections only; outgoing Lightning peers and chain-backend connections keep
+  their existing routing. Full backups retain the onion identity and Tor state.

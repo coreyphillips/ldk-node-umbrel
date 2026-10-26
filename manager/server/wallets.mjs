@@ -6,11 +6,13 @@ import { atomicJson, privateDir, readJson, failure } from './files.mjs';
 import { walletConfig, publicConfig, rpcRequest } from './config.mjs';
 import { createRecovery, readRecovery } from './recovery.mjs';
 import { createBackup } from './backup.mjs';
+import { TorProcess } from './tor.mjs';
 
 export class WalletManager {
-  constructor({ dataDir, binary, bridge, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), electrumCheck, backupFactory = createBackup }) {
+  constructor({ dataDir, binary, bridge, torBinary, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), torFactory = options => new TorProcess(options), electrumCheck, backupFactory = createBackup }) {
     this.dataDir = dataDir; this.binary = binary; this.bridge = bridge; this.portBase = portBase; this.publicPortBase = publicPortBase;
     this.electrumCheck = electrumCheck; this.processFactory = processFactory; this.backupFactory = backupFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false; this.backupInProgress = false; this.irohChildren = new Set();
+    this.torBinary = torBinary; this.torFactory = torFactory; this.torProcesses = new Set();
   }
   async initialize() {
     await privateDir(path.join(this.dataDir, 'wallets'));
@@ -31,7 +33,14 @@ export class WalletManager {
   get(id) { const wallet = this.wallets.find(item => item.id === id); if (!wallet) throw failure('Wallet not found', 404, 'NOT_FOUND'); return wallet; }
   directory(id) { this.get(id); return path.join(this.dataDir, 'wallets', id); }
   state(id) { return this.runtime.get(id) || { status: 'stopped', logs: [] }; }
-  list() { return this.wallets.map(wallet => ({ ...publicConfig(wallet), recovery_kind: wallet.recovery_kind || 'legacy_seed', status: this.state(wallet.id).status, last_error: this.state(wallet.id).error || null, public_port: this.publicPortBase + wallet.slot, iroh_status: this.state(wallet.id).iroh?.ready ? 'ready' : this.state(wallet.id).iroh?.status || 'stopped' })); }
+  list() { return this.wallets.map(wallet => ({ ...publicConfig(wallet), recovery_kind: wallet.recovery_kind || 'legacy_seed', status: this.state(wallet.id).status, last_error: this.state(wallet.id).error || null, public_port: this.publicPortBase + wallet.slot, iroh_status: this.state(wallet.id).iroh?.ready ? 'ready' : this.state(wallet.id).iroh?.status || 'stopped', ...this.torDetails(wallet) })); }
+  // Report only public onion information, never Tor identity or guard files.
+  torDetails(wallet) {
+    const state = this.state(wallet.id);
+    if (!wallet.tor?.enabled) return { tor_status: wallet.tor_onion_address ? 'external' : 'disabled', tor_bootstrap: 0, tor_error: null, tor_address: wallet.tor_onion_address || null };
+    return { tor_status: state.tor?.status || 'stopped', tor_bootstrap: state.tor?.bootstrap || 0, tor_error: state.tor?.error || null, tor_address: state.status === 'running' ? state.tor?.address || null : null };
+  }
+  requireTor(config, previous) { if (config.tor.enabled && !previous?.tor?.enabled && !this.torBinary) throw failure('Managed Tor is not installed in this dashboard. Update the app or configure an existing onion service.', 503, 'TOR_UNAVAILABLE'); }
   async persist() { await atomicJson(path.join(this.dataDir, 'wallets.json'), this.wallets); }
   requireWritable() { if (this.backupInProgress) throw failure('A backup is in progress. Try again after it finishes.', 409, 'BACKUP_BUSY'); }
   async create(input) {
@@ -40,6 +49,7 @@ export class WalletManager {
       this.requireWritable();
       if (this.wallets.length >= 8) throw failure('This installation supports eight wallets', 409, 'WALLET_LIMIT');
       const config = walletConfig(input);
+      this.requireTor(config);
       const slot = Array.from({ length: 8 }, (_, i) => i).find(i => !this.wallets.some(wallet => wallet.slot === i));
       const value = { ...config, id: randomUUID(), slot, created_at: new Date().toISOString(), recovery_kind: 'mnemonic' };
       await createRecovery(path.join(this.dataDir, 'wallets', value.id), value.network);
@@ -54,7 +64,8 @@ export class WalletManager {
       this.requireWritable();
       const wallet = this.get(id);
       if (!['stopped', 'failed'].includes(this.state(id).status)) throw failure('Stop this wallet before changing its settings', 409, 'STOP_REQUIRED');
-      const next = this.wallets.map(item => item.id === id ? { ...item, ...walletConfig(input, wallet) } : item);
+      const config = walletConfig(input, wallet); this.requireTor(config, wallet);
+      const next = this.wallets.map(item => item.id === id ? { ...item, ...config } : item);
       await atomicJson(path.join(this.dataDir, 'wallets.json'), next); this.wallets = next; return this.list().find(item => item.id === id);
     });
   }
@@ -63,6 +74,7 @@ export class WalletManager {
     const wallet = this.get(id); const old = this.state(id);
     if (this.shuttingDown) throw failure('Dashboard is shutting down', 409);
     if (old.startupInFlight || ['starting', 'running', 'stopping'].includes(old.status)) throw failure('Wallet is already active', 409);
+    if (old.tor && (!old.tor.closed || old.tor.startupInFlight)) throw failure('Wait for this wallet’s Tor process to stop before restarting', 409);
     clearTimeout(old.restartTimer);
     const state = { status: 'starting', startupInFlight: true, error: null, attempts: old.attempts || [], logs: old.logs || [], intentional: false };
     this.runtime.set(id, state);
@@ -87,13 +99,19 @@ export class WalletManager {
     process.once('fault', message => { state.noRestart = true; state.error = message; state.status = 'stopping'; });
     process.once('exit', () => {
       state.logs = process.logs || []; state.iroh?.child?.kill('SIGTERM'); state.iroh = null;
-      if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return; }
-      state.status = 'failed'; state.error ||= 'Native node stopped unexpectedly. Check logs before retrying an operation.';
-      this.scheduleRestart(wallet, state);
+      state.status = state.intentional || this.shuttingDown ? 'stopped' : 'failed';
+      if (state.status === 'failed') state.error ||= 'Native node stopped unexpectedly. Check logs before retrying an operation.';
+      // Stop onion forwarding even when the native process exits first. Do not
+      // replace this generation while a Tor writer is still shutting down.
+      this.stopTor(state).then(() => {
+        if (!state.intentional && !this.shuttingDown && this.runtime.get(id) === state) this.scheduleRestart(wallet, state);
+      }).catch(() => { state.error = 'Tor could not stop. Stop this wallet again before restarting or backing up.'; });
     });
       const ready = await process.start(); state.ready = ready;
       if (state.intentional || this.shuttingDown) { await process.stop(); return { status: 'stopped' }; }
+      if (process.closed) throw failure('Native node stopped during startup', 503);
       state.status = 'running';
+      if (wallet.tor?.enabled) this.startTor(wallet, state);
       if (wallet.iroh.enabled) await this.startIroh(wallet, state).catch(() => { state.iroh = { status: 'failed' }; });
       return { status: state.status };
     } catch (error) {
@@ -110,8 +128,9 @@ export class WalletManager {
   async stop(id) {
     this.requireWritable();
     this.get(id); const state = this.state(id); state.intentional = true; clearTimeout(state.restartTimer);
-    if (!state.process || state.process.closed) { state.status = 'stopped'; return { status: 'stopped' }; }
     state.status = 'stopping';
+    await this.stopTor(state);
+    if (!state.process || state.process.closed) { state.status = 'stopped'; return { status: 'stopped' }; }
     if (state.iroh?.child) {
       const child = state.iroh.child; child.kill('SIGTERM');
       let timer;
@@ -121,6 +140,17 @@ export class WalletManager {
     }
     await state.process.stop(); state.status = 'stopped'; return { status: 'stopped' };
   }
+  // Tor bootstrap is independent from native startup and Iroh. Keep every
+  // process tracked until its preparation and actual child exit are complete.
+  startTor(wallet, state) {
+    if (!this.torBinary) { state.tor = { closed: true, status: 'failed', error: 'Managed Tor is not installed. Update the app to enable automatic Tor.' }; return; }
+    const tor = this.torFactory({ binary: this.torBinary, directory: path.join(this.directory(wallet.id), 'tor'), port: this.portBase + wallet.slot });
+    state.tor = tor; this.torProcesses.add(tor);
+    const settled = () => { if (tor.closed && !tor.startupInFlight) this.torProcesses.delete(tor); };
+    tor.once('exit', settled);
+    tor.start().catch(() => {}).finally(settled);
+  }
+  async stopTor(state) { if (state.tor?.stop) await state.tor.stop(); }
   async startIroh(wallet, state) {
     if (!this.bridge) throw failure('Iroh bridge is not installed', 503);
     state.iroh = { status: 'starting' };
@@ -158,7 +188,8 @@ export class WalletManager {
     if (state.status !== 'running') throw failure('Start this wallet to pair Chicory', 409);
     const host = wallet.advertised_host || hostname;
     const tcp = `${state.ready.node_id}@${host.includes(':') ? `[${host}]` : host}:${this.publicPortBase + wallet.slot}`;
-    return { node_id: state.ready.node_id, tcp_uri: tcp, tor_uri: wallet.tor_onion_address ? `${state.ready.node_id}@${wallet.tor_onion_address}` : null, iroh_uri: state.iroh?.ready ? state.iroh.uri : null, iroh_status: state.iroh?.status || 'disabled', direct_addresses: state.iroh?.direct_addresses || [], network: wallet.network };
+    const tor = this.torDetails(wallet);
+    return { node_id: state.ready.node_id, tcp_uri: tcp, ...tor, tor_managed: wallet.tor?.enabled === true, tor_uri: tor.tor_address ? `${state.ready.node_id}@${tor.tor_address}` : null, iroh_uri: state.iroh?.ready ? state.iroh.uri : null, iroh_status: state.iroh?.status || 'disabled', direct_addresses: state.iroh?.direct_addresses || [], network: wallet.network };
   }
   /** Reveal only this registered wallet's verified phrase through the protected recovery endpoint. */
   async recovery(id) {
@@ -178,7 +209,7 @@ export class WalletManager {
           return state.startupInFlight || state.status !== 'stopped' || (state.process && !state.process.closed) ||
             (child && child.pid && child.exitCode === null && child.signalCode === null);
         });
-        if (active || this.irohChildren.size) throw failure('Stop every wallet and wait for its processes to exit before backing up.', 409, 'STOP_REQUIRED');
+        if (active || this.irohChildren.size || this.torProcesses.size) throw failure('Stop every wallet and wait for its processes to exit before backing up.', 409, 'STOP_REQUIRED');
         return this.backupFactory(this.dataDir, passphrase);
       });
     } finally { this.backupInProgress = false; }

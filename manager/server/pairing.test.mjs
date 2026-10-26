@@ -11,6 +11,15 @@ const URIS = Object.freeze({
 const TYPES = ['iroh', 'tcp', 'tor'];
 const LABELS = { iroh: 'Iroh', tcp: 'Local network (TCP)', tor: 'Tor' };
 
+test('managed Tor guidance describes automatic stable addressing while external Tor retains forwarding instructions', () => {
+  const managed = pairingConnections({ tor_uri: URIS.tor, tor_managed: true })[0];
+  const external = pairingConnections({ tor_uri: URIS.tor, tor_managed: false })[0];
+  assert.equal(managed.uri, external.uri);
+  assert.match(managed.help, /created automatically/);
+  assert.match(managed.help, /Local TCP and Iroh stay available/);
+  assert.match(external.help, /separately managed onion service/);
+});
+
 for (let mask = 0; mask < 8; mask++) {
   const available = TYPES.filter((type, index) => mask & (1 << index));
   test(`pairing offers exactly the available transports: ${available.join(', ') || 'none'}`, () => {
