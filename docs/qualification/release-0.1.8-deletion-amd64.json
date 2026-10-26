@@ -1,0 +1,24 @@
+{
+  "architecture": "amd64",
+  "image": "ldk-node-umbrel:0.1.8-amd64",
+  "image_id": "sha256:232ffa99278fd8d08086312f50159ec3ab8efb036b0d638f203c20c412986b4f",
+  "version": "0.1.8",
+  "checks": [
+    "disposable internal-only Bitcoin Core starts at genesis without mining",
+    "shipping manager version, bundled Tor availability and exact served deletion UI verified",
+    "two real native regtest wallets start with distinct identities and zero funds; active deletion is refused",
+    "anonymous, cookie-only, wrong-origin, missing-CSRF, non-JSON and incomplete confirmations leave target data intact",
+    "confirmed deletion removes only the stopped target while its running sibling retains identity and data",
+    "manager restart does not resurrect the deleted wallet and the surviving native node keeps its identity",
+    "released slot and ports are reused with a fresh UUID, seed and native identity; sibling files remain byte-identical",
+    "real filesystem cleanup failure leaves a durable pending record, reserves its slot and blocks start, editing, recovery and backup",
+    "pending deletion survives restart without autostart or automatic cleanup; explicit confirmation completes retry and preserves sibling bytes",
+    "authenticated full backup restores only the surviving wallet with matching data; its native node restarts with the original identity"
+  ],
+  "native_wallets": "real shipping daemon",
+  "deletion_transport_children": "disabled",
+  "funds_sent": false,
+  "blocks_mined": false,
+  "physical_umbrel": false,
+  "date": "2026-10-26T15:56:04.873Z"
+}

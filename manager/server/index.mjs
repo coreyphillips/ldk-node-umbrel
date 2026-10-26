@@ -38,7 +38,7 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
       if (url.pathname === '/api/login' && request.method === 'POST') return send(response, 200, auth.login(request, response, (await body(request)).password, secureCookies));
       if (url.pathname.startsWith('/api/')) {
         const mutation = request.method !== 'GET'; auth.require(request, mutation);
-        if (['POST', 'PUT'].includes(request.method) && !String(request.headers['content-type'] || '').startsWith('application/json')) throw failure('JSON request required', 415);
+        if (['POST', 'PUT', 'DELETE'].includes(request.method) && !String(request.headers['content-type'] || '').startsWith('application/json')) throw failure('JSON request required', 415);
         if (url.pathname === '/api/logout' && request.method === 'POST') { auth.logout(request, response); return send(response, 200, { ok: true }); }
         if (url.pathname === '/api/config' && request.method === 'GET') return send(response, 200, { version: packageMetadata.version, default_network: 'bitcoin', max_wallets: 8, backend: 'native-ldk-node', mainnet_experimental: true, iroh_available: Boolean(wallets.bridge), tor_available: Boolean(wallets.torBinary), ...electrumConfig });
         if (url.pathname === '/api/electrum/check' && request.method === 'POST') return send(response, 200, await electrumCheck(await body(request)));
@@ -55,6 +55,7 @@ export function createServer({ auth, wallets, publicOrigin, secureCookies = fals
         if (match) {
           const [, id, operation] = match;
           if (!operation && request.method === 'PUT') return send(response, 200, await wallets.update(id, await body(request)));
+          if (!operation && request.method === 'DELETE') return send(response, 200, await wallets.remove(id, await body(request)));
           if (operation === 'start' && request.method === 'POST') return send(response, 200, await wallets.start(id));
           if (operation === 'stop' && request.method === 'POST') return send(response, 200, await wallets.stop(id));
           if (operation === 'pairing' && request.method === 'GET') return send(response, 200, wallets.pairing(id, url.hostname));

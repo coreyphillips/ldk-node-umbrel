@@ -34,6 +34,7 @@ Version 0.1.2 and later also accept a trailing slash in existing Electrum URLs w
 - Bitcoin and Lightning balances, addresses, invoices, payments, channels, peers, splice operations, native events and offline voucher summaries.
 - Chicory primary pairing with selectable TCP, Tor and Iroh URIs and QR codes. Optional managed Tor creates a persistent onion address; Iroh public relays and endpoint discovery are enabled explicitly.
 - Separate controls for liquidity provisioning, funding budgets, fees and offline settlement.
+- Confirmed deletion of an individual stopped wallet, preserving the other wallets and their identities.
 - Password sessions, CSRF and Origin validation, private files, bounded administration queues, explicit uncertain transaction outcomes and supervised native processes.
 
 The manager runs the Rust `ldk-node-daemon` through private JSONL pipes. Lightning keys and channel state belong to the native daemon. The optional Iroh bridge carries transport bytes and has a separate transport identity.
@@ -54,6 +55,10 @@ Managed Tor is disabled by default and starts only for a running wallet that ena
 Version 0.1.4 adds **Settings > Recovery & backup**. New wallets have a 24-word recovery phrase with reveal and copy controls. Existing wallets keep their binary seeds and use an encrypted full backup. **Back up all wallets** stops wallet processes and downloads keys, configuration and complete Lightning channel state. Save the file and its password privately, then restart the wallets. See the [backup and offline restore instructions](docs/umbrel.md#back-up-and-restore). Reload the dashboard tab after updating the app.
 
 The primary needs liquidity for its enabled funding and routing functions. Never reuse another live node's storage. Back up complete stopped wallet state; a seed alone cannot restore current Lightning channels.
+
+## Delete a wallet
+
+Stop the selected wallet, then open **Settings > Delete wallet**. Type its exact name, acknowledge the permanent loss of its data, and choose **Permanently delete wallet**. This removes that wallet's local keys, recovery phrase, Lightning state, configuration and transport identities. Other wallets and previously downloaded backups remain unchanged. Save a current full backup and complete any fund recovery first; a recovery phrase alone cannot restore Lightning channels. If cleanup fails, the wallet stays blocked in a pending-deletion state until you confirm a retry. See [wallet deletion and recovery limits](docs/umbrel.md#delete-a-wallet).
 
 ## Development and local images
 

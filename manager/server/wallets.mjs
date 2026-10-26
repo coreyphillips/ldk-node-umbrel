@@ -1,4 +1,6 @@
 import path from 'node:path';
+import fs from 'node:fs/promises';
+import { constants } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { NativeProcess } from './rpc.mjs';
@@ -8,11 +10,44 @@ import { createRecovery, readRecovery } from './recovery.mjs';
 import { createBackup } from './backup.mjs';
 import { TorProcess } from './tor.mjs';
 
+const liveChild = child => Boolean(child?.pid && child.exitCode == null && child.signalCode == null);
+const unsafeDeletion = () => failure('Wallet deletion refused an unsafe data path. Check its private directory before retrying.', 409, 'WALLET_PATH_UNSAFE');
+
+// The manager owns these private directories and admits no wallet writers while
+// deleting. Refuse links and shared files before handing a registered tree to rm.
+async function deletionPath(dataDir, id) {
+  if (!/^[0-9a-f-]{36}$/.test(id)) throw unsafeDeletion();
+  const parent = path.join(dataDir, 'wallets');
+  for (const directory of [dataDir, parent]) {
+    const stat = await fs.lstat(directory);
+    if (!stat.isDirectory() || stat.isSymbolicLink() || (stat.mode & 0o077)) throw unsafeDeletion();
+  }
+  let entries = 0;
+  async function inspect(file, depth) {
+    if (++entries > 100_000 || depth > 64) throw unsafeDeletion();
+    const stat = await fs.lstat(file);
+    if ((stat.mode & 0o077) || stat.isSymbolicLink() || (!stat.isFile() && !stat.isDirectory()) || (stat.isFile() && stat.nlink !== 1)) throw unsafeDeletion();
+    if (stat.isDirectory()) for (const name of await fs.readdir(file)) await inspect(path.join(file, name), depth + 1);
+  }
+  const directory = path.join(parent, id);
+  try {
+    const stat = await fs.lstat(directory);
+    if (!stat.isDirectory() || stat.isSymbolicLink()) throw unsafeDeletion();
+    await inspect(directory, 0);
+  } catch (error) {
+    // A previous attempt may already have removed the entire registered tree.
+    if (error.code !== 'ENOENT') throw error;
+    try { await fs.lstat(directory); throw unsafeDeletion(); } catch (missing) { if (missing.code !== 'ENOENT') throw missing; }
+  }
+  return directory;
+}
+
 export class WalletManager {
   constructor({ dataDir, binary, bridge, torBinary, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), torFactory = options => new TorProcess(options), electrumCheck, backupFactory = createBackup }) {
     this.dataDir = dataDir; this.binary = binary; this.bridge = bridge; this.portBase = portBase; this.publicPortBase = publicPortBase;
     this.electrumCheck = electrumCheck; this.processFactory = processFactory; this.backupFactory = backupFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false; this.backupInProgress = false; this.irohChildren = new Set();
     this.torBinary = torBinary; this.torFactory = torFactory; this.torProcesses = new Set();
+    this.deleting = new Set(); this.startupStates = new Map(); this.nativeProcesses = new Map(); this.writerOwners = new WeakMap();
   }
   async initialize() {
     await privateDir(path.join(this.dataDir, 'wallets'));
@@ -21,11 +56,12 @@ export class WalletManager {
     const ids = new Set(); const slots = new Set();
     for (const wallet of this.wallets) {
       if (!/^[0-9a-f-]{36}$/.test(wallet.id) || ids.has(wallet.id) || !Number.isInteger(wallet.slot) || wallet.slot < 0 || wallet.slot >= 8 || slots.has(wallet.slot)) throw new Error('Invalid wallet registry');
+      if (wallet.deletion_pending !== undefined && typeof wallet.deletion_pending !== 'boolean') throw new Error('Invalid wallet deletion marker');
       ids.add(wallet.id); slots.add(wallet.slot); walletConfig(wallet);
     }
   }
   async boot() {
-    for (const wallet of this.wallets) if (wallet.autostart && !this.shuttingDown) await this.start(wallet.id).catch(() => {});
+    for (const wallet of this.wallets) if (wallet.autostart && !wallet.deletion_pending && !this.shuttingDown) await this.start(wallet.id).catch(() => {});
   }
   exclusive(action) {
     const task = this.serial.then(action); this.serial = task.catch(() => {}); return task;
@@ -33,7 +69,7 @@ export class WalletManager {
   get(id) { const wallet = this.wallets.find(item => item.id === id); if (!wallet) throw failure('Wallet not found', 404, 'NOT_FOUND'); return wallet; }
   directory(id) { this.get(id); return path.join(this.dataDir, 'wallets', id); }
   state(id) { return this.runtime.get(id) || { status: 'stopped', logs: [] }; }
-  list() { return this.wallets.map(wallet => ({ ...publicConfig(wallet), recovery_kind: wallet.recovery_kind || 'legacy_seed', status: this.state(wallet.id).status, last_error: this.state(wallet.id).error || null, public_port: this.publicPortBase + wallet.slot, iroh_status: this.state(wallet.id).iroh?.ready ? 'ready' : this.state(wallet.id).iroh?.status || 'stopped', ...this.torDetails(wallet) })); }
+  list() { return this.wallets.map(wallet => ({ ...publicConfig(wallet), recovery_kind: wallet.recovery_kind || 'legacy_seed', deletion_pending: this.deleting.has(wallet.id) || wallet.deletion_pending === true, status: this.deleting.has(wallet.id) || wallet.deletion_pending ? 'deletion_pending' : this.state(wallet.id).status, last_error: this.state(wallet.id).error || null, public_port: this.publicPortBase + wallet.slot, iroh_status: this.state(wallet.id).iroh?.ready ? 'ready' : this.state(wallet.id).iroh?.status || 'stopped', ...this.torDetails(wallet) })); }
   // Report only public onion information, never Tor identity or guard files.
   torDetails(wallet) {
     const state = this.state(wallet.id);
@@ -43,6 +79,65 @@ export class WalletManager {
   requireTor(config, previous) { if (config.tor.enabled && !previous?.tor?.enabled && !this.torBinary) throw failure('Managed Tor is not installed in this dashboard. Update the app or configure an existing onion service.', 503, 'TOR_UNAVAILABLE'); }
   async persist() { await atomicJson(path.join(this.dataDir, 'wallets.json'), this.wallets); }
   requireWritable() { if (this.backupInProgress) throw failure('A backup is in progress. Try again after it finishes.', 409, 'BACKUP_BUSY'); }
+  requireAvailable(id) {
+    if (this.deleting.has(id) || this.get(id).deletion_pending) throw failure('Wallet deletion is pending. Retry its confirmed deletion to finish cleanup.', 409, 'DELETE_PENDING');
+  }
+  requireStopped(id) {
+    const state = this.state(id);
+    const nativeActive = process => !process.closed || liveChild(process.child);
+    for (const [process] of this.nativeProcesses) if (!nativeActive(process)) this.nativeProcesses.delete(process);
+    if (this.startupStates.has(id) || state.startupInFlight || !['stopped', 'failed'].includes(state.status) ||
+      (state.process && nativeActive(state.process)) ||
+      (state.tor && (!state.tor.closed || state.tor.startupInFlight)) || liveChild(state.iroh?.child) ||
+      [...this.nativeProcesses].some(([process, owner]) => owner === id && nativeActive(process)) ||
+      [...this.irohChildren].some(child => this.writerOwners.get(child) === id) ||
+      [...this.torProcesses].some(tor => this.writerOwners.get(tor) === id)) {
+      throw failure('Stop this wallet and wait for all its processes to exit before deleting it.', 409, 'STOP_REQUIRED');
+    }
+  }
+  /**
+   * Delete one confirmed, stopped wallet. A durable registry marker reserves its
+   * slot and disables startup before any data is removed. Cleanup is retryable;
+   * failures, including an uncertain registry fsync, never imply a rollback.
+   */
+  async remove(id, input) {
+    this.requireWritable();
+    if (this.shuttingDown) throw failure('Dashboard is shutting down', 409, 'SHUTTING_DOWN');
+    const confirm = wallet => {
+      if (!input || input.confirmation_name !== wallet.name || input.acknowledge_data_loss !== true) throw failure('Enter the exact wallet name and acknowledge permanent data loss.', 400, 'CONFIRMATION_REQUIRED');
+    };
+    confirm(this.get(id));
+    if (this.deleting.has(id)) throw failure('Wallet deletion is already in progress.', 409, 'DELETE_PENDING');
+    this.requireStopped(id);
+    // start() is intentionally not serialized, so publish this guard before the
+    // first await and check it at every lifecycle or recovery entry point.
+    this.deleting.add(id);
+    try {
+      return await this.exclusive(async () => {
+        this.requireWritable();
+        if (this.shuttingDown) throw failure('Dashboard is shutting down', 409, 'SHUTTING_DOWN');
+        const wallet = this.get(id); confirm(wallet); this.requireStopped(id);
+        await deletionPath(this.dataDir, id);
+        const state = this.state(id); state.intentional = true; clearTimeout(state.restartTimer);
+        this.wallets = this.wallets.map(item => item.id === id ? { ...item, deletion_pending: true } : item);
+        try {
+          // Even if atomicJson rejects after rename, keep the pending in-memory
+          // record. Nothing is removed until this durable intent write succeeds.
+          await this.persist();
+          const directory = await deletionPath(this.dataDir, id);
+          await fs.rm(directory, { recursive: true, force: true });
+          const parent = await fs.open(path.dirname(directory), constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_DIRECTORY);
+          try { await parent.sync(); } finally { await parent.close(); }
+          const next = this.wallets.filter(item => item.id !== id);
+          await atomicJson(path.join(this.dataDir, 'wallets.json'), next);
+          this.wallets = next; this.runtime.delete(id);
+          return { deleted: true, id };
+        } catch {
+          throw failure('Wallet deletion is incomplete. Its data may be partially removed. Retry deletion to finish cleanup.', 500, 'DELETE_INCOMPLETE');
+        }
+      });
+    } finally { this.deleting.delete(id); }
+  }
   async create(input) {
     this.requireWritable();
     const wallet = await this.exclusive(async () => {
@@ -59,9 +154,9 @@ export class WalletManager {
     return this.list().find(item => item.id === wallet.id);
   }
   async update(id, input) {
-    this.requireWritable();
+    this.requireWritable(); this.requireAvailable(id);
     return this.exclusive(async () => {
-      this.requireWritable();
+      this.requireWritable(); this.requireAvailable(id);
       const wallet = this.get(id);
       if (!['stopped', 'failed'].includes(this.state(id).status)) throw failure('Stop this wallet before changing its settings', 409, 'STOP_REQUIRED');
       const config = walletConfig(input, wallet); this.requireTor(config, wallet);
@@ -70,7 +165,7 @@ export class WalletManager {
     });
   }
   async start(id) {
-    this.requireWritable();
+    this.requireWritable(); this.requireAvailable(id);
     const wallet = this.get(id); const old = this.state(id);
     if (this.shuttingDown) throw failure('Dashboard is shutting down', 409);
     if (old.startupInFlight || ['starting', 'running', 'stopping'].includes(old.status)) throw failure('Wallet is already active', 409);
@@ -78,6 +173,7 @@ export class WalletManager {
     clearTimeout(old.restartTimer);
     const state = { status: 'starting', startupInFlight: true, error: null, attempts: old.attempts || [], logs: old.logs || [], intentional: false };
     this.runtime.set(id, state);
+    this.startupStates.set(id, state);
     try {
     // Normalize legacy Electrum URLs before passing them to the native socket
     // client, which treats a trailing slash as part of the address.
@@ -96,6 +192,9 @@ export class WalletManager {
     });
     if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const process = this.processFactory({ binary: this.binary, config: configFile }); state.process = process;
+    this.nativeProcesses.set(process, id);
+    const settled = () => { if (process.closed && !liveChild(process.child)) this.nativeProcesses.delete(process); };
+    process.once('exit', settled);
     process.once('fault', message => { state.noRestart = true; state.error = message; state.status = 'stopping'; });
     process.once('exit', () => {
       state.logs = process.logs || []; state.iroh?.child?.kill('SIGTERM'); state.iroh = null;
@@ -107,7 +206,10 @@ export class WalletManager {
         if (!state.intentional && !this.shuttingDown && this.runtime.get(id) === state) this.scheduleRestart(wallet, state);
       }).catch(() => { state.error = 'Tor could not stop. Stop this wallet again before restarting or backing up.'; });
     });
-      const ready = await process.start(); state.ready = ready;
+      const startup = process.start();
+      process.child?.once('exit', settled);
+      process.child?.once('error', settled);
+      const ready = await startup; state.ready = ready;
       if (state.intentional || this.shuttingDown) { await process.stop(); return { status: 'stopped' }; }
       if (process.closed) throw failure('Native node stopped during startup', 503);
       state.status = 'running';
@@ -119,14 +221,14 @@ export class WalletManager {
       state.error = state.status === 'failed' ? state.error || error.message : null;
       if (state.status === 'failed' && !state.process) this.scheduleRestart(wallet, state);
       throw error;
-    } finally { state.startupInFlight = false; }
+    } finally { state.startupInFlight = false; if (this.startupStates.get(id) === state) this.startupStates.delete(id); }
   }
   scheduleRestart(wallet, state) {
     state.attempts = state.attempts.filter(time => Date.now() - time < 300_000); state.attempts.push(Date.now());
-    if (!state.noRestart && !state.intentional && !this.shuttingDown && wallet.autostart && state.attempts.length < 5) state.restartTimer = setTimeout(() => this.start(wallet.id).catch(() => {}), Math.min(60_000, 2000 * 2 ** state.attempts.length));
+    if (!this.deleting.has(wallet.id) && !this.wallets.find(item => item.id === wallet.id)?.deletion_pending && !state.noRestart && !state.intentional && !this.shuttingDown && wallet.autostart && state.attempts.length < 5) state.restartTimer = setTimeout(() => this.start(wallet.id).catch(() => {}), Math.min(60_000, 2000 * 2 ** state.attempts.length));
   }
   async stop(id) {
-    this.requireWritable();
+    this.requireWritable(); this.requireAvailable(id);
     this.get(id); const state = this.state(id); state.intentional = true; clearTimeout(state.restartTimer);
     state.status = 'stopping';
     await this.stopTor(state);
@@ -145,7 +247,7 @@ export class WalletManager {
   startTor(wallet, state) {
     if (!this.torBinary) { state.tor = { closed: true, status: 'failed', error: 'Managed Tor is not installed. Update the app to enable automatic Tor.' }; return; }
     const tor = this.torFactory({ binary: this.torBinary, directory: path.join(this.directory(wallet.id), 'tor'), port: this.portBase + wallet.slot });
-    state.tor = tor; this.torProcesses.add(tor);
+    state.tor = tor; this.torProcesses.add(tor); this.writerOwners.set(tor, wallet.id);
     const settled = () => { if (tor.closed && !tor.startupInFlight) this.torProcesses.delete(tor); };
     tor.once('exit', settled);
     tor.start().catch(() => {}).finally(settled);
@@ -160,6 +262,7 @@ export class WalletManager {
     const child = spawn(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     state.iroh.child = child;
     this.irohChildren.add(child);
+    this.writerOwners.set(child, wallet.id);
     child.once('exit', () => this.irohChildren.delete(child));
     child.once('error', () => { if (!child.pid) this.irohChildren.delete(child); });
     await new Promise((resolve, reject) => {
@@ -193,12 +296,14 @@ export class WalletManager {
   }
   /** Reveal only this registered wallet's verified phrase through the protected recovery endpoint. */
   async recovery(id) {
+    this.requireAvailable(id);
     const wallet = this.get(id);
     return readRecovery(this.directory(id), wallet.recovery_kind);
   }
   /** Freeze lifecycle and registry writes while copying all stopped wallet state. */
   async backup(passphrase) {
     this.requireWritable();
+    if (this.deleting.size || this.wallets.some(wallet => wallet.deletion_pending)) throw failure('Finish pending wallet deletions before backing up.', 409, 'DELETE_PENDING');
     this.backupInProgress = true;
     try {
       return await this.exclusive(async () => {

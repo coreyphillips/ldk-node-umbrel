@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "1440: exact name and acknowledgment are required; cancel is inert and backup opens the existing flow",
+    "1440: running wallet deletion is disabled without an automatic stop",
+    "1440: backup checks pending deletion before stopping any healthy sibling",
+    "1440: refused deletion keeps the wallet, confirmation and error without automatic retry",
+    "1440: incomplete deletion permits only explicit completion and preserves the sibling wallet",
+    "1440: deleting the last wallet returns to All wallets",
+    "1440: submitted deletion blocks Cancel, close, Escape and duplicate submission",
+    "1440: delayed success and failure preserve a newly selected wallet and release the original dialog",
+    "1440: a delayed deletion response cannot change a newer login or its selected wallet",
+    "1440: a pre-delete polling response cannot resurrect the removed wallet",
+    "1440: a lost response reconciles the list and does not retry deletion automatically",
+    "1440: a renamed target keeps the captured identity and server rejection prevents deletion",
+    "390: exact name and acknowledgment are required; cancel is inert and backup opens the existing flow",
+    "390: running wallet deletion is disabled without an automatic stop",
+    "390: backup checks pending deletion before stopping any healthy sibling",
+    "390: refused deletion keeps the wallet, confirmation and error without automatic retry",
+    "390: incomplete deletion permits only explicit completion and preserves the sibling wallet",
+    "390: deleting the last wallet returns to All wallets",
+    "390: submitted deletion blocks Cancel, close, Escape and duplicate submission",
+    "390: delayed success and failure preserve a newly selected wallet and release the original dialog",
+    "390: a delayed deletion response cannot change a newer login or its selected wallet",
+    "390: a pre-delete polling response cannot resurrect the removed wallet",
+    "390: a lost response reconciles the list and does not retry deletion automatically",
+    "390: a renamed target keeps the captured identity and server rejection prevents deletion"
+  ],
+  "browser_errors": [],
+  "real_wallets_deleted": false,
+  "funds_sent": false,
+  "physical_umbrel": false,
+  "frontend_sha256": "6d16e7dce2a9d14f866b3f90903bfcea845d31eb82293dc88cd6e6884dab80f4"
+}

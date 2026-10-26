@@ -277,4 +277,7 @@ async function bounded(promise, message) {
     await new Promise(resolve => server.close(resolve));
     await fs.rm(directory, { recursive: true, force: true });
   }
-})().catch(error => { console.error(error); process.exitCode = 1; });
+})().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => {
+  // Exit only after awaited cleanup, preserving failures and flushing results.
+  process.stdout.write('', () => process.exit(process.exitCode || 0));
+});

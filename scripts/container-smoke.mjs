@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const architecture = process.argv[2];
 if (!['amd64', 'arm64'].includes(architecture)) throw new Error('Usage: node scripts/container-smoke.mjs amd64|arm64');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const image = `ldk-node-umbrel:0.1.7-${architecture}`;
+const image = `ldk-node-umbrel:0.1.8-${architecture}`;
 const suffix = `${architecture}-${process.pid}`; const name = `ldk-dashboard-qa-${suffix}`; const volume = `${name}-data`;
 const port = architecture === 'amd64' ? 21095 : 21096; const origin = `http://127.0.0.1:${port}`;
 const umbrelMode = process.env.LDK_TEST_UMBREL === '1';
@@ -45,7 +45,7 @@ async function login() {
 }
 async function running(id) { for (let i = 0; i < 120; i++) { const wallet = (await request('/api/wallets')).find(w => w.id === id); if (wallet.status === 'running') return wallet; if (wallet.status === 'failed') { const logs = await request(`/api/wallets/${id}/logs`); throw new Error(wallet.last_error + ': ' + logs.text.slice(-1600)); } await delay(500); } throw new Error('Native wallet startup timed out'); }
 try {
-  docker('load', '--input', path.join(root, 'dist', `ldk-node-umbrel-0.1.7-${architecture}.tar`));
+  docker('load', '--input', path.join(root, 'dist', `ldk-node-umbrel-0.1.8-${architecture}.tar`));
   const inspect = JSON.parse(docker('image', 'inspect', image))[0]; if (inspect.Architecture !== architecture) throw new Error('Image architecture mismatch'); checks.push('image architecture verified');
   const chainHost = process.env.REGTEST_HOST || 'mint.local'; const chainPort = Number(process.env.REGTEST_PORT || 60401);
   const chainIp = (await dns.lookup(chainHost, { family: 4 })).address;

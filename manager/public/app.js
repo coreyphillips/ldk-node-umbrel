@@ -23,6 +23,7 @@ const state = { session: null, wallets: [], selected: null, view: 'overview', da
 let pairingView = null;
 const pairingSelections = new Map();
 let refreshQueued = false;
+let walletRevision = 0;
 let sensitiveCleanup = null;
 const networks = { bitcoin: 'Mainnet', regtest: 'Regtest', signet: 'Signet', testnet: 'Testnet' };
 const integer = value => {
@@ -54,7 +55,7 @@ const rpc = (method, params = {}) => api(`/wallets/${state.selected}/rpc`, { met
 function toast(message, error = false) { const node = el('div', `toast${error ? ' error' : ''}`, message); document.querySelector('#toasts').append(node); setTimeout(() => node.remove(), 7000); }
 async function run(action, message) { try { const result = await action(); if (message) toast(message); await refresh(); return result; } catch (error) { toast(error.message, true); } }
 function badge(text, color = '') { const node = el('span', `badge ${color}`); return add(node, el('span', 'dot'), document.createTextNode(text)); }
-function walletBadge(wallet) { return badge(wallet.status, wallet.status === 'running' ? 'green' : wallet.status === 'failed' ? 'red' : wallet.status === 'starting' ? 'amber' : ''); }
+function walletBadge(wallet) { return wallet.deletion_pending ? badge('Deletion pending', 'red') : badge(wallet.status, wallet.status === 'running' ? 'green' : wallet.status === 'failed' ? 'red' : wallet.status === 'starting' ? 'amber' : ''); }
 function brand() { const logo = el('img'); logo.src = '/icon.svg'; logo.alt = ''; return add(el('div', 'brand'), logo, add(el('div'), document.createTextNode('LDK Node'), el('small', '', 'Your Bitcoin. Your node.'))); }
 function notice(message, error = false) { return el('div', `notice${error ? ' error' : ''}`, message); }
 async function copy(value) {
@@ -108,9 +109,11 @@ async function refresh() {
   if (state.polling) { refreshQueued = true; return; }
   state.polling = true;
   const session = state.session;
+  const revision = walletRevision;
   try {
     const wallets = await api('/wallets');
     if (state.session !== session) return;
+    if (walletRevision !== revision) { refreshQueued = true; return; }
     state.wallets = wallets;
     if (state.selected && !active()) state.selected = null;
     const walletId = state.selected;
@@ -118,6 +121,7 @@ async function refresh() {
       const methods = ['info', 'balance', 'channels', 'payments', 'peers', 'offline_status', 'events'];
       const responses = await Promise.allSettled(methods.map(method => api(`/wallets/${walletId}/${method}`)));
       if (state.session !== session) return;
+      if (walletRevision !== revision) { refreshQueued = true; return; }
       if (state.selected !== walletId) { refreshQueued = true; return; }
       for (let i = 0; i < methods.length; i++) state.data[methods[i]] = responses[i].status === 'fulfilled' ? responses[i].value : null;
       state.data.error = responses.find(value => value.status === 'rejected')?.reason?.message;
@@ -167,11 +171,12 @@ function render() {
     const titles = { overview: wallet.name, channels: 'Channels & peers', activity: 'Activity', pairing: 'Pair Chicory', offline: 'Offline receive', settings: 'Wallet settings', logs: 'Node logs' };
     const actions = add(el('div', 'actions'), walletBadge(wallet));
     if (wallet.status === 'running') add(actions, button('Receive', receive, 'primary'), button('Send', send));
-    else if (!['starting','stopping'].includes(wallet.status)) actions.append(button('Start wallet', () => run(() => api(`/wallets/${wallet.id}/start`, { method: 'POST', body: {} }), 'Wallet started'), 'primary'));
+    else if (!wallet.deletion_pending && !['starting','stopping'].includes(wallet.status)) actions.append(button('Start wallet', () => run(() => api(`/wallets/${wallet.id}/start`, { method: 'POST', body: {} }), 'Wallet started'), 'primary'));
     add(content, add(el('div', 'page-head'), add(el('div'), el('div', 'eyebrow', networks[wallet.network]), el('h1', '', titles[state.view]), el('p', '', state.view === 'overview' ? 'A clear view of your Bitcoin and Lightning balance.' : 'Manage your native LDK node.')), actions));
     if (wallet.last_error) content.append(notice(wallet.last_error, true));
     if (state.data.error) content.append(notice(state.data.error, true));
-    if (state.view === 'pairing') renderPairing(content, wallet, pairingKey);
+    if (wallet.deletion_pending) renderDeletion(content, wallet);
+    else if (state.view === 'pairing') renderPairing(content, wallet, pairingKey);
     else ({ overview: renderOverview, channels: renderChannels, activity: renderActivity, offline: renderOffline, settings: renderSettings, logs: renderLogs }[state.view] || renderOverview)(content, wallet);
   }
   add(main, content); add(layout, sidebar, main); app.replaceChildren(layout);
@@ -330,7 +335,97 @@ function renderSettings(content, wallet) {
   content.append(card('Tor connections', tor));
   content.append(card('Recovery & backup', add(el('div'), el('p', '', wallet.recovery_kind === 'mnemonic' ? 'Save your 24-word recovery phrase somewhere private. Make a full backup to preserve Lightning channel state as well.' : 'This wallet was created with a binary seed and has no recovery phrase. An encrypted full backup preserves its existing seed, identity and channel state.'), add(el('div', 'actions'), button('Recovery phrase', () => recoveryPhrase(wallet)), button('Back up all wallets', backupAll)))));
   content.append(card('Node lifecycle', add(el('div'), el('p', '', 'Stop the wallet before changing settings or making a full backup. Restart preserves its native identity and channel state.'), add(el('div', 'actions'), button('Sync now', () => run(() => rpc('sync'), 'Synchronization completed')), button('Stop wallet', () => confirmAction('Stop this wallet?', 'Payments and offline settlement need this node online. You can start it again from the dashboard.', () => api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {} })), 'danger')))));
+  renderDeletion(content, wallet);
   content.append(notice('This local build is experimental. The qualification report in the package records supported paths and remaining interoperability limits, including the installed wallet commitment fee policy.'));
+}
+
+function renderDeletion(content, wallet) {
+  const pending = wallet.deletion_pending === true;
+  const remove = button(pending ? 'Finish deleting wallet' : 'Delete wallet', () => deleteWallet(wallet), 'danger');
+  remove.disabled = !pending && wallet.status !== 'stopped';
+  const description = pending
+    ? 'Deletion has started and some wallet data may already be gone. This wallet cannot run or provide a new recovery backup. Confirm again to finish removing its remaining data.'
+    : 'Permanently remove this wallet and its identity, channel state, configuration, Tor identity and Iroh identity from this app. This does not send or recover funds.';
+  const body = add(el('div'), notice(description, true));
+  if (pending) body.append(detail([['Wallet', wallet.name], ['Network', networks[wallet.network]]]));
+  else add(body, el('p', '', 'Save a full backup first to preserve wallet data. A recovery phrase alone cannot restore Lightning channels.'), wallet.status !== 'stopped' ? el('p', '', 'Stop this wallet before deleting it. Deletion does not stop a running wallet automatically.') : null);
+  const actions = add(el('div', 'actions'), !pending ? button('Back up all wallets', backupAll) : null, remove);
+  body.append(actions); content.append(card(pending ? 'Deletion pending' : 'Delete wallet', body));
+}
+
+// The dialog captures its target, while the server enforces stopped state and
+// exact confirmation. A submitted deletion continues even if navigation occurs.
+function deleteWallet(wallet) {
+  if (!wallet.deletion_pending && wallet.status !== 'stopped') { toast('Stop this wallet before deleting it.', true); return; }
+  const body = modal(wallet.deletion_pending ? 'Finish deleting wallet?' : 'Delete wallet?');
+  const session = state.session; const form = el('form');
+  let pending = false; let deletionPending = wallet.deletion_pending === true; let missing = false;
+  const currentSession = () => state.session === session && state.session?.authenticated;
+  const sameDialog = () => currentSession() && dialog.open && body.isConnected;
+  const current = () => sameDialog() && state.selected === wallet.id;
+  const warning = notice('', true);
+  const backup = button('Back up all wallets', backupAll);
+  add(body, detail([['Wallet', wallet.name], ['Network', networks[wallet.network]]]), el('hr', 'divider'), warning, backup);
+  const name = field(form, 'confirmation_name', 'Type the wallet name to confirm', { required: true, help: `Enter exactly: ${wallet.name}` });
+  name.autocomplete = 'off'; name.spellcheck = false;
+  const acknowledge = field(form, 'acknowledge_data_loss', 'I understand this permanently deletes this wallet’s data from this app', { type: 'checkbox', required: true });
+  const error = el('div', 'form-error'); error.role = 'alert';
+  const cancel = button('Cancel', () => dialog.close());
+  const remove = el('button', 'danger'); remove.type = 'submit';
+  const close = dialog.querySelector('.dialog-head button');
+  const update = () => {
+    warning.textContent = deletionPending
+      ? 'Deletion is pending and some data may already be removed. A new backup or recovery phrase cannot restore that missing data. Confirm again to finish deleting this wallet.'
+      : 'This permanently removes this wallet’s identity, channel state, configuration, Tor identity and Iroh identity from this app. It does not send or recover funds. Save a full backup first; a recovery phrase alone cannot restore Lightning channels.';
+    backup.hidden = deletionPending || missing; backup.disabled = pending;
+    name.disabled = pending || missing; acknowledge.disabled = pending || missing;
+    cancel.disabled = pending; close.disabled = pending;
+    remove.textContent = pending ? 'Deleting wallet...' : deletionPending ? 'Finish deleting wallet' : 'Permanently delete wallet';
+    remove.disabled = pending || missing || !current() || name.value !== wallet.name || !acknowledge.checked;
+  };
+  const escape = event => { if (pending && body.isConnected) event.preventDefault(); };
+  dialog.addEventListener('cancel', escape);
+  dialog.addEventListener('close', () => dialog.removeEventListener('cancel', escape), { once: true });
+  name.addEventListener('input', update); acknowledge.addEventListener('change', update);
+  add(form, error, add(el('div', 'dialog-actions'), cancel, remove)); body.append(form); update();
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (pending || missing || !current()) return;
+    error.textContent = '';
+    if (name.value !== wallet.name || !acknowledge.checked) { error.textContent = 'Enter the exact wallet name and acknowledge permanent data loss.'; return; }
+    pending = true; update();
+    try {
+      const result = await api(`/wallets/${wallet.id}`, { method: 'DELETE', body: { confirmation_name: name.value, acknowledge_data_loss: true } });
+      if (!currentSession()) return;
+      if (result.deleted !== true || result.id !== wallet.id) throw new Error('The dashboard did not confirm which wallet was deleted.');
+      // Invalidate every earlier list/RPC read before removing the target so a
+      // delayed poll cannot resurrect it after the server confirms deletion.
+      walletRevision++;
+      state.wallets = state.wallets.filter(item => item.id !== wallet.id); pairingSelections.delete(wallet.id);
+      if (current()) {
+        state.selected = state.wallets[0]?.id || null; state.view = 'overview'; state.data = {};
+        dialog.close(); render(); toast('Wallet deleted.');
+      } else {
+        if (sameDialog()) dialog.close();
+        if (state.selected === wallet.id) { state.selected = null; state.view = 'overview'; state.data = {}; }
+        if (!dialog.open) render();
+      }
+      await refresh();
+    } catch (failure) {
+      if (!sameDialog()) return;
+      error.textContent = `Deletion was not confirmed: ${failure.message}`;
+      // Reconcile a lost or failed response without retrying the destructive
+      // operation. Pending records only offer explicit deletion completion.
+      try {
+        const wallets = await api('/wallets');
+        if (!sameDialog()) return;
+        walletRevision++; state.wallets = wallets;
+        const remaining = wallets.find(item => item.id === wallet.id);
+        deletionPending = remaining?.deletion_pending === true; missing = !remaining;
+        if (missing) error.textContent += ' This wallet is no longer listed. Close this dialog to view the remaining wallets.';
+      } catch { if (sameDialog()) error.textContent += ' The wallet list could not be refreshed. Check it before retrying.'; }
+    } finally { pending = false; if (sameDialog()) update(); }
+  });
 }
 
 // Sensitive values live only in an open dialog, never in dashboard state or storage.
@@ -362,6 +457,7 @@ function recoveryPhrase(wallet) {
 }
 
 function backupAll() {
+  if (state.wallets.some(wallet => wallet.deletion_pending)) { toast('Finish pending wallet deletion before creating a full backup.', true); return; }
   const body = modal('Back up all wallets'); const session = state.session;
   const controller = new AbortController(); const form = el('form');
   add(body, notice('This stops every wallet and pauses payments and offline settlement. Wallets stay stopped after download. Start them again when your backup is stored safely.'), el('p', '', 'The encrypted backup contains every wallet, its keys and current channel state, connection credentials and dashboard sign-in. Keep both the file and its password safe. The password cannot be recovered.'));
@@ -375,6 +471,9 @@ function backupAll() {
     if (password.value.length < 12) throw new Error('Use at least 12 characters for the backup password');
     if (password.value !== confirmation.value) throw new Error('Backup passwords do not match');
     const wallets = await api('/wallets', { signal: controller.signal });
+    // Check every wallet before stopping any sibling. A pending deletion can
+    // contain partial data and cannot participate in a valid full backup.
+    if (wallets.some(wallet => wallet.deletion_pending)) throw new Error('Finish pending wallet deletion before creating a full backup. No wallets were stopped.');
     for (const wallet of wallets) {
       if (controller.signal.aborted) return;
       await api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {}, signal: controller.signal });
