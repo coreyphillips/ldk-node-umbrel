@@ -18,13 +18,24 @@ function acceptSession(session) {
   const { proof, ...publicSession } = session;
   state.session = publicSession;
 }
-function clearSession() { clearSensitiveDialog(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; pairingSelections.clear(); refreshQueued = false; if (dialog.open) dialog.close(); }
+function clearSession() { clearSensitiveDialog(); invalidateReceive(); rememberSessionProof(''); state.session = null; state.wallets = []; state.selected = null; state.data = {}; pairingView = null; pairingSelections.clear(); refreshQueued = false; if (dialog.open) dialog.close(); }
 const state = { session: null, wallets: [], selected: null, view: 'overview', data: {}, config: {}, polling: false };
 let pairingView = null;
 const pairingSelections = new Map();
 let refreshQueued = false;
 let walletRevision = 0;
 let sensitiveCleanup = null;
+let selectionRevision = 0;
+let dialogRevision = 0;
+let receiveView = null;
+let renderKey = null;
+let renderTimer = null;
+let resumeTimer = null;
+const resourceReads = new Map();
+const readTimeoutMs = 15000;
+// Native RPCs time out after 60 seconds. Keep their browser request admitted
+// beyond that limit because aborting fetch cannot cancel native work.
+const nativeReadTimeoutMs = 65000;
 const networks = { bitcoin: 'Mainnet', regtest: 'Regtest', signet: 'Signet', testnet: 'Testnet' };
 const integer = value => {
   if (typeof value === 'number' && Number.isSafeInteger(value)) return BigInt(value);
@@ -74,7 +85,8 @@ function card(title, child, actions) { const node = el('section', 'card'); add(n
 function empty(title, description, action) { return add(el('div', 'empty'), el('h3', '', title), el('p', '', description), action); }
 function detail(rows) { const node = el('dl', 'detail-list'); for (const [label, value] of rows) add(node, el('dt', '', label), el('dd', '', value)); return node; }
 function table(headers, rows) { const node = el('table'); const heading = el('tr'); for (const header of headers) heading.append(el('th', '', header)); node.append(add(el('thead'), heading)); const body = el('tbody'); for (const row of rows) { const tr = el('tr'); for (const value of row) tr.append(value instanceof Node ? add(el('td'), value) : el('td', '', value)); body.append(tr); } node.append(body); return add(el('div', 'table-wrap'), node); }
-function modal(title) { clearSensitiveDialog(); dialog.replaceChildren(); add(dialog, add(el('div', 'dialog-head'), el('h2', '', title), button('×', () => dialog.close(), 'ghost icon'))); const body = el('div', 'dialog-body'); dialog.append(body); if (!dialog.open) dialog.showModal(); return body; }
+function invalidateReceive() { dialogRevision++; receiveView = null; }
+function modal(title) { clearSensitiveDialog(); invalidateReceive(); dialog.replaceChildren(); add(dialog, add(el('div', 'dialog-head'), el('h2', '', title), button('×', () => dialog.close(), 'ghost icon'))); const body = el('div', 'dialog-body'); dialog.append(body); if (!dialog.open) dialog.showModal(); return body; }
 function field(form, name, label, { type = 'text', value = '', options, help, required = false, min, max, wide = false } = {}) {
   const box = el('div', `field${wide ? ' wide' : ''}`); const id = `field-${name}`;
   const control = el(type === 'textarea' ? 'textarea' : options ? 'select' : 'input'); control.id = id; control.name = name;
@@ -104,36 +116,99 @@ async function login(message) {
 }
 
 async function start() { state.config = await api('/config'); await refresh(); }
+// Read resources independently: a slow activity request must not delay balances.
+// Each wallet/resource has at most one browser request in flight, bounded even
+// when a connection disappears without returning an HTTP response.
+async function readApi(route, options = {}, timeoutMs = readTimeoutMs) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try { return await api(route, { ...options, signal: controller.signal }); }
+  catch (error) { if (controller.signal.aborted) throw new Error('The connection timed out.'); throw error; }
+  finally { clearTimeout(timeout); }
+}
+function scheduleRender() {
+  if (renderTimer !== null) return;
+  renderTimer = setTimeout(() => { renderTimer = null; if (state.session?.authenticated && !dialog.open) render(); }, 0);
+}
+function walletReadKey() { return JSON.stringify([state.selected, selectionRevision, active()?.status, active()?.network, !!active()?.deletion_pending]); }
+function refreshResources() {
+  const wallet = active();
+  if (!state.session?.authenticated || !wallet || wallet.status !== 'running' || wallet.deletion_pending) { updateReceive(); return; }
+  const session = state.session; const revision = walletRevision; const selectedRevision = selectionRevision;
+  const current = () => state.session === session && walletRevision === revision && selectionRevision === selectedRevision && state.selected === wallet.id && active()?.status === 'running' && !active()?.deletion_pending;
+  for (const method of ['balance', 'info', 'channels', 'payments', 'peers', 'offline_status', 'events']) {
+    const key = `${wallet.id}/${method}`;
+    if (resourceReads.has(key)) continue;
+    const request = readApi(`/wallets/${key}`, {}, nativeReadTimeoutMs);
+    resourceReads.set(key, request);
+    const delayed = method === 'balance' ? setTimeout(() => {
+      if (!current()) return;
+      state.data.balanceError = 'The node is taking longer than expected. Waiting for the current balance read.';
+      updateBalance();
+    }, readTimeoutMs) : null;
+    request.then(value => {
+      if (!current()) return;
+      if (method === 'balance' && ['onchain_total_sats', 'onchain_spendable_sats', 'lightning_total_sats'].some(field => integer(value?.[field]) === null || integer(value[field]) < 0n)) throw new Error('The node returned an invalid balance. Retrying automatically.');
+      state.data[method] = value;
+      if (method === 'balance') { state.data.balanceError = null; state.data.balanceUpdated = Date.now(); updateBalance(); }
+      else { if (state.data.errors) delete state.data.errors[method]; state.data.error = Object.values(state.data.errors || {})[0]; scheduleRender(); }
+    }).catch(error => {
+      if (!current()) return;
+      // Retain the last good value so a temporary failure never displays zero.
+      if (method === 'balance') { state.data.balanceError = error.message; updateBalance(); }
+      else { (state.data.errors ||= {})[method] = error.message; state.data.error = Object.values(state.data.errors)[0]; scheduleRender(); }
+    }).finally(() => { clearTimeout(delayed); if (resourceReads.get(key) === request) resourceReads.delete(key); });
+  }
+}
 async function refresh() {
   if (!state.session?.authenticated) return;
+  const resourcesKey = walletReadKey();
+  refreshResources();
   if (state.polling) { refreshQueued = true; return; }
   state.polling = true;
   const session = state.session;
   const revision = walletRevision;
   try {
-    const wallets = await api('/wallets');
+    const wallets = await readApi('/wallets');
     if (state.session !== session) return;
     if (walletRevision !== revision) { refreshQueued = true; return; }
+    const previous = active();
     state.wallets = wallets;
-    if (state.selected && !active()) state.selected = null;
-    const walletId = state.selected;
-    if (active()?.status === 'running') {
-      const methods = ['info', 'balance', 'channels', 'payments', 'peers', 'offline_status', 'events'];
-      const responses = await Promise.allSettled(methods.map(method => api(`/wallets/${walletId}/${method}`)));
-      if (state.session !== session) return;
-      if (walletRevision !== revision) { refreshQueued = true; return; }
-      if (state.selected !== walletId) { refreshQueued = true; return; }
-      for (let i = 0; i < methods.length; i++) state.data[methods[i]] = responses[i].status === 'fulfilled' ? responses[i].value : null;
-      state.data.error = responses.find(value => value.status === 'rejected')?.reason?.message;
-    } else state.data = {};
-    if (state.session?.authenticated && !dialog.open) render();
+    if (state.selected && !active()) { state.selected = null; state.data = {}; selectionRevision++; invalidateReceive(); if (dialog.open && dialog.querySelector('.receive-request')) dialog.close(); }
+    const wallet = active();
+    if (previous && wallet && (previous.status !== wallet.status || previous.network !== wallet.network || !!previous.deletion_pending !== !!wallet.deletion_pending)) {
+      selectionRevision++;
+      if (wallet.status !== 'running' || wallet.deletion_pending) state.data = {};
+      if ((wallet.deletion_pending || previous.network !== wallet.network || !receiveView) && dialog.querySelector('.receive-request')) { invalidateReceive(); dialog.close(); }
+    }
+    if (resourcesKey !== walletReadKey()) refreshResources();
+    updateBalance();
+    if (!dialog.open) render();
   } catch (error) { if (state.session === session) toast(error.message, true); }
   finally {
     state.polling = false;
     if (refreshQueued) { refreshQueued = false; refresh(); }
   }
 }
-function navigate(view, id = state.selected) { state.view = view; state.selected = id; state.data = {}; render(); refresh(); }
+function navigate(view, id = state.selected) {
+  if (id !== state.selected) { selectionRevision++; state.data = {}; invalidateReceive(); if (dialog.open && dialog.querySelector('.receive-request')) dialog.close(); }
+  state.view = view; state.selected = id; render(); refresh();
+}
+function balanceStatus() {
+  if (!active() || active().deletion_pending) return 'Wallet unavailable. Balance updates are paused.';
+  if (active().status !== 'running') return 'Wallet stopped. Balance updates resume when it is running.';
+  if (state.data.balanceError) return `Balance updates are delayed. The displayed balance may be outdated. ${state.data.balanceError}`;
+  if (document.visibilityState !== 'visible') return 'Balance checks paused while this page is hidden.';
+  return state.data.balanceUpdated ? 'Wallet balance is updating automatically.' : 'Checking wallet balance…';
+}
+function setText(node, value) { if (node && node.textContent !== value) node.textContent = value; }
+function updateBalance() {
+  const balance = state.data.balance || {};
+  for (const node of app.querySelectorAll('[data-balance]')) setText(node, fmt(balance[node.dataset.balance]));
+  for (const node of app.querySelectorAll('[data-balance-spendable]')) setText(node, `${fmt(balance.onchain_spendable_sats)} sats available to spend`);
+  for (const node of app.querySelectorAll('.balance-status')) { setText(node, balanceStatus()); node.classList.toggle('error', !!state.data.balanceError); }
+  updateReceive();
+}
 function pairingRenderKey() {
   // Tor progress updates its notice without remounting the selected QR or URI.
   const wallets = state.wallets.map(({ tor_status, tor_bootstrap, tor_error, tor_address, ...wallet }) => wallet);
@@ -145,6 +220,10 @@ function render() {
   // Polling keeps the mounted pairing controls, QR and selection intact. Only
   // visible wallet state or changed connection details need new content.
   if (pairingKey && pairingView?.key === pairingKey && pairingView.root.isConnected) { updatePairing(pairingView, wallet); return; }
+  const { balance, balanceError, balanceUpdated, ...renderData } = state.data;
+  const nextKey = JSON.stringify([state.selected, state.view, state.wallets, renderData]);
+  if (renderKey === nextKey && app.querySelector('.layout')) { updateBalance(); return; }
+  renderKey = nextKey;
   pairingView = null;
   const layout = el('div', 'layout'); const sidebar = el('aside', 'sidebar'); add(sidebar, brand());
   add(sidebar, add(el('div', 'nav'), button('◫   All wallets', () => navigate('overview', null), !wallet ? 'active' : '')));
@@ -195,7 +274,12 @@ function renderWallets(content) {
 }
 function renderOverview(content, wallet) {
   const balance = state.data.balance || {}; const channels = state.data.channels || [];
-  add(content, add(el('div', 'stats'), stat('On-chain balance', fmt(balance.onchain_total_sats), `${fmt(balance.onchain_spendable_sats)} sats available to spend`), stat('Lightning balance', fmt(balance.lightning_total_sats), `${channels.filter(channel => channel.is_usable).length} usable channels`), stat('Chicory funding limit', fmt(wallet.chicory.max_total_fronted_sats), wallet.chicory.enabled ? 'Liquidity provider enabled' : 'Liquidity provider disabled')));
+  const onchain = stat('On-chain balance', fmt(balance.onchain_total_sats), `${fmt(balance.onchain_spendable_sats)} sats available to spend`);
+  const lightning = stat('Lightning balance', fmt(balance.lightning_total_sats), `${channels.filter(channel => channel.is_usable).length} usable channels`);
+  for (const [node, field] of [[onchain, 'onchain_total_sats'], [lightning, 'lightning_total_sats']]) { const value = node.querySelector('.value'); value.firstChild.replaceWith(el('span', '', fmt(balance[field]))); value.firstChild.dataset.balance = field; }
+  onchain.querySelector('.foot').dataset.balanceSpendable = '';
+  add(content, add(el('div', 'stats'), onchain, lightning, stat('Chicory funding limit', fmt(wallet.chicory.max_total_fronted_sats), wallet.chicory.enabled ? 'Liquidity provider enabled' : 'Liquidity provider disabled')));
+  content.append(el('p', `balance-status${state.data.balanceError ? ' error' : ''}`, balanceStatus()));
   const info = state.data.info || {};
   const summary = detail([['Node status', wallet.status], ['Network', networks[wallet.network]], ['Chain height', fmt(info.best_block_height)], ['Node ID', info.node_id || 'Start wallet to load identity'], ['Chain source', wallet.chain_source.type], ['Native peers', String(state.data.peers?.length ?? '...')]]);
   const phone = add(el('div'), el('p', '', 'Use this native node as your Chicory primary. Share its Lightning address or enable the optional Iroh phone link.'), button('Pair your phone', () => navigate('pairing'), 'primary'));
@@ -570,16 +654,59 @@ function walletForm(wallet) {
   }); body.append(form);
 }
 function confirmAction(title, description, action) { const body = modal(title); body.append(el('p', '', description)); const form = el('form'); submit(form, 'Confirm', async () => { await action(); dialog.close(); toast('Operation accepted'); await refresh(); }); body.append(form); }
+function currentReceive(view) {
+  return receiveView === view && dialog.open && view.body.isConnected && dialogRevision === view.dialogRevision && state.session === view.session && state.selected === view.walletId && active()?.network === view.network && !active()?.deletion_pending;
+}
+function updateReceive() {
+  const view = receiveView;
+  if (!view || !currentReceive(view)) return;
+  const balance = state.data.balance;
+  const snapshot = balance ? JSON.stringify([balance.onchain_total_sats, balance.onchain_spendable_sats, balance.lightning_total_sats].map(String)) : null;
+  if (snapshot && view.baseline === null) view.baseline = snapshot;
+  if (snapshot && snapshot !== view.baseline) view.changed = true;
+  setText(view.balance, `On-chain wallet balance: ${fmt(balance?.onchain_total_sats)} sats. Lightning wallet balance: ${fmt(balance?.lightning_total_sats)} sats.`);
+  setText(view.status, balanceStatus());
+  view.status.classList.toggle('error', !!state.data.balanceError);
+  setText(view.change, view.changed ? 'Wallet balance changed. Review Activity for payment details.' : '');
+}
+async function receiveQr(view) {
+  if (!currentReceive(view) || view.loading) return;
+  view.loading = true; view.qr.replaceChildren(el('div', 'qr qr-loading', 'Creating QR code…'));
+  try {
+    const { image } = await readApi(`/wallets/${view.walletId}/qr`, { method: 'POST', body: { text: view.value } });
+    if (!currentReceive(view)) return;
+    const qr = el('img', 'qr'); qr.src = image; qr.alt = 'Payment request QR code'; view.qr.replaceChildren(qr);
+  } catch (error) {
+    if (!currentReceive(view)) return;
+    view.qr.replaceChildren(notice(`QR code unavailable. ${error.message}`, true), button('Retry QR code', () => receiveQr(view), 'small'));
+  } finally { view.loading = false; }
+}
 function receive() {
-  const body = modal('Receive Bitcoin'); const form = el('form');
-  const type = field(form, 'type', 'Payment network', { options: [['onchain','On-chain Bitcoin'],['lightning','Lightning invoice']] });
-  const amount = field(form, 'amount', 'Amount (sats)', { type: 'number', min: 1, value: '', help: 'Required for a Lightning invoice. Leave blank for an on-chain address.' });
+  const wallet = active(); if (!wallet || wallet.status !== 'running' || wallet.deletion_pending) return;
+  const session = state.session; const selectedRevision = selectionRevision;
+  const body = modal('Receive Bitcoin'); body.classList.add('receive-request'); const form = el('form');
+  const revision = dialogRevision;
+  const current = () => dialog.open && body.isConnected && dialogRevision === revision && state.session === session && selectionRevision === selectedRevision && state.selected === wallet.id && active()?.network === wallet.network && active()?.status === 'running' && !active()?.deletion_pending;
+  field(form, 'type', 'Payment network', { options: [['onchain','On-chain Bitcoin'],['lightning','Lightning invoice']] });
+  field(form, 'amount', 'Amount (sats)', { type: 'number', min: 1, value: '', help: 'Required for a Lightning invoice. Leave blank for an on-chain address.' });
   field(form, 'description', 'Description', { value: 'Wallet receive' });
+  let submitting = false;
   submit(form, 'Create request', async data => {
-    const result = type.value === 'onchain' ? await rpc('address') : await rpc('invoice', { amount_msat: numeric(data, 'amount', 1000), description: data.get('description'), expiry_secs: 3600 });
-    const value = result.invoice || result.address || result.bolt11 || String(result);
-    const { image } = await api(`/wallets/${state.selected}/qr`, { method: 'POST', body: { text: value } });
-    const output = modal(type.value === 'onchain' ? 'Your Bitcoin address' : 'Your Lightning invoice'); const qr = el('img', 'qr'); qr.src = image; qr.alt = 'Payment request QR code'; add(output, qr, copyValue(value), el('p', '', 'Use this request only on the wallet network. Payment status appears in Activity.'));
+    if (!current() || submitting) return;
+    submitting = true;
+    const rail = data.get('type');
+    try {
+      const params = rail === 'onchain' ? {} : { amount_msat: numeric(data, 'amount', 1000), description: data.get('description'), expiry_secs: 3600 };
+      const result = await api(`/wallets/${wallet.id}/rpc`, { method: 'POST', body: { method: rail === 'onchain' ? 'address' : 'invoice', params } });
+      if (!current()) return;
+      const value = result.invoice || result.address || result.bolt11;
+      if (typeof value !== 'string' || !value) throw new Error('The node did not return a payment request.');
+      const output = modal(rail === 'onchain' ? 'Your Bitcoin address' : 'Your Lightning invoice'); output.classList.add('receive-request');
+      const view = { body: output, walletId: wallet.id, network: wallet.network, session, dialogRevision, value, qr: el('div', 'receive-qr'), balance: el('p', 'receive-balance'), status: el('p', 'receive-status'), change: el('p', 'receive-change'), baseline: null, changed: false, loading: false };
+      receiveView = view; view.status.role = 'status'; view.status.setAttribute('aria-live', 'polite'); view.change.role = 'status';
+      add(output, detail([['Wallet', wallet.name], ['Network', networks[wallet.network]]]), view.qr, copyValue(value), view.balance, view.status, view.change, el('p', '', 'These balances describe the whole wallet and do not confirm payment of this request. Use this request only on the wallet network. Check Activity for payment details.'), button('Done', () => dialog.close()));
+      updateReceive(); receiveQr(view); refreshResources();
+    } finally { submitting = false; }
   }); body.append(form);
 }
 function sent(result) {
@@ -628,9 +755,15 @@ function channelForm(channel) {
   }); body.append(form);
 }
 
-dialog.addEventListener('close', () => { if (!dialog.open) { clearSensitiveDialog(); dialog.replaceChildren(); refresh(); } });
+dialog.addEventListener('close', () => { if (!dialog.open) { clearSensitiveDialog(); invalidateReceive(); dialog.replaceChildren(); refresh(); } });
 dialog.addEventListener('cancel', () => clearSensitiveDialog());
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && sensitiveCleanup) { clearSensitiveDialog(); dialog.close(); } });
+function resumeRefresh() {
+  if (document.visibilityState !== 'visible' || !state.session?.authenticated || resumeTimer !== null) return;
+  resumeTimer = setTimeout(() => { resumeTimer = null; if (document.visibilityState === 'visible') refresh(); }, 75);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && sensitiveCleanup) { clearSensitiveDialog(); dialog.close(); } updateReceive(); resumeRefresh(); });
+window.addEventListener('focus', resumeRefresh);
+window.addEventListener('online', resumeRefresh);
 window.addEventListener('pagehide', () => { if (sensitiveCleanup) { clearSensitiveDialog(); dialog.close(); } });
 try { acceptSession(await api('/session')); if (state.session.authenticated) await start(); else login(); } catch (error) { login(error.message); }
-setInterval(() => { if (document.visibilityState === 'visible' && !dialog.open) refresh(); }, 5000);
+setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 5000);

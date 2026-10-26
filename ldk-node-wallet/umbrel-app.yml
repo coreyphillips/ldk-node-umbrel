@@ -3,7 +3,7 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.8"
+version: "0.1.9"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory as your phone wallet.
@@ -30,9 +30,8 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Adds Delete wallet in Settings for permanently removing a stopped wallet from
-  this app. Type the exact wallet name and acknowledge data loss to confirm.
-  Other wallets keep their data and identities. If cleanup is interrupted, the
-  wallet remains blocked until you explicitly retry deletion. Make a current full
-  backup and finish any fund recovery before deleting wallet data; a recovery
-  phrase alone cannot restore Lightning channels.
+  Balances and payment status refresh automatically while a receive QR is open
+  and when you return to the dashboard. New receive addresses are watched through
+  the wallet's configured Electrum or Esplora server, prompting a native wallet
+  sync when activity changes. Watching resumes after a wallet restart. Bitcoin
+  Core wallets retain their native automatic chain and mempool synchronization.

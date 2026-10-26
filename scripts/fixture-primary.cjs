@@ -49,7 +49,7 @@ async function handle(input) {
     const suffix = crypto.createHash('sha256').update(directory).digest('hex').slice(0, 14); const name = `ldk-umbrel-funded-${suffix}`;
     saved = { container: name, volume: name + '-data', port: Number(portText), http_port: await freePort(), architecture };
     docker('volume', 'create', saved.volume);
-    docker('run', '-d', '--name', name, '--platform', `linux/${architecture}`, '--init', '--security-opt', 'no-new-privileges:true', '--add-host', 'host.docker.internal:host-gateway', '-p', `127.0.0.1:${saved.http_port}:3000`, '-p', `127.0.0.1:${saved.port}:9735`, '-v', `${saved.volume}:/data`, '-e', `PUBLIC_ORIGIN=http://127.0.0.1:${saved.http_port}`, '-e', 'ALLOWED_HOSTS=127.0.0.1', `ldk-node-umbrel:0.1.8-${architecture}`);
+    docker('run', '-d', '--name', name, '--platform', `linux/${architecture}`, '--init', '--security-opt', 'no-new-privileges:true', '--add-host', 'host.docker.internal:host-gateway', '-p', `127.0.0.1:${saved.http_port}:3000`, '-p', `127.0.0.1:${saved.port}:9735`, '-v', `${saved.volume}:/data`, '-e', `PUBLIC_ORIGIN=http://127.0.0.1:${saved.http_port}`, '-e', 'ALLOWED_HOSTS=127.0.0.1', `ldk-node-umbrel:0.1.9-${architecture}`);
     fs.writeFileSync(file, JSON.stringify(saved), { mode: 0o600 });
     if (process.env.LDK_CONTAINER_RESOURCE_LOG) fs.appendFileSync(process.env.LDK_CONTAINER_RESOURCE_LOG, JSON.stringify(saved) + '\n', { mode: 0o600 });
   }

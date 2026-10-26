@@ -1,0 +1,20 @@
+{
+  "version": "0.1.9",
+  "recorded_at": "2026-10-26T16:40:20.629012+00:00",
+  "command": "node --experimental-test-coverage --test server/receive-sync.test.mjs",
+  "working_directory": "manager",
+  "passed": 13,
+  "failed": 0,
+  "skipped": 0,
+  "coverage": {
+    "manager/server/receive-sync.mjs": {
+      "line_percent": 100,
+      "branch_percent": 100,
+      "function_percent": 100
+    }
+  },
+  "source_sha256": {
+    "manager/server/receive-sync.mjs": "a2f0c49583f50e0c4f157202fdfef8d940ba944d18d56a7590bbbcbb9dfcf3d8",
+    "manager/server/receive-sync.test.mjs": "efa3c12a130548ad4b4bfe885ef47dc6dddc3ed8b42c7774bdb584f52fc21bfd"
+  }
+}
