@@ -4,11 +4,13 @@ import { spawn } from 'node:child_process';
 import { NativeProcess } from './rpc.mjs';
 import { atomicJson, privateDir, readJson, failure } from './files.mjs';
 import { walletConfig, publicConfig, rpcRequest } from './config.mjs';
+import { createRecovery, readRecovery } from './recovery.mjs';
+import { createBackup } from './backup.mjs';
 
 export class WalletManager {
-  constructor({ dataDir, binary, bridge, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), electrumCheck }) {
+  constructor({ dataDir, binary, bridge, portBase = 9735, publicPortBase = 19351, processFactory = options => new NativeProcess(options), electrumCheck, backupFactory = createBackup }) {
     this.dataDir = dataDir; this.binary = binary; this.bridge = bridge; this.portBase = portBase; this.publicPortBase = publicPortBase;
-    this.electrumCheck = electrumCheck; this.processFactory = processFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false;
+    this.electrumCheck = electrumCheck; this.processFactory = processFactory; this.backupFactory = backupFactory; this.wallets = []; this.runtime = new Map(); this.serial = Promise.resolve(); this.shuttingDown = false; this.backupInProgress = false; this.irohChildren = new Set();
   }
   async initialize() {
     await privateDir(path.join(this.dataDir, 'wallets'));
@@ -29,22 +31,27 @@ export class WalletManager {
   get(id) { const wallet = this.wallets.find(item => item.id === id); if (!wallet) throw failure('Wallet not found', 404, 'NOT_FOUND'); return wallet; }
   directory(id) { this.get(id); return path.join(this.dataDir, 'wallets', id); }
   state(id) { return this.runtime.get(id) || { status: 'stopped', logs: [] }; }
-  list() { return this.wallets.map(wallet => ({ ...publicConfig(wallet), status: this.state(wallet.id).status, last_error: this.state(wallet.id).error || null, public_port: this.publicPortBase + wallet.slot, iroh_status: this.state(wallet.id).iroh?.ready ? 'ready' : this.state(wallet.id).iroh?.status || 'stopped' })); }
+  list() { return this.wallets.map(wallet => ({ ...publicConfig(wallet), recovery_kind: wallet.recovery_kind || 'legacy_seed', status: this.state(wallet.id).status, last_error: this.state(wallet.id).error || null, public_port: this.publicPortBase + wallet.slot, iroh_status: this.state(wallet.id).iroh?.ready ? 'ready' : this.state(wallet.id).iroh?.status || 'stopped' })); }
   async persist() { await atomicJson(path.join(this.dataDir, 'wallets.json'), this.wallets); }
+  requireWritable() { if (this.backupInProgress) throw failure('A backup is in progress. Try again after it finishes.', 409, 'BACKUP_BUSY'); }
   async create(input) {
+    this.requireWritable();
     const wallet = await this.exclusive(async () => {
+      this.requireWritable();
       if (this.wallets.length >= 8) throw failure('This installation supports eight wallets', 409, 'WALLET_LIMIT');
       const config = walletConfig(input);
       const slot = Array.from({ length: 8 }, (_, i) => i).find(i => !this.wallets.some(wallet => wallet.slot === i));
-      const value = { ...config, id: randomUUID(), slot, created_at: new Date().toISOString() };
-      await privateDir(path.join(this.dataDir, 'wallets', value.id));
+      const value = { ...config, id: randomUUID(), slot, created_at: new Date().toISOString(), recovery_kind: 'mnemonic' };
+      await createRecovery(path.join(this.dataDir, 'wallets', value.id), value.network);
       const next = [...this.wallets, value]; await atomicJson(path.join(this.dataDir, 'wallets.json'), next); this.wallets = next; return value;
     });
     if (wallet.autostart) this.start(wallet.id).catch(() => {});
     return this.list().find(item => item.id === wallet.id);
   }
   async update(id, input) {
+    this.requireWritable();
     return this.exclusive(async () => {
+      this.requireWritable();
       const wallet = this.get(id);
       if (!['stopped', 'failed'].includes(this.state(id).status)) throw failure('Stop this wallet before changing its settings', 409, 'STOP_REQUIRED');
       const next = this.wallets.map(item => item.id === id ? { ...item, ...walletConfig(input, wallet) } : item);
@@ -52,11 +59,12 @@ export class WalletManager {
     });
   }
   async start(id) {
+    this.requireWritable();
     const wallet = this.get(id); const old = this.state(id);
     if (this.shuttingDown) throw failure('Dashboard is shutting down', 409);
-    if (['starting', 'running', 'stopping'].includes(old.status)) throw failure('Wallet is already active', 409);
+    if (old.startupInFlight || ['starting', 'running', 'stopping'].includes(old.status)) throw failure('Wallet is already active', 409);
     clearTimeout(old.restartTimer);
-    const state = { status: 'starting', error: null, attempts: old.attempts || [], logs: old.logs || [], intentional: false };
+    const state = { status: 'starting', startupInFlight: true, error: null, attempts: old.attempts || [], logs: old.logs || [], intentional: false };
     this.runtime.set(id, state);
     try {
     // Normalize legacy Electrum URLs before passing them to the native socket
@@ -65,12 +73,16 @@ export class WalletManager {
     if (chain_source.type === 'electrum' && this.electrumCheck) await this.electrumCheck({ url: chain_source.url, network: wallet.network });
     if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const directory = this.directory(id);
+    // Never let the daemon replace missing seed material for a phrase-backed wallet.
+    if (wallet.recovery_kind === 'mnemonic') await readRecovery(directory, 'mnemonic');
     await privateDir(path.join(directory, 'node'));
+    if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const configFile = path.join(directory, 'node.json');
     await atomicJson(configFile, {
       network: wallet.network, data_dir: path.join(directory, 'node'), listen_address: `0.0.0.0:${this.portBase + wallet.slot}`,
       alias: wallet.name, chain_source, chicory: wallet.chicory,
     });
+    if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const process = this.processFactory({ binary: this.binary, config: configFile }); state.process = process;
     process.once('fault', message => { state.noRestart = true; state.error = message; state.status = 'stopping'; });
     process.once('exit', () => {
@@ -89,13 +101,14 @@ export class WalletManager {
       state.error = state.status === 'failed' ? state.error || error.message : null;
       if (state.status === 'failed' && !state.process) this.scheduleRestart(wallet, state);
       throw error;
-    }
+    } finally { state.startupInFlight = false; }
   }
   scheduleRestart(wallet, state) {
     state.attempts = state.attempts.filter(time => Date.now() - time < 300_000); state.attempts.push(Date.now());
     if (!state.noRestart && !state.intentional && !this.shuttingDown && wallet.autostart && state.attempts.length < 5) state.restartTimer = setTimeout(() => this.start(wallet.id).catch(() => {}), Math.min(60_000, 2000 * 2 ** state.attempts.length));
   }
   async stop(id) {
+    this.requireWritable();
     this.get(id); const state = this.state(id); state.intentional = true; clearTimeout(state.restartTimer);
     if (!state.process || state.process.closed) { state.status = 'stopped'; return { status: 'stopped' }; }
     state.status = 'stopping';
@@ -116,6 +129,9 @@ export class WalletManager {
     if (wallet.iroh.default_relays) args.push('--default-relays');
     const child = spawn(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     state.iroh.child = child;
+    this.irohChildren.add(child);
+    child.once('exit', () => this.irohChildren.delete(child));
+    child.once('error', () => { if (!child.pid) this.irohChildren.delete(child); });
     await new Promise((resolve, reject) => {
       let buffer = ''; const timer = setTimeout(() => { child.kill('SIGTERM'); reject(new Error('Iroh startup timed out')); }, 20_000);
       child.stdout.on('data', data => {
@@ -144,6 +160,29 @@ export class WalletManager {
     const tcp = `${state.ready.node_id}@${host.includes(':') ? `[${host}]` : host}:${this.publicPortBase + wallet.slot}`;
     return { node_id: state.ready.node_id, tcp_uri: tcp, tor_uri: wallet.tor_onion_address ? `${state.ready.node_id}@${wallet.tor_onion_address}` : null, iroh_uri: state.iroh?.ready ? state.iroh.uri : null, iroh_status: state.iroh?.status || 'disabled', direct_addresses: state.iroh?.direct_addresses || [], network: wallet.network };
   }
+  /** Reveal only this registered wallet's verified phrase through the protected recovery endpoint. */
+  async recovery(id) {
+    const wallet = this.get(id);
+    return readRecovery(this.directory(id), wallet.recovery_kind);
+  }
+  /** Freeze lifecycle and registry writes while copying all stopped wallet state. */
+  async backup(passphrase) {
+    this.requireWritable();
+    this.backupInProgress = true;
+    try {
+      return await this.exclusive(async () => {
+        if (this.shuttingDown) throw failure('Dashboard is shutting down', 409);
+        const active = this.wallets.some(wallet => {
+          const state = this.state(wallet.id);
+          const child = state.process?.child;
+          return state.startupInFlight || state.status !== 'stopped' || (state.process && !state.process.closed) ||
+            (child && child.pid && child.exitCode === null && child.signalCode === null);
+        });
+        if (active || this.irohChildren.size) throw failure('Stop every wallet and wait for its processes to exit before backing up.', 409, 'STOP_REQUIRED');
+        return this.backupFactory(this.dataDir, passphrase);
+      });
+    } finally { this.backupInProgress = false; }
+  }
   logs(id) { this.get(id); const state = this.state(id); return (state.process?.logs || state.logs || []).join('').slice(-64 * 1024); }
-  async close() { this.shuttingDown = true; await Promise.all(this.wallets.map(wallet => this.stop(wallet.id).catch(() => {}))); }
+  async close() { this.shuttingDown = true; await this.serial; await Promise.all(this.wallets.map(wallet => this.stop(wallet.id).catch(() => {}))); }
 }

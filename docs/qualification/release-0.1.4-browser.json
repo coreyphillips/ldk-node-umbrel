@@ -1,0 +1,19 @@
+{
+  "version": "0.1.4",
+  "checks": [
+    "1440: numbered phrase, clipboard fallback, mobile fit and close cleanup",
+    "1440: page exit clears displayed phrase",
+    "1440: automatic expiry removes phrase and closes dialog",
+    "1440: password confirmation, encrypted download, full channel-state restore, secret field cleanup",
+    "1440: legacy wallet preserves identity and explains full backup",
+    "390: numbered phrase, clipboard fallback, mobile fit and close cleanup",
+    "390: page exit clears displayed phrase",
+    "390: automatic expiry removes phrase and closes dialog",
+    "390: password confirmation, encrypted download, full channel-state restore, secret field cleanup",
+    "390: legacy wallet preserves identity and explains full backup"
+  ],
+  "browser_errors": [],
+  "funds_sent": false,
+  "physical_umbrel": false,
+  "frontend_sha256": "92d690e5db6440352be3ce07d7c81b2394fa008d85e2341438f43dcbfe66a96a"
+}

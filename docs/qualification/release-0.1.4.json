@@ -1,0 +1,96 @@
+{
+  "amd64": {
+    "qualified_base": {
+      "image_id": "sha256:2d8e2df8ebf13f97a5db13b525ca03b42f06a6d05f848500f2aa24c809728638",
+      "architecture": "amd64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "a733a3e805426f11a59be85bae414bb8807c7a8eded2a8da6b64287605a7ba1b",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-x64-gnu/iroh.linux-x64-gnu.node": "d660aa1abbc2b65b99a970e8da094339256725078b75ed1201b49e0b0acbda55"
+      },
+      "frontend_sha256": "1a87c786330bf88a2e7870d716469d10cb7c1a581d44e7d430db53c18ceca995"
+    },
+    "release_image": {
+      "image_id": "sha256:9675320f68f81ac0ac30d19d47307c5d5dd29016290f0bd6a470d93bb8f292e0",
+      "architecture": "amd64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "a733a3e805426f11a59be85bae414bb8807c7a8eded2a8da6b64287605a7ba1b",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-x64-gnu/iroh.linux-x64-gnu.node": "d660aa1abbc2b65b99a970e8da094339256725078b75ed1201b49e0b0acbda55"
+      },
+      "frontend_sha256": "92d690e5db6440352be3ce07d7c81b2394fa008d85e2341438f43dcbfe66a96a",
+      "manager_files": {
+        "/opt/ldk/manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
+        "/opt/ldk/manager/server/backup.mjs": "8b6ef7550241a7199addc0f1b27ab0a8ebff32870d482c447cdc0465a356e263",
+        "/opt/ldk/manager/server/config.mjs": "77412234d32dd53014c80dd47531a402d0a4365916584baf4071c229c1bc5dc0",
+        "/opt/ldk/manager/server/electrum.mjs": "1734649b3d065e879e1432d3bde4ce04612d44da163947e60d6867fde67006ab",
+        "/opt/ldk/manager/server/files.mjs": "af4b64c38ffc746cdc187722a0ad501314185450f23004129841cb86481391b8",
+        "/opt/ldk/manager/server/index.mjs": "1d7ad79724a940405354f9114905ed18906bad849d398996c1e72a2286e717e4",
+        "/opt/ldk/manager/server/recovery.mjs": "e89a2628fb42d4a5fe5e6121b529cfcfaf2a2e56ead9446ead78cd680ef5527c",
+        "/opt/ldk/manager/server/request-security.mjs": "90a0225665d74fe40b370288d4fec8c4c2c7afb82d4fac86a55dc6da77aa07fd",
+        "/opt/ldk/manager/server/rpc.mjs": "3dbae8021b220581feb5455a75d5051a133bda5605a4691a595222272bd5d9a4",
+        "/opt/ldk/manager/server/wallets.mjs": "ca89e955a9097d080626250f59651195f0e30357d51eb2add8309a10f8d6c913",
+        "/opt/ldk/manager/public/app.js": "92d690e5db6440352be3ce07d7c81b2394fa008d85e2341438f43dcbfe66a96a",
+        "/opt/ldk/manager/public/icon.svg": "e5e2d9686ba0c8903056ee5a4050db8754040ed19c3ab96b31d25c40d0d267a9",
+        "/opt/ldk/manager/public/index.html": "0a5d2d2225f25fa13e28172081a291e21434ad3c22b29bf7b08033fe54243982",
+        "/opt/ldk/manager/public/style.css": "0ae2bf77ecf856b3861255829d0c73d8d211fdee8f63a7c2ba28eaa05d67bb9e",
+        "/opt/ldk/manager/package.json": "36f761baa27c6e4d37322962c3f034cee562aacdbde43e424dd04988617bfa1b",
+        "/opt/ldk/manager/package-lock.json": "f1317a5878e383498eb97e338f73a67bb6fa0724719ad7738fe0c6d6d55a1378",
+        "/opt/ldk/scripts/restore-backup.mjs": "f39c92837540c2b9835edee9330ffd2b5c0d0556debb6d6c5e8ef3df098faa8a"
+      }
+    },
+    "archive": {
+      "file": "ldk-node-umbrel-0.1.4-amd64.tar",
+      "sha256": "3ac40e1e4d41ecb4adf10b8569baf0e780ab9406ed3c029c0b3911ce75287e1d",
+      "bytes": 108739072
+    }
+  },
+  "arm64": {
+    "qualified_base": {
+      "image_id": "sha256:3debe191f3ee156d58480fb953b62c12405c805f0b00db0b37527bf12d2d293f",
+      "architecture": "arm64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "9c32115bcd926489690c5c063dd261f3eebb541c8f34593e1a865de765c510ab",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-arm64-gnu/iroh.linux-arm64-gnu.node": "e19d9da4111f5e35b630317c281b575e81c7f0abf6e3cd09dd1ba15d074eec82"
+      },
+      "frontend_sha256": "1a87c786330bf88a2e7870d716469d10cb7c1a581d44e7d430db53c18ceca995"
+    },
+    "release_image": {
+      "image_id": "sha256:6d488e73cd9a5bd67a9ffa844e02827269d7dc62a6dc85fc88dd9023fb7980c4",
+      "architecture": "arm64",
+      "native_files": {
+        "/opt/ldk/bin/ldk-node-daemon": "9c32115bcd926489690c5c063dd261f3eebb541c8f34593e1a865de765c510ab",
+        "/opt/ldk/iroh/bridge.cjs": "87baceb09d395cb51f7d9f1ba2b23d2e4b117470416f961cf771728ff18ba64c",
+        "/opt/ldk/iroh/node_modules/@number0/iroh-linux-arm64-gnu/iroh.linux-arm64-gnu.node": "e19d9da4111f5e35b630317c281b575e81c7f0abf6e3cd09dd1ba15d074eec82"
+      },
+      "frontend_sha256": "92d690e5db6440352be3ce07d7c81b2394fa008d85e2341438f43dcbfe66a96a",
+      "manager_files": {
+        "/opt/ldk/manager/server/auth.mjs": "3e9331bd98ced14e7c59cc71004911ad9e58bdb4451954f761e7b6fc8472a2ce",
+        "/opt/ldk/manager/server/backup.mjs": "8b6ef7550241a7199addc0f1b27ab0a8ebff32870d482c447cdc0465a356e263",
+        "/opt/ldk/manager/server/config.mjs": "77412234d32dd53014c80dd47531a402d0a4365916584baf4071c229c1bc5dc0",
+        "/opt/ldk/manager/server/electrum.mjs": "1734649b3d065e879e1432d3bde4ce04612d44da163947e60d6867fde67006ab",
+        "/opt/ldk/manager/server/files.mjs": "af4b64c38ffc746cdc187722a0ad501314185450f23004129841cb86481391b8",
+        "/opt/ldk/manager/server/index.mjs": "1d7ad79724a940405354f9114905ed18906bad849d398996c1e72a2286e717e4",
+        "/opt/ldk/manager/server/recovery.mjs": "e89a2628fb42d4a5fe5e6121b529cfcfaf2a2e56ead9446ead78cd680ef5527c",
+        "/opt/ldk/manager/server/request-security.mjs": "90a0225665d74fe40b370288d4fec8c4c2c7afb82d4fac86a55dc6da77aa07fd",
+        "/opt/ldk/manager/server/rpc.mjs": "3dbae8021b220581feb5455a75d5051a133bda5605a4691a595222272bd5d9a4",
+        "/opt/ldk/manager/server/wallets.mjs": "ca89e955a9097d080626250f59651195f0e30357d51eb2add8309a10f8d6c913",
+        "/opt/ldk/manager/public/app.js": "92d690e5db6440352be3ce07d7c81b2394fa008d85e2341438f43dcbfe66a96a",
+        "/opt/ldk/manager/public/icon.svg": "e5e2d9686ba0c8903056ee5a4050db8754040ed19c3ab96b31d25c40d0d267a9",
+        "/opt/ldk/manager/public/index.html": "0a5d2d2225f25fa13e28172081a291e21434ad3c22b29bf7b08033fe54243982",
+        "/opt/ldk/manager/public/style.css": "0ae2bf77ecf856b3861255829d0c73d8d211fdee8f63a7c2ba28eaa05d67bb9e",
+        "/opt/ldk/manager/package.json": "36f761baa27c6e4d37322962c3f034cee562aacdbde43e424dd04988617bfa1b",
+        "/opt/ldk/manager/package-lock.json": "f1317a5878e383498eb97e338f73a67bb6fa0724719ad7738fe0c6d6d55a1378",
+        "/opt/ldk/scripts/restore-backup.mjs": "f39c92837540c2b9835edee9330ffd2b5c0d0556debb6d6c5e8ef3df098faa8a"
+      }
+    },
+    "archive": {
+      "file": "ldk-node-umbrel-0.1.4-arm64.tar",
+      "sha256": "74d14745066306d3715df7eba76fe077e8282b9294d296210517fb9ff7347001",
+      "bytes": 107740672
+    }
+  },
+  "native_runtime_commit": "35b49a99bdff7edbe3c97dd5a605edf6e878ead4",
+  "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59"
+}

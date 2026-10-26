@@ -44,7 +44,7 @@ The qualified phone builds use Chicory 0.7.4 with local portable-engine fixes fo
 4. Open **Pair Chicory** and scan or paste the URI as an external primary.
 5. For Iroh pairing, explicitly enable Iroh, public relays and endpoint discovery. An existing v3 onion service can be configured as a same-key fallback. The dashboard does not create an onion service.
 
-Version 0.1.3 keeps the Pair Chicory page in place during background updates, including its scroll position and selected connection text. Reload the dashboard tab after updating the app.
+Version 0.1.4 adds **Settings > Recovery & backup**. New wallets have a 24-word recovery phrase with reveal and copy controls. Existing wallets keep their binary seeds and use an encrypted full backup. **Back up all wallets** stops wallet processes and downloads keys, configuration and complete Lightning channel state. Save the file and its password privately, then restart the wallets. See the [backup and offline restore instructions](docs/umbrel.md#back-up-and-restore). Reload the dashboard tab after updating the app.
 
 The primary needs liquidity for its enabled funding and routing functions. Never reuse another live node's storage. Back up complete stopped wallet state; a seed alone cannot restore current Lightning channels.
 
