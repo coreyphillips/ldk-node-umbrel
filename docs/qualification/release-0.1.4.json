@@ -92,5 +92,27 @@
     }
   },
   "native_runtime_commit": "35b49a99bdff7edbe3c97dd5a605edf6e878ead4",
-  "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59"
+  "notice_checksums_sha256": "aa297144c2ccfea370d4555e1046ef4a733b9ff35c09eef0f32d90b4cede3c59",
+  "registry": {
+    "image": "ghcr.io/coreyphillips/ldk-node-umbrel:0.1.4",
+    "index_digest": "sha256:924331f2a4592126950470d97a9d660791df9a6985261c26cfcc6f18addb5038",
+    "amd64_manifest_digest": "sha256:3ddddd5f82fe7e87541a030134099ffc55aa809bc7a26a3b2a3e369a08b3533f",
+    "arm64_manifest_digest": "sha256:3ce553d649500b2d2bc5696662985b55d95306163cb371fc9e38feccc9fe87e7",
+    "workflow": "https://github.com/coreyphillips/ldk-node-umbrel/actions/runs/40261437954",
+    "anonymous_index_access": true,
+    "verification": {
+      "amd64": {
+        "anonymous_docker_pull": true,
+        "native_files_match_qualified_archive": true,
+        "notice_bundle_matches": true,
+        "frontend_matches_browser_qualified_source": true
+      },
+      "arm64": {
+        "anonymous_docker_pull": true,
+        "native_files_match_qualified_archive": true,
+        "notice_bundle_matches": true,
+        "frontend_matches_browser_qualified_source": true
+      }
+    }
+  }
 }
