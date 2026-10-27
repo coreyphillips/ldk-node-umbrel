@@ -1,0 +1,38 @@
+{
+  "version": "0.1.12",
+  "verified_at": "2026-10-27T03:17:11.647203+00:00",
+  "workflow_run": "https://github.com/coreyphillips/ldk-node-umbrel/actions/runs/40442931798",
+  "index_digest": "sha256:5e90abb59309d74841c98d7f137f3f3c68dce3d41d614088f8f5acc25216d6bd",
+  "anonymous_manifest_access": true,
+  "empty_docker_config": true,
+  "credential_helpers_excluded_from_path": true,
+  "qualified_record_sha256": "0898172d43b6df20e5e5af72fba0f380e1651f421e0627cffcbd57859bbb78f8",
+  "architectures": {
+    "amd64": {
+      "manifest_digest": "sha256:b2c4fa2371feaade5be1c558702c519ffd3777c41ef62b6b905f76a2c1b8acbf",
+      "image_id": "sha256:b2c4fa2371feaade5be1c558702c519ffd3777c41ef62b6b905f76a2c1b8acbf",
+      "image_config_digest": "sha256:031225e1b1030a1ae1555928308d9f8055b091df3de0d987f4c0cf6a4820c7c4",
+      "anonymous_pull": true,
+      "qualified_image_id": "sha256:84878685861b8437165702796a88d13375441651b23daaa68e9a4a51ed0fc587",
+      "manifest_digest_matches_qualified_archive": false,
+      "image_config_matches_qualified_archive": true,
+      "packaged_files_match_qualified_archive": true,
+      "native_daemon_sha256": "039abb62729a8e5543616c54c8d01a874108abcaab5cda603bc480031b71bf16",
+      "verified_files": 68
+    },
+    "arm64": {
+      "manifest_digest": "sha256:aefcfa3ebdb8d6a0dfc6435fff186fb356a1a4f71727926b52e2f6d79d90b29b",
+      "image_id": "sha256:aefcfa3ebdb8d6a0dfc6435fff186fb356a1a4f71727926b52e2f6d79d90b29b",
+      "image_config_digest": "sha256:6c01f6fb3b7d602f5673be3ec3242f9993f3aa475f97cedca81a0bcb7f5ff6c4",
+      "anonymous_pull": true,
+      "qualified_image_id": "sha256:7b7ee6b6598675674c7d189992a220a8e348f79d886550b74f6e78eeca25ed5b",
+      "manifest_digest_matches_qualified_archive": false,
+      "image_config_matches_qualified_archive": true,
+      "packaged_files_match_qualified_archive": true,
+      "native_daemon_sha256": "c80b9cacd849756b2d272c1af996e67c9476b54764caef64dd1a50c2f7942663",
+      "verified_files": 68
+    }
+  },
+  "completed_at": "2026-10-27T03:17:14.828407+00:00",
+  "manifest_note": "Published manifest digests differ from the local OCI archive digests; image config digests and all 68 qualified runtime files per architecture match exactly."
+}

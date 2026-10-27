@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-27T03:19:35.570832+00:00",
+  "checks": [
+    {
+      "hostname": "umbrel.local",
+      "lightning_ports": 8,
+      "verified_digest": true,
+      "schema_only_proxy": true
+    },
+    {
+      "hostname": "node-example.local",
+      "lightning_ports": 8,
+      "verified_digest": true,
+      "schema_only_proxy": true
+    }
+  ],
+  "started_services": false
+}

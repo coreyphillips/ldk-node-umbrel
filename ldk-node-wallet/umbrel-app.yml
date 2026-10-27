@@ -3,7 +3,7 @@ id: ldk-node-wallet
 name: LDK Node
 tagline: Your native Bitcoin and Chicory primary
 category: bitcoin
-version: "0.1.11"
+version: "0.1.12"
 port: 2114
 description: >-
   Manage independent native LDK Node wallets and pair Chicory or a compatible Bitkit Primary client as your phone wallet.
@@ -30,7 +30,8 @@ deterministicPassword: true
 storage:
   dataRoot: data
 releaseNotes: >-
-  Updates the native offline-receive feature bits to match Beignet and avoid
-  conflicts with Eclair on-the-fly funding. Upgrade both the primary and phone
-  client before using offline receive. The protocol wire messages and stored
-  wallet state remain compatible.
+  Adds support for compatible Bitkit, Beignet and Chicory wallets to fund a
+  receiving Lightning channel directly from an onchain payment using bgnq
+  requests. The primary can open a confirmed channel or splice an existing
+  channel. Upgrade the phone's native client together with the primary.
+  Includes durable recovery of interrupted funding exchanges.
