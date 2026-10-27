@@ -8,7 +8,8 @@
     ],
     "repository": "https://github.com/RustCrypto/traits",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -18,7 +19,9 @@
     "source_revision": "1ae238c527c204dd9590e3abc406cfbb342d46ea",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "d122413f284cf2d62fb1b7db97e02edb8cda96d769b16e443a4f6195e35662b0"
   },
@@ -628,8 +631,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.11.json",
-    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
+    "source_manifest": "native-source-0.1.12.json",
+    "source_manifest_sha256": "251cb710c0e842d2b6a58e93d5188f53ee96ae0c00ba77e3f7b5acf21337f749"
   },
   {
     "name": "bdk_chain",
@@ -1437,6 +1440,29 @@
     "source_archive_sha256": "65c35e4b699c7e15ccbe7ee35c005e4fc0a278d22238a2857e6ce2dadeda1b06"
   },
   {
+    "name": "chacha20",
+    "version": "0.9.1",
+    "license": "Apache-2.0 OR MIT",
+    "authors": [
+      "RustCrypto Developers"
+    ],
+    "repository": "https://github.com/RustCrypto/stream-ciphers",
+    "products": [
+      "ldk-node-daemon"
+    ],
+    "notices": [
+      "LICENSE-APACHE",
+      "LICENSE-MIT"
+    ],
+    "source_url": "https://static.crates.io/crates/chacha20/chacha20-0.9.1.crate",
+    "source_revision": "b5d39c45c45df97335f4b6effb853cde97810de1",
+    "target_graphs": [
+      "ldk/amd64",
+      "ldk/arm64"
+    ],
+    "source_archive_sha256": "c3613f74bd2eac03dad61bd53dbe620703d4371614fe0bc3b9f04dd36fe4e818"
+  },
+  {
     "name": "chacha20-poly1305",
     "version": "0.1.2",
     "license": "CC0-1.0",
@@ -1465,6 +1491,29 @@
       "ldk/arm64"
     ],
     "source_archive_sha256": "4b4b0fc281743d80256607bd65e8beedc42cb0787ea119c85b81b4c0eab85e5f"
+  },
+  {
+    "name": "chacha20poly1305",
+    "version": "0.10.1",
+    "license": "Apache-2.0 OR MIT",
+    "authors": [
+      "RustCrypto Developers"
+    ],
+    "repository": "https://github.com/RustCrypto/AEADs/tree/master/chacha20poly1305",
+    "products": [
+      "ldk-node-daemon"
+    ],
+    "notices": [
+      "LICENSE-APACHE",
+      "LICENSE-MIT"
+    ],
+    "source_url": "https://static.crates.io/crates/chacha20poly1305/chacha20poly1305-0.10.1.crate",
+    "source_revision": "746f70a5f6c7371e723dc64e04f2115b56f24d27",
+    "target_graphs": [
+      "ldk/amd64",
+      "ldk/arm64"
+    ],
+    "source_archive_sha256": "10cd79432192d1c0f4e1a0fef9527696cc039165d729fb41b3f4f4f354c2dc35"
   },
   {
     "name": "chrono",
@@ -1521,7 +1570,8 @@
     ],
     "repository": "https://github.com/RustCrypto/traits",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -1531,7 +1581,9 @@
     "source_revision": "0af93f6076a76757c65cb2ef6f6abd9756440478",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "773f3b9af64447d2ce9850330c473515014aa235e6a783b02db81ff39e4a3dad"
   },
@@ -1704,7 +1756,8 @@
     ],
     "repository": "https://github.com/RustCrypto/utils",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -1714,7 +1767,8 @@
     "source_revision": "9d92d5e95ab4c07c5d8bfd024bf2a17e96d20feb",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64"
     ],
     "source_archive_sha256": "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
   },
@@ -1858,7 +1912,8 @@
     ],
     "repository": "https://github.com/RustCrypto/traits",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -1868,7 +1923,9 @@
     "source_revision": "66a997ccf5776ce873da5a48e2885a9908e940f6",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a"
   },
@@ -3326,12 +3383,13 @@
     "version": "0.14.7",
     "license": "MIT",
     "authors": [
-      "Bartłomiej Kamiński <fizyk20@gmail.com>",
+      "Bart\u0142omiej Kami\u0144ski <fizyk20@gmail.com>",
       "Aaron Trent <novacrazy@gmail.com>"
     ],
     "repository": "https://github.com/fizyk20/generic-array.git",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE"
@@ -3340,7 +3398,9 @@
     "source_revision": "1397d2bb40c406901b7827161b73b34b056cbe3a",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
   },
@@ -3655,7 +3715,7 @@
     "version": "0.2.3",
     "license": "CC0-1.0",
     "authors": [
-      "Martin Habovštiak <martin.habovstiak@gmail.com>",
+      "Martin Habov\u0161tiak <martin.habovstiak@gmail.com>",
       "Andrew Poelstra <apoelstra@wpsoftware.net>"
     ],
     "repository": "https://github.com/rust-bitcoin/hex-conservative",
@@ -3677,7 +3737,7 @@
     "version": "1.2.0",
     "license": "CC0-1.0",
     "authors": [
-      "Martin Habovštiak <martin.habovstiak@gmail.com>",
+      "Martin Habov\u0161tiak <martin.habovstiak@gmail.com>",
       "Andrew Poelstra <apoelstra@wpsoftware.net>"
     ],
     "repository": "https://github.com/rust-bitcoin/hex-conservative",
@@ -4093,7 +4153,7 @@
     "license": "MIT OR Apache-2.0",
     "authors": [
       "Andrew Straw <strawman@astraw.com>",
-      "René Kijewski <rene.kijewski@fu-berlin.de>",
+      "Ren\u00e9 Kijewski <rene.kijewski@fu-berlin.de>",
       "Ryan Lopopolo <rjl@hyperbo.la>"
     ],
     "repository": "https://github.com/strawlab/iana-time-zone",
@@ -4598,7 +4658,8 @@
     ],
     "repository": "https://github.com/RustCrypto/utils",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -4608,7 +4669,9 @@
     "source_revision": "784ff3c76c907f80363ada7dc69c1d5831d4789f",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "879f10e63c20629ecabbb64a8010319738c66a5cd0c29b02d63d272b03751d01"
   },
@@ -4885,7 +4948,7 @@
     "version": "0.17.0",
     "license": "Apache-2.0/MIT",
     "authors": [
-      "Rüdiger Klaehn <rklaehn@protonmail.com>",
+      "R\u00fcdiger Klaehn <rklaehn@protonmail.com>",
       "n0 team"
     ],
     "repository": "https://github.com/n0-computer/irpc",
@@ -4909,7 +4972,7 @@
     "version": "0.17.0",
     "license": "Apache-2.0/MIT",
     "authors": [
-      "Rüdiger Klaehn <rklaehn@protonmail.com>"
+      "R\u00fcdiger Klaehn <rklaehn@protonmail.com>"
     ],
     "repository": "https://github.com/n0-computer/irpc",
     "products": [
@@ -4944,7 +5007,7 @@
     "version": "0.17.0",
     "license": "Apache-2.0/MIT",
     "authors": [
-      "Rüdiger Klaehn <rklaehn@protonmail.com>",
+      "R\u00fcdiger Klaehn <rklaehn@protonmail.com>",
       "n0 team"
     ],
     "repository": "https://github.com/n0-computer/irpc",
@@ -5029,7 +5092,7 @@
     "version": "1.5.0",
     "license": "MIT OR Apache-2.0",
     "authors": [
-      "Marvin Löbel <loebel.marvin@gmail.com>"
+      "Marvin L\u00f6bel <loebel.marvin@gmail.com>"
     ],
     "repository": "https://github.com/rust-lang-nursery/lazy-static.rs",
     "products": [
@@ -5074,8 +5137,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.11.json",
-    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
+    "source_manifest": "native-source-0.1.12.json",
+    "source_manifest_sha256": "251cb710c0e842d2b6a58e93d5188f53ee96ae0c00ba77e3f7b5acf21337f749"
   },
   {
     "name": "ldk-node-daemon",
@@ -5098,8 +5161,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.11.json",
-    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
+    "source_manifest": "native-source-0.1.12.json",
+    "source_manifest_sha256": "251cb710c0e842d2b6a58e93d5188f53ee96ae0c00ba77e3f7b5acf21337f749"
   },
   {
     "name": "libc",
@@ -5241,8 +5304,8 @@
     ],
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.11.json",
-    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
+    "source_manifest": "native-source-0.1.12.json",
+    "source_manifest_sha256": "251cb710c0e842d2b6a58e93d5188f53ee96ae0c00ba77e3f7b5acf21337f749"
   },
   {
     "name": "lightning-background-processor",
@@ -5387,8 +5450,8 @@
     "license_note": "Published package declares this SPDX license and omits the license text. Canonical SPDX text is supplied with the package author and available source copyright notices.",
     "source_base_commit": "b63959d535fd66995b3c89213e102aa4f6d5f327",
     "source_working_tree": true,
-    "source_manifest": "native-source-0.1.11.json",
-    "source_manifest_sha256": "6a0135d6a16d4d78100ed4e53e34fbe961aa141fa10eaaa107b15eab82674a6e"
+    "source_manifest": "native-source-0.1.12.json",
+    "source_manifest_sha256": "251cb710c0e842d2b6a58e93d5188f53ee96ae0c00ba77e3f7b5acf21337f749"
   },
   {
     "name": "lightning-macros",
@@ -6020,7 +6083,7 @@
     "version": "0.3.2",
     "license": "MIT OR Apache-2.0",
     "authors": [
-      "Philipp Krüger <philipp@n0.computer>",
+      "Philipp Kr\u00fcger <philipp@n0.computer>",
       "n0 team"
     ],
     "repository": "https://github.com/n0-computer/n0-future",
@@ -6756,7 +6819,8 @@
     ],
     "repository": "https://github.com/RustCrypto/utils",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -6766,7 +6830,9 @@
     "source_revision": "dd4adddf8b716bb51eb8ccb8c73e47bff1e358aa",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
   },
@@ -7122,6 +7188,29 @@
     "source_archive_sha256": "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
   },
   {
+    "name": "poly1305",
+    "version": "0.8.0",
+    "license": "Apache-2.0 OR MIT",
+    "authors": [
+      "RustCrypto Developers"
+    ],
+    "repository": "https://github.com/RustCrypto/universal-hashes",
+    "products": [
+      "ldk-node-daemon"
+    ],
+    "notices": [
+      "LICENSE-APACHE",
+      "LICENSE-MIT"
+    ],
+    "source_url": "https://static.crates.io/crates/poly1305/poly1305-0.8.0.crate",
+    "source_revision": "47a72962e8898fc70ab79d4ab40949efe61a23d2",
+    "target_graphs": [
+      "ldk/amd64",
+      "ldk/arm64"
+    ],
+    "source_archive_sha256": "8159bd90725d2df49889a078b54f4f79e87f1f8a8444194cdca81d38f5393abf"
+  },
+  {
     "name": "polyval",
     "version": "0.6.2",
     "license": "Apache-2.0 OR MIT",
@@ -7399,7 +7488,7 @@
     "version": "3.5.0",
     "license": "MIT OR Apache-2.0",
     "authors": [
-      "Bastian Köcher <git@kchr.de>"
+      "Bastian K\u00f6cher <git@kchr.de>"
     ],
     "repository": "https://github.com/bkchr/proc-macro-crate",
     "products": [
@@ -8397,7 +8486,7 @@
     "version": "0.29.1",
     "license": "CC0-1.0",
     "authors": [
-      "Dawid Ciężarkiewicz <dpc@ucore.info>",
+      "Dawid Ci\u0119\u017carkiewicz <dpc@ucore.info>",
       "Andrew Poelstra <apoelstra@wpsoftware.net>"
     ],
     "repository": "https://github.com/rust-bitcoin/rust-secp256k1/",
@@ -8420,7 +8509,7 @@
     "version": "0.10.1",
     "license": "CC0-1.0",
     "authors": [
-      "Dawid Ciężarkiewicz <dpc@ucore.info>",
+      "Dawid Ci\u0119\u017carkiewicz <dpc@ucore.info>",
       "Andrew Poelstra <apoelstra@wpsoftware.net>",
       "Steven Roose <steven@stevenroose.org>"
     ],
@@ -10375,7 +10464,8 @@
     "authors": [],
     "repository": "https://github.com/paholg/typenum",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE",
@@ -10386,7 +10476,9 @@
     "source_revision": "0db9a0f731981f29266b63586c29fa07e4477b1a",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
   },
@@ -10505,7 +10597,8 @@
     ],
     "repository": "https://github.com/RustCrypto/traits",
     "products": [
-      "iroh-native-addon"
+      "iroh-native-addon",
+      "ldk-node-daemon"
     ],
     "notices": [
       "LICENSE-APACHE",
@@ -10515,7 +10608,9 @@
     "source_revision": "742af86f821d7f79e76962d302c819b14622a485",
     "target_graphs": [
       "iroh/amd64",
-      "iroh/arm64"
+      "iroh/arm64",
+      "ldk/amd64",
+      "ldk/arm64"
     ],
     "source_archive_sha256": "fc1de2c688dc15305988b563c3854064043356019f97a4b46276fe734c4f07ea"
   },

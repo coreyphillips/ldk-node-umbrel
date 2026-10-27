@@ -1,0 +1,41 @@
+{
+  "version": "0.1.12",
+  "scope": "native direct-funding sender and receiver with built Umbrel primary image",
+  "architecture": "amd64",
+  "image_id": "sha256:84878685861b8437165702796a88d13375441651b23daaa68e9a4a51ed0fc587",
+  "image_archive_sha256": "39284364fa60d97dd4393dbf7825b5bb8f41bb39458c248cbb0d5d75da0043c0",
+  "fixture_adapter_sha256": "1017d05b59822c9da9a7d40975a8318a38ff5a1f43db63b1b11346cef275a6d7",
+  "native_driver_sha256": "e1a1bb16ea6e19479d564de6cfcb574bf9923b5288b8f9f3c22238291a1393ad",
+  "native_wallet_binary_sha256": "5563ee6fab1bee7ccce5d36fd45b5baafde32654639beae41b9ee93925ba7c24",
+  "chain": "regtest",
+  "physical_umbrel": false,
+  "started_at": "2026-10-27T03:07:20.121770+00:00",
+  "completed_at": "2026-10-27T03:07:35.071065+00:00",
+  "checks": [
+    {
+      "name": "new channel direct funding reaches mempool",
+      "txid": "e4926f25baf60bfc21d165a72a5b712d6a0c209ac077f252c0647ae1aba5d06c",
+      "feeSats": 155
+    },
+    {
+      "name": "new channel has exact credit without onchain fallback",
+      "valueSats": 100000
+    },
+    {
+      "name": "existing channel direct funding splices exact credit",
+      "valueSats": 140000,
+      "txid": "50c552ed64066acee4bb8324c5ff1d4a0730184dad10b0d16a31fa98aead8106"
+    },
+    {
+      "name": "payment retry and both endpoint restarts preserve exactly two payments",
+      "primaryRestarted": true,
+      "primaryIdentityPreserved": true
+    }
+  ],
+  "fixture_artifacts": "/var/folders/qp/kzxmybts2x31vx40khn8_3fm0000gn/T/bgnq-regtest-rai7qgz2",
+  "qualification_artifacts": "/var/folders/qp/kzxmybts2x31vx40khn8_3fm0000gn/T/bgnq-container-amd64-esg79n6l",
+  "test_containers_and_volumes_removed": [
+    "ldk-umbrel-funded-ce82dadd89a25a"
+  ],
+  "passed": true
+}

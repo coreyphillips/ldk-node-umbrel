@@ -42,9 +42,11 @@ The manager runs the Rust `ldk-node-daemon` through private JSONL pipes. Lightni
 
 ## Protocol compatibility update
 
-Version 0.1.11 moves the native FFOR offline-receive feature pairs to 440/441 and 442/443, matching Beignet's protocol update and avoiding Eclair's on-the-fly funding assignments. Update both the primary and compatible phone client together before using offline receive. Peers advertising only the former 560-563 bits no longer qualify for FFOR. Ordinary channels and existing wallet custody data are unchanged. The native daemon does not advertise Beignet's separate async receive service at 444/445 because it does not implement that service.
+Version 0.1.12 adds native Beignet v3 direct-funding support (`bgnq`) for compatible phone wallets. A confirmed onchain coin can fund a new receiving channel or grow an existing channel through the primary. The phone must use the matching updated native client. Funding requests, signed transactions and coin reservations survive restarts; uncertain signed payments remain pending until chain evidence resolves them. The protocol uses a single confirmed coin, an explicit amount and a payer fee ceiling. Normal Lightning and onchain payment options remain available in combined invoices.
 
-The new native images use the verified 0.1.10 source snapshot with this feature-bit fix. Prior Chicory qualification below used the old feature assignments, so those older phone bundles need the matching protocol update for offline receive. See [client compatibility](docs/client-compatibility.md).
+Version 0.1.11 introduced the native FFOR change, moving the offline-receive feature pairs to 440/441 and 442/443, matching Beignet's protocol update and avoiding Eclair's on-the-fly funding assignments. Update both the primary and compatible phone client together before using offline receive. Peers advertising only the former 560-563 bits no longer qualify for FFOR. Ordinary channels and existing wallet custody data are unchanged. The native daemon does not advertise Beignet's separate async receive service at 444/445 because it does not implement that service.
+
+The 0.1.12 native images include those feature-bit assignments and the updated local native direct-funding implementation. Prior Chicory qualification below used the old feature assignments, so those older phone bundles need the matching protocol update for offline receive. See [client compatibility](docs/client-compatibility.md).
 
 ## Pair with Chicory
 
@@ -81,7 +83,7 @@ npm test
 
 Use Node 24. Set `LDK_NODE_BIN` to the native daemon, `DATA_DIR` to an unused private directory, and `PUBLIC_ORIGIN` to the exact browser origin before `npm start`.
 
-The container release rebuilds the native daemon from the selected local LDK source and preserves the qualified 0.1.9 Iroh, Tor, system libraries and locked JavaScript dependencies. The native LDK compatibility fork and phone patches remain separate local projects and are not published in this repository. Consequently, the complete native release is not reproducible from this repository alone. The [qualification record](docs/qualification.md) includes exact native binary and build-input hashes; [third-party notices](licenses/README.md) include applicable source archives and license texts.
+The container release rebuilds the native daemon from the selected local LDK source and preserves the qualified 0.1.10 Iroh, Tor, system libraries and locked JavaScript dependencies. The native LDK compatibility fork and phone patches remain separate local projects and are not published in this repository. Consequently, the complete native release is not reproducible from this repository alone. The [qualification record](docs/qualification.md) includes exact native binary and build-input hashes; [third-party notices](licenses/README.md) include applicable source archives and license texts.
 
 If you have that native source checkout, the full build path is:
 

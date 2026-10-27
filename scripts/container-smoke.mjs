@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const architecture = process.argv[2];
 if (!['amd64', 'arm64'].includes(architecture)) throw new Error('Usage: node scripts/container-smoke.mjs amd64|arm64');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const image = `ldk-node-umbrel:0.1.11-${architecture}`;
+const image = `ldk-node-umbrel:0.1.12-${architecture}`;
 const suffix = `${architecture}-${process.pid}`; const name = `ldk-dashboard-qa-${suffix}`; const volume = `${name}-data`;
 const port = architecture === 'amd64' ? 21095 : 21096; const origin = `http://127.0.0.1:${port}`;
 const umbrelMode = process.env.LDK_TEST_UMBREL === '1';
@@ -45,13 +45,22 @@ async function login() {
 }
 async function running(id) { for (let i = 0; i < 120; i++) { const wallet = (await request('/api/wallets')).find(w => w.id === id); if (wallet.status === 'running') return wallet; if (wallet.status === 'failed') { const logs = await request(`/api/wallets/${id}/logs`); throw new Error(wallet.last_error + ': ' + logs.text.slice(-1600)); } await delay(500); } throw new Error('Native wallet startup timed out'); }
 try {
-  docker('load', '--input', path.join(root, 'dist', `ldk-node-umbrel-0.1.11-${architecture}.tar`));
+  docker('load', '--input', path.join(root, 'dist', `ldk-node-umbrel-0.1.12-${architecture}.tar`));
   const inspect = JSON.parse(docker('image', 'inspect', image))[0]; if (inspect.Architecture !== architecture) throw new Error('Image architecture mismatch'); checks.push('image architecture verified');
-  const chainHost = process.env.REGTEST_HOST || 'mint.local'; const chainPort = Number(process.env.REGTEST_PORT || 60401);
-  const chainIp = (await dns.lookup(chainHost, { family: 4 })).address;
+  let chainSource;
+  if (process.env.REGTEST_RPC_URL) {
+    const endpoint = new URL(process.env.REGTEST_RPC_URL);
+    if (endpoint.protocol !== 'rpc:') throw new Error('REGTEST_RPC_URL must use rpc://');
+    const host = ['127.0.0.1', 'localhost'].includes(endpoint.hostname) ? 'host.docker.internal' : endpoint.hostname;
+    chainSource = { type: 'bitcoind', host, port: Number(endpoint.port), user: decodeURIComponent(endpoint.username), password: decodeURIComponent(endpoint.password) };
+  } else {
+    const chainHost = process.env.REGTEST_HOST || 'mint.local'; const chainPort = Number(process.env.REGTEST_PORT || 60401);
+    const chainIp = (await dns.lookup(chainHost, { family: 4 })).address;
+    chainSource = { type: 'electrum', url: `tcp://${chainIp}:${chainPort}` };
+  }
   docker('volume', 'create', volume);
   const authEnvironment = umbrelMode ? ['-e', 'AUTH_MODE=password', '-e', 'ALLOWED_HOSTS=*', '-e', `DASHBOARD_BOOTSTRAP_PASSWORD=${bootstrapPassword}`] : ['-e', `PUBLIC_ORIGIN=${origin}`, '-e', 'ALLOWED_HOSTS=127.0.0.1'];
-  docker('run', '-d', '--name', name, '--platform', `linux/${architecture}`, '--init', '--security-opt', 'no-new-privileges:true', '-p', `127.0.0.1:${port}:3000`, '-v', `${volume}:/data`, ...authEnvironment, image);
+  docker('run', '-d', '--name', name, '--platform', `linux/${architecture}`, '--init', '--security-opt', 'no-new-privileges:true', '--add-host', 'host.docker.internal:host-gateway', '-p', `127.0.0.1:${port}:3000`, '-v', `${volume}:/data`, ...authEnvironment, image);
   await ready(); if ((await httpFetch(origin + '/api/wallets')).status !== 401) throw new Error('Unauthenticated wallet access'); checks.push('unauthenticated access denied');
   await login();
   const cookieOnlyHeaders = { ...headers }; delete cookieOnlyHeaders['x-session-proof'];
@@ -67,7 +76,7 @@ try {
     checks.push('Umbrel app password, custom hostname and session binding');
   }
   const defaults = await request('/api/config'); if (defaults.default_network !== 'bitcoin') throw new Error('Mainnet default missing'); checks.push('mainnet first-run default');
-  const wallet = await request('/api/wallets', { name: `${architecture} qualification`, network: 'regtest', chain_source: { type: 'electrum', url: `tcp://${chainIp}:${chainPort}` }, autostart: true }); await running(wallet.id);
+  const wallet = await request('/api/wallets', { name: `${architecture} qualification`, network: 'regtest', chain_source: chainSource, autostart: true }); await running(wallet.id);
   const rpc = (method, params = {}) => request(`/api/wallets/${wallet.id}/rpc`, { method, params });
   await rpc('sync'); const first = await request(`/api/wallets/${wallet.id}/info`); if (first.network !== 'regtest' || !first.best_block_height) throw new Error('Native chain sync failed'); checks.push('native regtest sync');
   const balance = await request(`/api/wallets/${wallet.id}/balance`); if (balance.onchain_total_sats !== 0) throw new Error('Disposable wallet unexpectedly funded');

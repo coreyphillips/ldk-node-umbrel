@@ -2,6 +2,12 @@
 
 The public dashboard image includes the native primary protocol implementation. It does not update Chicory on a phone. The qualification runs used Chicory 0.7.4 with reviewed local client corrections. Those source branches remain local and are not published by this dashboard release.
 
+## Direct funding in 0.1.12
+
+A compatible Bitkit, Beignet or Chicory client can advertise a signed Beignet v3 `bgnq` request in its combined Bitcoin URI. A compatible payer supplies a confirmed onchain coin to open or grow the receiving phone's channel through this primary. Bitkit requires the updated local Android build and matching native AAR; upgrading the primary alone does not add the phone UI or payer implementation. Ordinary Lightning payment and Bitcoin-address options remain available.
+
+This release is qualified against the local Bitkit native engine and Beignet's actual sender and receiver implementations on disposable regtest funds. Direct funding requires a verified unspent coin, a payer-selected fee ceiling and positive channel confirmation depth. It does not use the primary's liquidity-advance receive fee. The new native source snapshot is recorded in `licenses/native-source-0.1.12.json`; the native branch remains local.
+
 ## Feature-bit migration in 0.1.11
 
 Release 0.1.11 advertises optional FFOR bits 441 and 443 and recognizes both required and optional variants of the new 440/441 and 442/443 pairs. It intentionally stops interpreting 560-563 as FFOR because Eclair uses those assignments for different protocols. Upgrade both endpoints before enabling offline receive. No wire-message encoding or stored wallet custody format changes.
