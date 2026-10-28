@@ -13,20 +13,21 @@ async function directory(t) { const dir = await fs.mkdtemp(path.join(os.tmpdir()
 const request = (headers = {}, address = '127.0.0.1') => ({ headers: { host: 'localhost:3000', origin: 'http://localhost:3000', ...headers }, socket: { remoteAddress: address } });
 const response = () => ({ headers: {}, setHeader(key, value) { this.headers[key] = value; } });
 test('mainnet default, spending opt-ins, credential redaction and immutable network', () => {
-  const value = walletConfig(config()); assert.equal(value.network, 'bitcoin'); assert.equal(value.chicory.enabled, false); assert.equal(value.chicory.offline_enabled, false); assert.equal(value.iroh.enabled, false);
+  const value = walletConfig(config()); assert.equal(value.network, 'bitcoin'); assert.equal(value.chicory.enabled, false); assert.equal(Object.hasOwn(value.chicory, 'offline_enabled'), false); assert.equal(value.iroh.enabled, false);
   assert.throws(() => walletConfig({ ...config(), iroh: { enabled: true } }), /consent/);
   assert.throws(() => walletConfig({ ...config(), tor_onion_address: 'example.com:9735' }), /v3 onion/);
   assert.equal(walletConfig({ ...config(), tor_onion_address: 'a'.repeat(56) + '.onion:9735' }).tor_onion_address.length, 67);
   assert.equal(publicConfig(value).chain_source.password, ''); assert.equal(value.chain_source.password, 'a-private-rpc-value');
   assert.throws(() => walletConfig({ ...config(), network: 'regtest' }, value), /cannot be changed/);
   assert.throws(() => walletConfig({ ...config(), name: '🍋'.repeat(9) }), /UTF-8/);
-  assert.throws(() => walletConfig({ ...config(), chicory: { offline_enabled: true } }), /provider/);
+  assert.throws(() => walletConfig({ ...config(), chicory: { offline_enabled: true } }), { code: 'OFFLINE_RECEIVE_REMOVED' });
   for (const url of ['http://server:50001', 'tcp://server', 'tcp://user:pass@server:50001', 'tcp://server:50001/secret', 'tcp://server:50001?token=x']) assert.throws(() => walletConfig({ ...config(), chain_source: { type: 'electrum', url } }));
   assert.equal(walletConfig({ ...config(), chain_source: { ...config().chain_source, password: '' } }, value).chain_source.password, value.chain_source.password);
   assert.throws(() => walletConfig({ ...config(), chicory: { max_client_funding_sats: 100_000, max_total_fronted_sats: 10_000 } }), /cover/);
 });
 test('fund-moving RPCs require explicit review and private native methods are inaccessible', () => {
   for (const method of ['pay', 'send_onchain', 'open', 'close', 'splice_in', 'splice_out']) { assert.throws(() => rpcRequest(method, {}), /Confirm/); assert.deepEqual(rpcRequest(method, { confirm: true, amount_sats: 12 }), { amount_sats: 12 }); }
+  assert.throws(() => rpcRequest('offline_status'), /Unsupported/);
   assert.throws(() => rpcRequest('stop'), /Unsupported/); assert.throws(() => rpcRequest('export_seed'), /Unsupported/); assert.throws(() => rpcRequest('invoice', { description: 'a'.repeat(40_000) }), /too large/);
 });
 test('durable storage uses private files and refuses symlinks', async t => {

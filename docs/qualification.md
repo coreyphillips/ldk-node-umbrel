@@ -1,5 +1,11 @@
 # Qualification record
 
+The release records below are historical evidence for their named images. The
+current source removes FFOR offline receiving and its dashboard controls. Older
+offline-receive results do not qualify the current source. The [current migration
+and validation notes](ffor-removal.md) distinguish this local candidate from the
+published 0.1.12 image.
+
 This file distinguishes executable checks from deployment assumptions. All funded checks use disposable regtest state.
 
 ## Original native and dashboard qualification

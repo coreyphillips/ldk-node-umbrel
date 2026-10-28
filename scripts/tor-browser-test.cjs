@@ -28,7 +28,7 @@ function fixtures(walletConfig) {
     name: 'Tor fixture', network: 'regtest', autostart: false,
     chain_source: { type: 'electrum', url: 'tcp://192.0.2.10:50001' },
     advertised_host: '192.0.2.20', tor: { enabled: false }, tor_onion_address: LEGACY_ONION,
-    chicory: { enabled: true, offline_enabled: true, flat_fee_sat: 250, fee_ppm: 2250, max_client_funding_sats: 300000, max_total_fronted_sats: 1500000 },
+    chicory: { enabled: true, flat_fee_sat: 250, fee_ppm: 2250, max_client_funding_sats: 300000, max_total_fronted_sats: 1500000 },
     iroh: { enabled: true, discovery: true, default_relays: true },
   });
   const wallets = [{
@@ -79,7 +79,6 @@ function fixtures(walletConfig) {
     call: async (id, method) => {
       if (method === 'info') return { node_id: `02${(id === FIRST_ID ? 'ab' : 'cd').repeat(32)}`, best_block_height: 100, capabilities: [] };
       if (method === 'balance') return { onchain_total_sats: 0, onchain_spendable_sats: 0, lightning_total_sats: 0 };
-      if (method === 'offline_status') return { epochs: [] };
       if (['channels', 'payments', 'peers', 'events'].includes(method)) return [];
       throw new Error(`Unexpected fixture RPC: ${method}`);
     },

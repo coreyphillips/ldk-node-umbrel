@@ -17,7 +17,7 @@ function deferred() { let resolve; const promise = new Promise(done => { resolve
 async function until(check, message, limit = 15000) { const end = Date.now() + limit; while (!await check()) { if (Date.now() > end) throw new Error(message); await new Promise(resolve => setTimeout(resolve, 20)); } }
 function fixture() {
   return {
-    wallets: [A, B].map((id, index) => ({ id, name: 'Balance fixture ' + (index + 1), network: 'regtest', status: 'running', recovery_kind: 'legacy_seed', chain_source: { type: 'electrum' }, autostart: false, chicory: { enabled: false, offline_enabled: false, max_total_fronted_sats: 1000000 }, iroh: { enabled: false }, tor: { enabled: false } })),
+    wallets: [A, B].map((id, index) => ({ id, name: 'Balance fixture ' + (index + 1), network: 'regtest', status: 'running', recovery_kind: 'legacy_seed', chain_source: { type: 'electrum' }, autostart: false, chicory: { enabled: false, max_total_fronted_sats: 1000000 }, iroh: { enabled: false }, tor: { enabled: false } })),
     balances: { [A]: { onchain_total_sats: 0, onchain_spendable_sats: 0, lightning_total_sats: 0 }, [B]: { onchain_total_sats: 9000, onchain_spendable_sats: 9000, lightning_total_sats: 0 } },
     calls: [], reads: {}, concurrent: {}, maximum: {}, holds: new Map(), failures: new Map(), listReads: 0,
     payments: [{ id: 'historical', direction: 'inbound', status: 'succeeded', kind: 'onchain', amount_msat: 1000000, updated_at: 1 }],
@@ -45,7 +45,6 @@ function fixture() {
       else if (method === 'address') result = { address: ADDRESS };
       else if (method === 'invoice') result = { invoice: INVOICE };
       else if (method === 'payments') result = structuredClone(current.payments);
-      else if (method === 'offline_status') result = { epochs: [] };
       else if (['channels', 'peers', 'events'].includes(method)) result = [];
       else throw new Error(`Unexpected fixture RPC: ${method}`);
       try { if (waiting) { waiting.started.resolve(); await waiting.release.promise; } if (failure) throw Object.assign(new Error(failure), { status: 503, code: 'FIXTURE_UNAVAILABLE' }); return result; }

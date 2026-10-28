@@ -1,0 +1,126 @@
+{
+  "version": "0.1.12",
+  "scope": "FFOR removal package upgrade with no custody",
+  "architecture": "arm64",
+  "image": "ldk-node-umbrel:chicory-flows-final-arm64",
+  "previous_image": "ldk-node-umbrel:0.1.12-arm64",
+  "image_id": "sha256:520d2bf1b3c3e0a192e7ca8261f6a3e920cefc187f9d2d1f2f565f55f12af8c4",
+  "recorded_at": "2026-10-28T16:02:39.614Z",
+  "checks": [
+    "previous release creates unfunded wallets with both saved offline policy values",
+    "upgrade and restart preserve both native identities, registry and autostart",
+    "generated daemon configurations omit the removed setting for both legacy policy values",
+    "encrypted Lightning init omits all FFOR and unimplemented async receive bits",
+    "both updated wallets return zero balances, regtest addresses and unpaid invoices",
+    "removed offline status is absent from capabilities and rejected by authenticated routes",
+    "new offline receiving requests are explicitly refused",
+    "qualified Iroh native addon loads"
+  ],
+  "observations": [
+    {
+      "phase": "previous offline false",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63
+      ]
+    },
+    {
+      "phase": "previous offline true",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63,
+        441,
+        443
+      ]
+    },
+    {
+      "phase": "updated saved policy 0",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63
+      ]
+    },
+    {
+      "phase": "updated saved policy 1",
+      "features": [
+        0,
+        5,
+        7,
+        8,
+        12,
+        14,
+        17,
+        19,
+        23,
+        25,
+        27,
+        29,
+        35,
+        39,
+        43,
+        44,
+        47,
+        51,
+        63
+      ]
+    }
+  ],
+  "beignet_source_sha256": {
+    "src/lightning/features/flags.ts": "70a072677464b0f9d435d277b158b2fd99d438fe130c31c971f183983f39b777",
+    "src/lightning/transport/peer.ts": "bccdd36f8062d0224549a7c962a901c8e07079d42ca06691945f8bfa28ed5562"
+  },
+  "network": "isolated regtest at genesis",
+  "funds_sent": false,
+  "physical_umbrel": false
+}

@@ -22,7 +22,7 @@ function fixtures() {
   const wallets = [FIRST_ID, SECOND_ID].map((id, index) => ({
     id, name: `Pairing fixture ${index + 1}`, network: 'regtest', status: 'running',
     chain_source: { type: 'electrum', url: 'tcp://127.0.0.1:50001' },
-    chicory: { enabled: false, offline_enabled: false, flat_fee_sat: 100, fee_ppm: 1000, max_client_funding_sats: 200000, max_total_fronted_sats: 1000000 },
+    chicory: { enabled: false, flat_fee_sat: 100, fee_ppm: 1000, max_client_funding_sats: 200000, max_total_fronted_sats: 1000000 },
     iroh: { enabled: true, discovery: true, default_relays: true },
     iroh_status: 'ready', autostart: false, public_port: 19351 + index,
   }));
@@ -42,7 +42,6 @@ function fixtures() {
     call: async (id, method) => {
       if (method === 'info') return { node_id: pairing.get(id).node_id, best_block_height: 100, capabilities: [] };
       if (method === 'balance') return { onchain_total_sats: 0, onchain_spendable_sats: 0, lightning_total_sats: 0 };
-      if (method === 'offline_status') return { epochs: [] };
       if (['channels', 'payments', 'peers', 'events'].includes(method)) return [];
       throw new Error(`Unexpected fixture RPC: ${method}`);
     },

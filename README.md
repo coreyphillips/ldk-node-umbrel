@@ -4,6 +4,17 @@ An Umbrel community app store and dashboard for independent native LDK Node wall
 
 ![Native LDK wallet dashboard](docs/screenshots/wallet.png)
 
+## Current source compatibility
+
+The current source removes experimental FFOR offline receiving from the native
+primary and dashboard. Ordinary Lightning, JIT funding, confirmed direct funding,
+peer backup recovery, and TCP, Tor and Iroh connections remain in scope. See the
+[migration and local verification notes](docs/ffor-removal.md).
+
+The community-store manifest still points to the published 0.1.12 image. These
+source changes take effect only in a locally built candidate until a separately
+qualified release updates that image digest. No new release is implied here.
+
 ## Install on Umbrel
 
 1. Open **App Store**, select the three-dot menu, then **Community App Stores**.
@@ -31,20 +42,20 @@ Version 0.1.2 and later also accept a trailing slash in existing Electrum URLs w
 ## Features
 
 - Up to eight independent native nodes with persistent identities and storage.
-- Bitcoin and Lightning balances, addresses, invoices, payments, channels, peers, splice operations, native events and offline voucher summaries.
+- Bitcoin and Lightning balances, addresses, invoices, payments, channels, peers, splice operations and native events.
 - Chicory primary pairing with selectable TCP, Tor and Iroh URIs and QR codes. Optional managed Tor creates a persistent onion address; Iroh public relays and endpoint discovery are enabled explicitly.
-- Separate controls for liquidity provisioning, funding budgets, fees and offline settlement.
+- Separate controls for liquidity provisioning, funding budgets and fees.
 - Confirmed deletion of an individual stopped wallet, preserving the other wallets and their identities.
 - Authenticated native wallet logs and process diagnostics with copy and plain-text download controls.
 - Password sessions, CSRF and Origin validation, private files, bounded administration queues, explicit uncertain transaction outcomes and supervised native processes.
 
 The manager runs the Rust `ldk-node-daemon` through private JSONL pipes. Lightning keys and channel state belong to the native daemon. The optional Iroh bridge carries transport bytes and has a separate transport identity.
 
-## Protocol compatibility update
+## Published protocol compatibility updates
 
 Version 0.1.12 adds native Beignet v3 direct-funding support (`bgnq`) for compatible phone wallets. A confirmed onchain coin can fund a new receiving channel or grow an existing channel through the primary. The phone must use the matching updated native client. Funding requests, signed transactions and coin reservations survive restarts; uncertain signed payments remain pending until chain evidence resolves them. The protocol uses a single confirmed coin, an explicit amount and a payer fee ceiling. Normal Lightning and onchain payment options remain available in combined invoices.
 
-Version 0.1.11 introduced the native FFOR change, moving the offline-receive feature pairs to 440/441 and 442/443, matching Beignet's protocol update and avoiding Eclair's on-the-fly funding assignments. Update both the primary and compatible phone client together before using offline receive. Peers advertising only the former 560-563 bits no longer qualify for FFOR. Ordinary channels and existing wallet custody data are unchanged. The native daemon does not advertise Beignet's separate async receive service at 444/445 because it does not implement that service.
+The historical 0.1.11 release introduced the native FFOR change, moving the offline-receive feature pairs to 440/441 and 442/443, matching Beignet's protocol update and avoiding Eclair's on-the-fly funding assignments. That release required matching primary and phone feature assignments. Peers advertising only the former 560-563 bits no longer qualify for FFOR. Ordinary channels and existing wallet custody data are unchanged. The native daemon does not advertise Beignet's separate async receive service at 444/445 because it does not implement that service.
 
 The 0.1.12 native images include those feature-bit assignments and the updated local native direct-funding implementation. Prior Chicory qualification below used the old feature assignments, so those older phone bundles need the matching protocol update for offline receive. See [client compatibility](docs/client-compatibility.md).
 
@@ -54,7 +65,7 @@ The qualified phone builds use Chicory 0.7.4 with local portable-engine fixes fo
 
 1. Use the same Bitcoin network on the phone and the primary.
 2. In wallet Settings, choose a reachable LAN hostname or IP for TCP pairing. The wallet's public Lightning port is displayed by the dashboard.
-3. Enable the Chicory provider if this node should fund phone channels. Review funding caps and fees. Offline settlement is a separate setting.
+3. Enable the Chicory provider if this node should fund phone channels. Review funding caps and fees. FFOR offline receiving is no longer available in the current source.
 4. Open **Pair Chicory > Connection method**, choose an available connection, then scan its QR code or paste its URI as an external primary. Switching this view does not change enabled transports, so you can pair one client over Tor while Iroh remains enabled for another.
 5. For Tor pairing, stop the wallet, open **Settings > Edit configuration**, turn on **Enable Tor connections**, save and start the wallet. The app creates a persistent v3 onion address automatically. Once available, choose **Tor** in **Pair Chicory** to scan or copy it. Iroh and local TCP remain available.
 6. For Iroh pairing, explicitly enable Iroh, public relays and endpoint discovery. The Tor URI can also serve as a fallback for clients that support it. An advanced manual onion address remains available for an existing external service; enabling automatic Tor clears that manual address.
@@ -63,7 +74,7 @@ Managed Tor is disabled by default and starts only for a running wallet that ena
 
 Version 0.1.4 adds **Settings > Recovery & backup**. New wallets have a 24-word recovery phrase with reveal and copy controls. Existing wallets keep their binary seeds and use an encrypted full backup. **Back up all wallets** stops wallet processes and downloads keys, configuration and complete Lightning channel state. Save the file and its password privately, then restart the wallets. See the [backup and offline restore instructions](docs/umbrel.md#back-up-and-restore). Reload the dashboard tab after updating the app.
 
-The primary needs liquidity for its enabled funding and routing functions. Never reuse another live node's storage. Back up complete stopped wallet state; a seed alone cannot restore current Lightning channels.
+The primary needs liquidity for its enabled funding and routing functions. It also retains a default 25,000-sat on-chain anchor reserve per channel, including a channel funded entirely by the phone. Keep that additional reserve available before the phone opens its first channel. The reserve covers emergency channel-closing transactions and does not contribute to the phone's channel balance. Never reuse another live node's storage. Back up complete stopped wallet state; a seed alone cannot restore current Lightning channels.
 
 ## Automatic receive updates
 
@@ -83,7 +94,7 @@ npm test
 
 Use Node 24. Set `LDK_NODE_BIN` to the native daemon, `DATA_DIR` to an unused private directory, and `PUBLIC_ORIGIN` to the exact browser origin before `npm start`.
 
-The container release rebuilds the native daemon from the selected local LDK source and preserves the qualified 0.1.10 Iroh, Tor, system libraries and locked JavaScript dependencies. The native LDK compatibility fork and phone patches remain separate local projects and are not published in this repository. Consequently, the complete native release is not reproducible from this repository alone. The [qualification record](docs/qualification.md) includes exact native binary and build-input hashes; [third-party notices](licenses/README.md) include applicable source archives and license texts.
+The container release rebuilds the native daemon from the selected local LDK source and preserves the qualified 0.1.10 Iroh, Tor, system libraries and locked JavaScript dependencies. The native LDK compatibility fork and phone patches remain separate projects and are not included in this repository. Consequently, the complete native release is not reproducible from this repository alone. The [qualification record](docs/qualification.md) includes exact native binary and build-input hashes; [third-party notices](licenses/README.md) include applicable source archives and license texts.
 
 If you have that native source checkout, the full build path is:
 

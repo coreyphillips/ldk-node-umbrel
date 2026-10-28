@@ -61,7 +61,7 @@ export class WalletManager {
     for (const wallet of this.wallets) {
       if (!/^[0-9a-f-]{36}$/.test(wallet.id) || ids.has(wallet.id) || !Number.isInteger(wallet.slot) || wallet.slot < 0 || wallet.slot >= 8 || slots.has(wallet.slot)) throw new Error('Invalid wallet registry');
       if (wallet.deletion_pending !== undefined && typeof wallet.deletion_pending !== 'boolean') throw new Error('Invalid wallet deletion marker');
-      ids.add(wallet.id); slots.add(wallet.slot); walletConfig(wallet);
+      ids.add(wallet.id); slots.add(wallet.slot); walletConfig(wallet, undefined, { allowLegacyOffline: true });
     }
   }
   async boot() {
@@ -181,9 +181,10 @@ export class WalletManager {
     this.runtime.set(id, state);
     this.startupStates.set(id, state);
     try {
-    // Normalize legacy Electrum URLs before passing them to the native socket
-    // client, which treats a trailing slash as part of the address.
-    const { chain_source } = walletConfig(wallet);
+    // Normalize legacy connection and provider options only for the daemon.
+    // The registry and all native custody state remain intact. The native reader
+    // rejects unsupported persisted custody rather than silently discarding it.
+    const { chain_source, chicory } = walletConfig(wallet, undefined, { allowLegacyOffline: true });
     if (chain_source.type === 'electrum' && this.electrumCheck) await this.electrumCheck({ url: chain_source.url, network: wallet.network });
     if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const directory = this.directory(id);
@@ -194,7 +195,7 @@ export class WalletManager {
     const configFile = path.join(directory, 'node.json');
     await atomicJson(configFile, {
       network: wallet.network, data_dir: path.join(directory, 'node'), listen_address: `0.0.0.0:${this.portBase + wallet.slot}`,
-      alias: wallet.name, chain_source, chicory: wallet.chicory,
+      alias: wallet.name, chain_source, chicory,
     });
     if (state.intentional || this.shuttingDown) { state.status = 'stopped'; return { status: 'stopped' }; }
     const process = this.processFactory({ binary: this.binary, config: configFile }); state.process = process;

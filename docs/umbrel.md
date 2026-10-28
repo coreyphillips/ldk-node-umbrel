@@ -36,7 +36,16 @@ For a saved failed wallet, open **Settings > Edit configuration**, select the in
 
 No chain app is automatically installed. Backend passwords are stored privately on the server and redacted from dashboard reads.
 
-Enable provider funding and offline settlement only after reviewing the configured limits.
+Enable provider funding only after reviewing the configured limits. The current
+source omits experimental FFOR offline receiving. Existing settings and custody
+require the [migration guidance](ffor-removal.md) before using a new native build.
+
+The primary also needs its default 25,000-sat on-chain anchor reserve for each
+channel, even when the phone supplies the channel funding. Keep an additional
+25,000 sats available above existing reserves before accepting a new anchor
+channel. A primary with no available reserve rejects the first phone-funded
+channel. This reserve remains available for emergency channel-closing
+transactions and is separate from the phone's contribution and JIT liquidity.
 
 ## Larger primary payments in 0.1.10
 

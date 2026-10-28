@@ -137,7 +137,7 @@ function refreshResources() {
   if (!state.session?.authenticated || !wallet || wallet.status !== 'running' || wallet.deletion_pending) { updateReceive(); return; }
   const session = state.session; const revision = walletRevision; const selectedRevision = selectionRevision;
   const current = () => state.session === session && walletRevision === revision && selectionRevision === selectedRevision && state.selected === wallet.id && active()?.status === 'running' && !active()?.deletion_pending;
-  for (const method of ['balance', 'info', 'channels', 'payments', 'peers', 'offline_status', 'events']) {
+  for (const method of ['balance', 'info', 'channels', 'payments', 'peers', 'events']) {
     const key = `${wallet.id}/${method}`;
     if (resourceReads.has(key)) continue;
     const request = readApi(`/wallets/${key}`, {}, nativeReadTimeoutMs);
@@ -242,7 +242,7 @@ function render() {
   if (wallet) {
     sidebar.append(el('div', 'nav-label', 'Manage wallet'));
     const nav = el('nav', 'nav');
-    for (const [view, symbol, label] of [['overview','◈','Overview'],['channels','⇄','Channels & peers'],['activity','↗','Activity'],['pairing','▦','Pair Chicory'],['offline','☾','Offline receive'],['settings','⚙','Settings'],['logs','≡','Logs']]) {
+    for (const [view, symbol, label] of [['overview','◈','Overview'],['channels','⇄','Channels & peers'],['activity','↗','Activity'],['pairing','▦','Pair Chicory'],['settings','⚙','Settings'],['logs','≡','Logs']]) {
       const control = button('', () => navigate(view), state.view === view ? 'active' : ''); add(control, el('span', 'symbol', symbol), document.createTextNode(label)); nav.append(control);
     }
     sidebar.append(nav);
@@ -252,7 +252,7 @@ function render() {
   add(main, add(el('header', 'topbar'), add(el('div', 'actions'), menu, el('span', 'crumb', wallet ? `Wallets / ${wallet.name}` : 'Your workspace')), add(el('div', 'top-actions'), badge('Local installation', 'green'), button('Refresh', () => { logsView = null; refresh(); }, 'small'))));
   const content = el('div', 'content');
   if (!wallet) renderWallets(content); else {
-    const titles = { overview: wallet.name, channels: 'Channels & peers', activity: 'Activity', pairing: 'Pair Chicory', offline: 'Offline receive', settings: 'Wallet settings', logs: 'Node logs' };
+    const titles = { overview: wallet.name, channels: 'Channels & peers', activity: 'Activity', pairing: 'Pair Chicory', settings: 'Wallet settings', logs: 'Node logs' };
     const actions = add(el('div', 'actions'), walletBadge(wallet));
     if (wallet.status === 'running') add(actions, button('Receive', receive, 'primary'), button('Send', send));
     else if (!wallet.deletion_pending && !['starting','stopping'].includes(wallet.status)) actions.append(button('Start wallet', () => run(() => api(`/wallets/${wallet.id}/start`, { method: 'POST', body: {} }), 'Wallet started'), 'primary'));
@@ -261,7 +261,7 @@ function render() {
     if (state.data.error) content.append(notice(state.data.error, true));
     if (wallet.deletion_pending) renderDeletion(content, wallet);
     else if (state.view === 'pairing') renderPairing(content, wallet, pairingKey);
-    else ({ overview: renderOverview, channels: renderChannels, activity: renderActivity, offline: renderOffline, settings: renderSettings, logs: renderLogs }[state.view] || renderOverview)(content, wallet);
+    else ({ overview: renderOverview, channels: renderChannels, activity: renderActivity, settings: renderSettings, logs: renderLogs }[state.view] || renderOverview)(content, wallet);
   }
   add(main, content); add(layout, sidebar, main); app.replaceChildren(layout);
 }
@@ -275,7 +275,7 @@ function renderWallets(content) {
   }
   if (!state.wallets.length) rows.append(empty('Your first node starts here', 'Choose your Bitcoin network and chain source. Every wallet has its own native identity and private storage.'));
   content.append(card('Your wallets', rows, badge(`${state.wallets.length} of 8`)));
-  add(content, add(el('div', 'grid'), card('Made for your own infrastructure', el('p', '', 'Use your Umbrel Bitcoin Core, Electrum, or Esplora server. Configure Chicory liquidity and offline settlement for each wallet.')), card('Keep the whole wallet safe', add(el('div'), el('p', '', 'Download an encrypted backup of all wallets, including current Lightning channel state. Wallets remain stopped after the backup.'), button('Back up all wallets', backupAll)))));
+  add(content, add(el('div', 'grid'), card('Made for your own infrastructure', el('p', '', 'Use your Umbrel Bitcoin Core, Electrum, or Esplora server. Configure Chicory liquidity for each wallet.')), card('Keep the whole wallet safe', add(el('div'), el('p', '', 'Download an encrypted backup of all wallets, including current Lightning channel state. Wallets remain stopped after the backup.'), button('Back up all wallets', backupAll)))));
 }
 function renderOverview(content, wallet) {
   const balance = state.data.balance || {}; const channels = state.data.channels || [];
@@ -410,20 +410,13 @@ async function updatePairing(view, wallet) {
     view.error.textContent = view.signature ? `Unable to refresh pairing: ${error.message} The displayed connection details may be outdated.` : error.message;
   } finally { view.loading = false; }
 }
-function renderOffline(content, wallet) {
-  const status = state.data.offline_status || {}; const epochs = status.epochs || [];
-  content.append(card('Offline settlement', add(el('div'), badge(wallet.chicory.offline_enabled ? 'Enabled' : 'Disabled', wallet.chicory.offline_enabled ? 'green' : ''), el('p', '', 'Chicory can reserve native channel vouchers and receive through this online node while the phone is offline. Native monitor persistence protects settlement and recovery.'), button('Configure provider', () => navigate('settings')))));
-  if (epochs.length) content.append(card('Voucher books', table(['Channel','Phase','Slots','Reserved (sats)','Settling','Settled'], epochs.map(epoch => [short(epoch.channel_id), epoch.phase, String(epoch.slot_count), sats(epoch.reserved_msat), String(epoch.settling_count), String(epoch.settled_count)]))));
-  else content.append(card('Voucher books', empty('No active books', 'Reservations appear after a paired Chicory wallet enables offline receiving.')));
-  content.append(notice('A draining concurrent voucher book can require a force close and an on-chain timeout before it retires. Keep this node online and back up its complete data directory.'));
-}
 function renderSettings(content, wallet) {
-  const summary = detail([['Wallet', wallet.name], ['Network', networks[wallet.network]], ['Chain backend', wallet.chain_source.type], ['Autostart', wallet.autostart ? 'Enabled' : 'Disabled'], ['Chicory provider', wallet.chicory.enabled ? 'Enabled' : 'Disabled'], ['Offline settlement', wallet.chicory.offline_enabled ? 'Enabled' : 'Disabled'], ['Iroh', wallet.iroh.enabled ? 'Enabled' : 'Disabled'], ['Flat fee', `${fmt(wallet.chicory.flat_fee_sat)} sats`], ['Proportional fee', `${fmt(wallet.chicory.fee_ppm)} ppm`], ['Client funding cap', `${fmt(wallet.chicory.max_client_funding_sats)} sats`]]);
+  const summary = detail([['Wallet', wallet.name], ['Network', networks[wallet.network]], ['Chain backend', wallet.chain_source.type], ['Autostart', wallet.autostart ? 'Enabled' : 'Disabled'], ['Chicory provider', wallet.chicory.enabled ? 'Enabled' : 'Disabled'], ['Iroh', wallet.iroh.enabled ? 'Enabled' : 'Disabled'], ['Flat fee', `${fmt(wallet.chicory.flat_fee_sat)} sats`], ['Proportional fee', `${fmt(wallet.chicory.fee_ppm)} ppm`], ['Client funding cap', `${fmt(wallet.chicory.max_client_funding_sats)} sats`]]);
   content.append(card('Configuration', summary, button('Edit configuration', () => walletForm(wallet), 'small')));
   const tor = add(el('div'), detail([['Tor connections', torStatus(wallet)], ['Onion address', wallet.tor_address || 'Not available yet']]), el('hr', 'divider'), torNotice(wallet));
   content.append(card('Tor connections', tor));
   content.append(card('Recovery & backup', add(el('div'), el('p', '', wallet.recovery_kind === 'mnemonic' ? 'Save your 24-word recovery phrase somewhere private. Make a full backup to preserve Lightning channel state as well.' : 'This wallet was created with a binary seed and has no recovery phrase. An encrypted full backup preserves its existing seed, identity and channel state.'), add(el('div', 'actions'), button('Recovery phrase', () => recoveryPhrase(wallet)), button('Back up all wallets', backupAll)))));
-  content.append(card('Node lifecycle', add(el('div'), el('p', '', 'Stop the wallet before changing settings or making a full backup. Restart preserves its native identity and channel state.'), add(el('div', 'actions'), button('Sync now', () => run(() => rpc('sync'), 'Synchronization completed')), button('Stop wallet', () => confirmAction('Stop this wallet?', 'Payments and offline settlement need this node online. You can start it again from the dashboard.', () => api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {} })), 'danger')))));
+  content.append(card('Node lifecycle', add(el('div'), el('p', '', 'Stop the wallet before changing settings or making a full backup. Restart preserves its native identity and channel state.'), add(el('div', 'actions'), button('Sync now', () => run(() => rpc('sync'), 'Synchronization completed')), button('Stop wallet', () => confirmAction('Stop this wallet?', 'Payments need this node online. You can start it again from the dashboard.', () => api(`/wallets/${wallet.id}/stop`, { method: 'POST', body: {} })), 'danger')))));
   renderDeletion(content, wallet);
   content.append(notice('This local build is experimental. The qualification report in the package records supported paths and remaining interoperability limits, including the installed wallet commitment fee policy.'));
 }
@@ -549,7 +542,7 @@ function backupAll() {
   if (state.wallets.some(wallet => wallet.deletion_pending)) { toast('Finish pending wallet deletion before creating a full backup.', true); return; }
   const body = modal('Back up all wallets'); const session = state.session;
   const controller = new AbortController(); const form = el('form');
-  add(body, notice('This stops every wallet and pauses payments and offline settlement. Wallets stay stopped after download. Start them again when your backup is stored safely.'), el('p', '', 'The encrypted backup contains every wallet, its keys and current channel state, connection credentials and dashboard sign-in. Keep both the file and its password safe. The password cannot be recovered.'));
+  add(body, notice('This stops every wallet and pauses payments. Wallets stay stopped after download. Start them again when your backup is stored safely.'), el('p', '', 'The encrypted backup contains every wallet, its keys and current channel state, connection credentials and dashboard sign-in. Keep both the file and its password safe. The password cannot be recovered.'));
   const password = field(form, 'backup_password', 'Backup password', { type: 'password', required: true, help: 'At least 12 characters. Use a strong, unique password.' });
   const confirmation = field(form, 'backup_confirmation', 'Confirm backup password', { type: 'password', required: true });
   for (const control of [password, confirmation]) { control.minLength = 12; control.maxLength = 512; control.autocomplete = 'new-password'; }
@@ -667,7 +660,6 @@ function walletForm(wallet) {
   }; source.addEventListener('change', renderSource); renderSource();
   add(form, el('hr', 'divider'), el('h3', '', 'Chicory provider'));
   field(form, 'provider', 'Fund eligible Chicory channels automatically', { type: 'checkbox', value: wallet?.chicory.enabled || false, help: 'Uses this wallet balance within the caps below.' });
-  field(form, 'offline', 'Settle offline receive reservations', { type: 'checkbox', value: wallet?.chicory.offline_enabled || false });
   const fees = el('div', 'form-grid'); form.append(fees);
   field(fees, 'flat', 'Flat fee (sats)', { type: 'number', min: 0, max: 100000, value: wallet?.chicory.flat_fee_sat ?? 100 });
   field(fees, 'ppm', 'Fee rate (ppm)', { type: 'number', min: 0, max: 1000000, value: wallet?.chicory.fee_ppm ?? 1000 });
@@ -689,7 +681,7 @@ function walletForm(wallet) {
   field(form, 'autostart', 'Start automatically with the dashboard', { type: 'checkbox', value: wallet?.autostart ?? true });
   submit(form, wallet ? 'Save settings' : 'Create wallet', async data => {
     const chain_source = data.get('source') === 'bitcoind' ? { type: 'bitcoind', host: data.get('host'), port: Number(data.get('port')), user: data.get('user'), password: data.get('password') } : { type: data.get('source'), url: data.get('url') };
-    const config = { name: data.get('name'), network: wallet?.network || data.get('network'), chain_source, advertised_host: data.get('advertised_host'), tor: { enabled: tor.checked }, tor_onion_address: tor.checked ? '' : data.get('tor_onion_address'), autostart: data.has('autostart'), chicory: { enabled: data.has('provider'), offline_enabled: data.has('offline'), flat_fee_sat: Number(data.get('flat')), fee_ppm: Number(data.get('ppm')), max_client_funding_sats: Number(data.get('clientcap')), max_total_fronted_sats: Number(data.get('totalcap')) }, iroh: { enabled: data.has('iroh'), discovery: data.has('discovery'), default_relays: data.has('relay') } };
+    const config = { name: data.get('name'), network: wallet?.network || data.get('network'), chain_source, advertised_host: data.get('advertised_host'), tor: { enabled: tor.checked }, tor_onion_address: tor.checked ? '' : data.get('tor_onion_address'), autostart: data.has('autostart'), chicory: { enabled: data.has('provider'), flat_fee_sat: Number(data.get('flat')), fee_ppm: Number(data.get('ppm')), max_client_funding_sats: Number(data.get('clientcap')), max_total_fronted_sats: Number(data.get('totalcap')) }, iroh: { enabled: data.has('iroh'), discovery: data.has('discovery'), default_relays: data.has('relay') } };
     const result = await api(wallet ? `/wallets/${wallet.id}` : '/wallets', { method: wallet ? 'PUT' : 'POST', body: config });
     dialog.close(); state.selected = result.id; state.view = 'overview'; toast(wallet ? 'Configuration saved. Start the wallet when ready.' : 'Wallet created'); await refresh();
     if (!wallet && active()?.id === result.id && state.session?.authenticated) recoveryPhrase(active());

@@ -37,7 +37,7 @@ function fixture() {
   const wallets = [FIRST_ID, SECOND_ID].map((id, index) => ({
     id, name: index ? SECOND_NAME : FIRST_NAME, network: index ? 'signet' : 'regtest', status: 'stopped', recovery_kind: 'legacy_seed',
     chain_source: { type: 'electrum', url: 'tcp://192.0.2.10:50001' }, autostart: false, public_port: 19351 + index,
-    chicory: { enabled: false, offline_enabled: false, flat_fee_sat: 100, fee_ppm: 1000, max_client_funding_sats: 200000, max_total_fronted_sats: 1000000 },
+    chicory: { enabled: false, flat_fee_sat: 100, fee_ppm: 1000, max_client_funding_sats: 200000, max_total_fronted_sats: 1000000 },
     iroh: { enabled: true, discovery: true, default_relays: true }, iroh_status: 'stopped',
     tor: { enabled: true }, tor_status: 'stopped', tor_address: null, tor_bootstrap: 0, tor_error: null,
   }));
@@ -62,7 +62,6 @@ function fixture() {
     call: async (id, method) => {
       if (method === 'info') return { node_id: `02${'ab'.repeat(32)}`, capabilities: [], best_block_height: 100 };
       if (method === 'balance') return { onchain_total_sats: 0, onchain_spendable_sats: 0, lightning_total_sats: 0 };
-      if (method === 'offline_status') return { epochs: [] };
       if (['channels', 'payments', 'peers', 'events'].includes(method)) return [];
       unexpected.push(method); throw error('Unexpected fixture operation', 400, 'UNEXPECTED_OPERATION');
     },

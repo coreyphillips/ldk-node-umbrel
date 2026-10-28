@@ -9,7 +9,8 @@ import { fileURLToPath } from 'node:url';
 const architecture = process.argv[2];
 if (!['amd64', 'arm64'].includes(architecture)) throw new Error('Usage: node scripts/container-smoke.mjs amd64|arm64');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const image = `ldk-node-umbrel:0.1.12-${architecture}`;
+const version = (await fs.readFile(path.join(root, 'VERSION'), 'utf8')).trim();
+const image = process.env.LDK_CONTAINER_IMAGE || `ldk-node-umbrel:${version}-${architecture}`;
 const suffix = `${architecture}-${process.pid}`; const name = `ldk-dashboard-qa-${suffix}`; const volume = `${name}-data`;
 const port = architecture === 'amd64' ? 21095 : 21096; const origin = `http://127.0.0.1:${port}`;
 const umbrelMode = process.env.LDK_TEST_UMBREL === '1';
@@ -45,7 +46,7 @@ async function login() {
 }
 async function running(id) { for (let i = 0; i < 120; i++) { const wallet = (await request('/api/wallets')).find(w => w.id === id); if (wallet.status === 'running') return wallet; if (wallet.status === 'failed') { const logs = await request(`/api/wallets/${id}/logs`); throw new Error(wallet.last_error + ': ' + logs.text.slice(-1600)); } await delay(500); } throw new Error('Native wallet startup timed out'); }
 try {
-  docker('load', '--input', path.join(root, 'dist', `ldk-node-umbrel-0.1.12-${architecture}.tar`));
+  if (!process.env.LDK_CONTAINER_IMAGE) docker('load', '--input', path.join(root, 'dist', `ldk-node-umbrel-${version}-${architecture}.tar`));
   const inspect = JSON.parse(docker('image', 'inspect', image))[0]; if (inspect.Architecture !== architecture) throw new Error('Image architecture mismatch'); checks.push('image architecture verified');
   let chainSource;
   if (process.env.REGTEST_RPC_URL) {
@@ -100,8 +101,11 @@ try {
     if (nextIroh.iroh_uri?.split('?')[0] !== firstIroh.iroh_uri.split('?')[0]) throw new Error('Iroh transport identity changed');
     checks.push('native and Iroh identities survive supervised restart');
   }
-  const evidence = { architecture, authentication: umbrelMode ? 'Umbrel app password' : 'local generated password', image_id: inspect.Id, checks, network: 'regtest', funds_sent: false, physical_umbrel: false, date: new Date().toISOString() };
-  await fs.writeFile(path.join(root, 'dist', `qualification-${umbrelMode ? 'umbrel-' : ''}${process.env.LDK_TEST_IROH === '1' ? 'iroh-' : ''}${architecture}.json`), JSON.stringify(evidence, null, 2) + '\n'); console.log(JSON.stringify(evidence));
+  const candidate = Boolean(process.env.LDK_CONTAINER_IMAGE);
+  const evidence = { architecture, authentication: umbrelMode ? 'Umbrel app password' : 'local generated password', image, image_source: candidate ? 'preloaded candidate' : 'release archive', image_id: inspect.Id, checks, network: 'regtest', funds_sent: false, physical_umbrel: false, published_release_qualified: false, date: new Date().toISOString() };
+  const evidenceFile = process.env.LDK_SMOKE_EVIDENCE_FILE || path.join(root, 'dist', `${candidate ? 'candidate-' : ''}qualification-${umbrelMode ? 'umbrel-' : ''}${process.env.LDK_TEST_IROH === '1' ? 'iroh-' : ''}${architecture}.json`);
+  await fs.mkdir(path.dirname(evidenceFile), { recursive: true });
+  await fs.writeFile(evidenceFile, JSON.stringify(evidence, null, 2) + '\n', { mode: 0o600 }); console.log(JSON.stringify(evidence));
 } finally {
   try { docker('rm', '-f', name); } catch {}
   try { docker('volume', 'rm', volume); } catch {}
