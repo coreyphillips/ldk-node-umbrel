@@ -14,6 +14,8 @@ const architecture = process.env.LDK_CONTAINER_ARCH || (process.arch === 'arm64'
 if (!['arm64', 'amd64'].includes(architecture)) throw new Error('Unsupported architecture');
 const version = fs.readFileSync(path.join(__dirname, '../VERSION'), 'utf8').trim();
 const image = process.env.LDK_CONTAINER_IMAGE || `ldk-node-umbrel:${version}-${architecture}`;
+const trustedSplicePeers = JSON.parse(process.env.CHICORY_TEST_TRUSTED_SPLICE_PEERS || '[]');
+if (!Array.isArray(trustedSplicePeers) || trustedSplicePeers.some(key => typeof key !== 'string' || !/^0[23][0-9a-f]{64}$/.test(key))) throw new Error('Invalid explicit regtest splice trust list');
 const source = new URL(sourceText); if (!['rpc:', 'tcp:', 'ssl:'].includes(source.protocol)) throw new Error('Fixture requires an explicit regtest chain source');
 const host = ['127.0.0.1', 'localhost'].includes(source.hostname) ? 'host.docker.internal' : source.hostname;
 const chain_source = source.protocol === 'rpc:' ? { type: 'bitcoind', host, port: Number(source.port), user: decodeURIComponent(source.username), password: decodeURIComponent(source.password) } : { type: 'electrum', url: `${source.protocol}//${host}:${source.port}` };
@@ -62,6 +64,13 @@ async function handle(input) {
   const session = await login.json(); headers = { origin, cookie: login.headers.get('set-cookie').split(';')[0], 'x-csrf-token': session.csrf, 'x-session-proof': session.proof, 'content-type': 'application/json' };
   if (!saved.wallet_id) {
     const wallet = await request('/api/wallets', { name: 'Funded regtest qualification', network: 'regtest', chain_source, autostart: false, chicory: { enabled: true, flat_fee_sat: 100, fee_ppm: 1000, max_client_funding_sats: 500000, max_total_fronted_sats: 2000000 } }); saved.wallet_id = wallet.id; fs.writeFileSync(file, JSON.stringify(saved), { mode: 0o600 });
+  }
+  const current = (await request('/api/wallets')).find(wallet => wallet.id === saved.wallet_id);
+  if (!current || current.network !== 'regtest') throw new Error('Refusing fixture configuration outside regtest');
+  if (JSON.stringify(current.chicory.trusted_splice_peer_pubkeys || []) !== JSON.stringify(trustedSplicePeers)) {
+    if (!['stopped', 'failed'].includes(current.status)) await request(walletRoute('stop'), {});
+    const updated = await request(`/api/wallets/${saved.wallet_id}`, { ...current, chicory: { ...current.chicory, trusted_splice_peer_pubkeys: trustedSplicePeers } }, 'PUT');
+    if (JSON.stringify(updated.chicory.trusted_splice_peer_pubkeys) !== JSON.stringify(trustedSplicePeers)) throw new Error('Regtest splice trust setting did not persist');
   }
   await request(walletRoute('start'), {}); const info = await rpc('info'); if (info.network !== 'regtest') throw new Error('Refusing funded qualification outside regtest');
   const address = await rpc('address'); emit({ ready: true, nodeId: info.node_id, uri: `${info.node_id}@127.0.0.1:${saved.port}`, address: address.address });

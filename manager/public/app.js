@@ -665,6 +665,7 @@ function walletForm(wallet) {
   field(fees, 'ppm', 'Fee rate (ppm)', { type: 'number', min: 0, max: 1000000, value: wallet?.chicory.fee_ppm ?? 1000 });
   field(fees, 'clientcap', 'Per-client funding cap (sats)', { type: 'number', min: 10000, max: 100000000, value: wallet?.chicory.max_client_funding_sats ?? 200000 });
   field(fees, 'totalcap', 'Total funding cap (sats)', { type: 'number', min: 10000, value: wallet?.chicory.max_total_fronted_sats ?? 1000000 });
+  field(form, 'trusted_splice_peers', 'Trusted wallets for instant channel growth (optional)', { type: 'textarea', value: (wallet?.chicory.trusted_splice_peer_pubkeys || []).join('\n'), help: 'Advanced: enter one Lightning public key per line. Leave empty to require confirmations for growth of confirmed channels. Only list wallets you control and trust: before the splice confirms, a listed wallet can spend the old channel funding and cause this primary to lose funds. Pairing does not add a wallet to this list.' });
   add(form, el('hr', 'divider'), el('h3', '', 'Phone transport & startup'));
   const tor = field(form, 'tor', 'Enable Tor connections', { type: 'checkbox', value: wallet?.tor?.enabled || false, help: 'Automatically creates a persistent onion address for this wallet. Local TCP and Iroh stay available. Applies to incoming connections only.' });
   if (!state.config.tor_available) {
@@ -682,6 +683,7 @@ function walletForm(wallet) {
   submit(form, wallet ? 'Save settings' : 'Create wallet', async data => {
     const chain_source = data.get('source') === 'bitcoind' ? { type: 'bitcoind', host: data.get('host'), port: Number(data.get('port')), user: data.get('user'), password: data.get('password') } : { type: data.get('source'), url: data.get('url') };
     const config = { name: data.get('name'), network: wallet?.network || data.get('network'), chain_source, advertised_host: data.get('advertised_host'), tor: { enabled: tor.checked }, tor_onion_address: tor.checked ? '' : data.get('tor_onion_address'), autostart: data.has('autostart'), chicory: { enabled: data.has('provider'), flat_fee_sat: Number(data.get('flat')), fee_ppm: Number(data.get('ppm')), max_client_funding_sats: Number(data.get('clientcap')), max_total_fronted_sats: Number(data.get('totalcap')) }, iroh: { enabled: data.has('iroh'), discovery: data.has('discovery'), default_relays: data.has('relay') } };
+    config.chicory.trusted_splice_peer_pubkeys = String(data.get('trusted_splice_peers') || '').split(/\s+/).filter(Boolean);
     const result = await api(wallet ? `/wallets/${wallet.id}` : '/wallets', { method: wallet ? 'PUT' : 'POST', body: config });
     dialog.close(); state.selected = result.id; state.view = 'overview'; toast(wallet ? 'Configuration saved. Start the wallet when ready.' : 'Wallet created'); await refresh();
     if (!wallet && active()?.id === result.id && state.session?.authenticated) recoveryPhrase(active());

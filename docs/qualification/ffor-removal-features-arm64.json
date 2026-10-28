@@ -2,10 +2,10 @@
   "version": "0.1.12",
   "scope": "FFOR removal package upgrade with no custody",
   "architecture": "arm64",
-  "image": "ldk-node-umbrel:chicory-flows-final-arm64",
+  "image": "ldk-node-umbrel:chicory-qualified-arm64",
   "previous_image": "ldk-node-umbrel:0.1.12-arm64",
-  "image_id": "sha256:520d2bf1b3c3e0a192e7ca8261f6a3e920cefc187f9d2d1f2f565f55f12af8c4",
-  "recorded_at": "2026-10-28T16:02:39.614Z",
+  "image_id": "sha256:5f610ca12e1d99464393c44b4d30df90457039e9a97f9235ed22208bae069b6b",
+  "recorded_at": "2026-10-28T17:29:10.776Z",
   "checks": [
     "previous release creates unfunded wallets with both saved offline policy values",
     "upgrade and restart preserve both native identities, registry and autostart",

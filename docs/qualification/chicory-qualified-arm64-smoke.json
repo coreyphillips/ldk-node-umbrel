@@ -1,0 +1,28 @@
+{
+  "architecture": "arm64",
+  "authentication": "Umbrel app password",
+  "image": "ldk-node-umbrel:chicory-qualified-arm64",
+  "image_source": "preloaded candidate",
+  "image_id": "sha256:5f610ca12e1d99464393c44b4d30df90457039e9a97f9235ed22208bae069b6b",
+  "checks": [
+    "image architecture verified",
+    "unauthenticated access denied",
+    "shared-host cookie replay cannot authorize dashboard access",
+    "Umbrel app password, custom hostname and session binding",
+    "mainnet first-run default",
+    "native regtest sync",
+    "native address and unpaid invoice",
+    "authenticated pairing and QR",
+    "native Iroh addon loads",
+    "native stop/start retains identity",
+    "container restart autostarts same native identity",
+    "Docker termination reaches graceful native shutdown",
+    "dashboard starts real Iroh relay and discovery bridge",
+    "native and Iroh identities survive supervised restart"
+  ],
+  "network": "regtest",
+  "funds_sent": false,
+  "physical_umbrel": false,
+  "published_release_qualified": false,
+  "date": "2026-10-28T17:29:08.170Z"
+}

@@ -17,6 +17,32 @@ primary's on-chain wallet for emergency channel-closing transactions; the phone
 can supply all of the channel's funding without spending this reserve. JIT
 liquidity advances and routing capacity have their own funding requirements.
 
+## Instant growth of confirmed channels
+
+A channel first funded onchain or by direct funding keeps its confirmation
+policy. Waiting six blocks while holding an incoming Lightning payment cannot
+provide prompt JIT growth. To allow instant growth for a wallet you control and
+trust, stop the primary and open **Settings > Edit configuration > Trusted
+wallets for instant channel growth**. Enter that wallet's compressed Lightning
+public key, save and restart. The `chicory.trusted_splice_peer_pubkeys` list is
+empty by default; pairing never adds a wallet automatically.
+
+This is an explicit financial trust decision. Until the splice confirms, the
+wallet can spend the old channel funding and invalidate the new funding after
+receiving a payment. The primary can lose the forwarded funds. Owning the added
+inputs does not eliminate this old-funding risk. Only the listed wallet's
+primary-initiated positive splice, funded entirely by the primary, qualifies.
+The native transaction checks reject hidden peer inputs before signing. Direct
+funding and phone-initiated deposits retain their confirmation requirements.
+
+The phone also has to explicitly trust its configured primary and use the
+compatible portable engine. Each side records permission for the individual
+candidate; the channel's general confirmation policy is unchanged. Removing a
+wallet from the primary list prevents future fast-path attempts but does not
+revoke an already authorized attempt, including one still negotiating. Unlisted wallets can use confirmed funding
+and ordinary Lightning within available capacity, but oversized incoming
+payments can expire while a confirmed channel grows and may need a new payment.
+
 ## Existing wallets
 
 Old dashboard registries contain `chicory.offline_enabled`, including `false`
@@ -63,7 +89,7 @@ not test existing FFOR custody or physical Umbrel hardware.
 cd manager
 npm test
 cd ..
-LDK_CONTAINER_IMAGE=ldk-node-umbrel:chicory-flows-final-arm64 \
+LDK_CONTAINER_IMAGE=ldk-node-umbrel:chicory-qualified-arm64 \
 BEIGNET_ROOT=/absolute/path/to/beignet \
 node scripts/feature-bits-container-test.mjs arm64
 ```
@@ -79,7 +105,7 @@ The externally reachable primary RPC and Electrum ports can differ.
 
 ```sh
 python3 scripts/chicory-flow-container-test.py \
-  --image ldk-node-umbrel:chicory-flows-final-arm64 \
+  --image ldk-node-umbrel:chicory-qualified-arm64 \
   --architecture arm64 \
   --native-source /absolute/path/to/ldk-node \
   --chicory-source /absolute/path/to/chicory \
@@ -94,11 +120,13 @@ Use the installed Chicory dependencies and a built Beignet payer checkout. Set
 The runner clears inherited scenario and transport overrides. It runs these nine
 scenarios sequentially and stops at the first failure:
 
-- `initial-deposit-growth`: first deposit, JIT channel growth and restarts.
+- `initial-deposit-growth`: first deposit, explicit trusted-wallet opt-in,
+  JIT growth without mining, and restarts.
 - `baseline-growth-splices`: fixed and amountless receives, an external Lightning
   recipient, JIT growth and splice-out.
-- `direct-funding`: existing-home and first-channel deposits, receive completion,
-  a later JIT splice and restarts.
+- `direct-funding`: existing-home and first-channel deposits, pending receipts
+  across restarts, receive completion, and later explicitly trusted JIT growth
+  without mining.
 - `send-max-bech32`, `send-max-bech32m`, `send-max-p2wsh`: exact reviewed destinations.
 - `drain`: completion after restarts and exclusion of later receipts.
 - `conflict`: recovery of usable prior funding after a confirmed conflict.
@@ -125,8 +153,26 @@ and logs. The adapter no longer requests offline receiving.
 
 ## Recorded candidate checks
 
-The final candidates `ldk-node-umbrel:chicory-flows-final-arm64` and
-`ldk-node-umbrel:chicory-flows-final-amd64` each passed the eight unfunded upgrade
+Both local candidates passed the complete nine-scenario funded matrix with
+107 checks each: [ARM64](qualification/chicory-qualified-arm64-flows.json) and
+[AMD64](qualification/chicory-qualified-amd64-flows.json). This covers initial
+phone-funded channels, ordinary and JIT Lightning receives, payments to an
+external recipient, channel growth and splice-out, direct funding, all three
+send-max destinations, drain, confirmed conflict recovery and recovery sweep.
+The records include pending and completed receipt checks, exact balances and
+Activity rows, and phone/primary restarts. Instant growth of a confirmed channel
+uses the explicit trust configuration described above.
+
+Both matrices used the portable engine at `2cdab260ed36dc053278fb48326130ed7f654b77`
+and the patched wallet-core snapshot documented in
+[client compatibility](client-compatibility.md). Their installed client, adapter
+and driver hashes agree, and all nine recorded fixture containers and volumes
+were removed after each suite. These are local Docker/regtest results, including
+AMD64 under CPU emulation. Published 0.1.12 and physical Umbrel hardware remain
+outside this candidate qualification.
+
+The final candidates `ldk-node-umbrel:chicory-qualified-arm64` and
+`ldk-node-umbrel:chicory-qualified-amd64` each passed the eight unfunded upgrade
 checks against the corresponding published 0.1.12 image. Both legacy settings preserved
 their native identities and unchanged registry bytes, and real encrypted BOLT 8
 handshakes confirmed the removed features were absent. The record includes the
@@ -138,15 +184,19 @@ The disposable containers, volume and networks were removed after the run.
 Both final images passed 14 unfunded packaged-manager checks each, including
 Umbrel app-password authentication, hostname/session binding, native and container
 restarts, and real Iroh relay/discovery bridge startup with stable identities.
-The [ARM64 smoke record](qualification/chicory-flows-final-arm64-smoke.json) and
-[AMD64 smoke record](qualification/chicory-flows-final-amd64-smoke.json) identify
+The [ARM64 smoke record](qualification/chicory-qualified-arm64-smoke.json) and
+[AMD64 smoke record](qualification/chicory-qualified-amd64-smoke.json) identify
 the images and keep the physical-hardware and published-release claims false.
 This checks Iroh bridge startup, not an end-to-end Iroh payment.
 
-The manager suite passed 269 tests. Existing pairing, Tor-settings, balance and
-deletion browser regressions passed 18, 16, 39 and 24 checks respectively at
-desktop and mobile sizes with zero browser errors. Those browser checks use
+The manager suite passed 271 tests. Pairing, Tor-settings with trusted-splice
+controls, balance and deletion browser regressions passed 18, 18, 39 and 24
+checks respectively at desktop and mobile sizes with zero browser errors. Those browser checks use
 synthetic wallet data and do not qualify payments or Tor network reachability.
+The [source-check record](qualification/chicory-qualified-source-checks.json)
+records the native, portable, wallet-core, Chicory and manager checks, and the
+[settings-browser record](qualification/chicory-qualified-settings-browser.json)
+includes the explicit trust controls.
 The direct-funding wrapper's candidate selection and
 evidence fields were checked separately with synthetic process stubs; this is
 not a funded protocol result.

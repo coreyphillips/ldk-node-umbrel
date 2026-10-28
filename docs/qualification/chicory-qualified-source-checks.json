@@ -1,0 +1,41 @@
+{
+  "scope": "local candidate source and client verification",
+  "physical_umbrel": false,
+  "published_release_changed": false,
+  "native_tests": {
+    "library_passed": 292,
+    "daemon_passed": 8,
+    "lightning_passed": 1255,
+    "lightning_ignored": 9,
+    "note": "One Electrum fixture raced during unrestricted parallel execution; isolated and full library rerun with four threads passed."
+  },
+  "portable_tests_passed": 268,
+  "portable_public_types_passed": true,
+  "portable_full_source_typecheck": "19 pre-existing diagnostics, unchanged from the base",
+  "manager_tests_passed": 271,
+  "matrix_runner_tests_passed": 9,
+  "chicory_tests_passed": 152,
+  "chicory_typecheck_passed": true,
+  "wallet_core_receive_tests_passed": 42,
+  "git_install_reproduced": true,
+  "portable_revision": "2cdab260ed36dc053278fb48326130ed7f654b77",
+  "wallet_core_revision": "f1cae26eda6c9b3b8c8e21220b2f42eaaff8661d",
+  "wallet_core_patch": "Chicory patches/@beignet+wallet-core+0.1.0.patch",
+  "sha256": {
+    "manager/server/config.mjs": "77d98e41e3dc01d44b3f720e0f13ad405d39580d1616c59e151339ffefc2d443",
+    "manager/public/app.js": "5bb82a1f34ecb9492483ab8f92c883d38fe0e275c07b2300137506c2f4c36b53",
+    "scripts/fixture-primary.cjs": "f9962ac0239ad23dc47d27674361f2ca2ae9479f9e869ea95646557eedc0719b",
+    "scripts/chicory-flow-container-test.py": "35bbde25dc6d4c71697e2fce2625b350e9f7fa701a5766efe051db1c0bc9fda8",
+    "scripts/tor-browser-test.cjs": "8f5a28ab54b5cefc410ed816b7ab97f6d9bcdc6af44bc478f15e91f1a958c710"
+  },
+  "native_input_manifest": "chicory-qualified-native-inputs.json",
+  "native_input_note": "Exact build snapshot: all 289 files match native commit 437ee29947f96c486cf01a74bf941539b49d3b79, including production and test sources. Both qualified images use this snapshot.",
+  "tested_client_sha256": {
+    "portable_engine/dist/portable.cjs": "50f3c1dd032b4268cbf0ab89908a278942743aaad6f9fac9d416cf6e9b59a8c1",
+    "portable_engine/dist/portable.mjs": "78fdb087d031fb2f2dc7efcfe44d60b7805a3e0405f1e9fcad9664e9dafb5221",
+    "patched_wallet_core/src/index.js": "5b824d7209fb45daa8fecf2597b6b0b81959e3e50f76f03ee5b9b29aa67e7010"
+  },
+  "tested_chicory_snapshot": "a2086e9710e7d333a13506a42643fa59fb3e03a9",
+  "native_runtime_commit": "437ee29947f96c486cf01a74bf941539b49d3b79",
+  "commit_note": "These commits preserve the tested snapshots after the runs; flow provenance retains the original revisions and tracked-change flags."
+}

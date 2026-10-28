@@ -8,6 +8,59 @@ published 0.1.12 image.
 
 This file distinguishes executable checks from deployment assumptions. All funded checks use disposable regtest state.
 
+## Current local candidate after FFOR removal
+
+Both `ldk-node-umbrel:chicory-qualified-arm64` and
+`ldk-node-umbrel:chicory-qualified-amd64` passed the complete installed-Chicory
+matrix through the authenticated manager and real packaged daemon. Each run
+completed all nine scenarios with 107 checks and no cleanup errors.
+
+| Architecture | Funded flow evidence | Unfunded migration | Umbrel and Iroh smoke |
+| --- | --- | --- | --- |
+| ARM64 | [9 scenarios, 107 checks](qualification/chicory-qualified-arm64-flows.json) | [8 checks](qualification/ffor-removal-features-arm64.json) | [14 checks](qualification/chicory-qualified-arm64-smoke.json) |
+| AMD64 | [9 scenarios, 107 checks](qualification/chicory-qualified-amd64-flows.json) | [8 checks](qualification/ffor-removal-features-amd64.json) | [14 checks](qualification/chicory-qualified-amd64-smoke.json) |
+
+The matrix covers initial phone deposits and later JIT growth; fixed and
+amountless Lightning receives and an external routed payment; confirmed
+splice-in and splice-out; direct funding of existing and new channels;
+send-max to Bech32, Bech32m and P2WSH destinations; drain; confirmed-conflict
+recovery; and recovery from a primary-held backup followed by a sweep. It checks
+exact amounts, fees, pending/completed receipts, Activity uniqueness and state
+after phone and primary restarts. The direct-funding receipt remains completed
+after later JIT growth. The conflict case restores an unpaid request without a
+phantom receive. Instant growth of confirmed channels uses an explicit trusted
+peer opt-in, while deposits and direct funding retain confirmation requirements.
+
+The migration checks upgrade fresh unfunded 0.1.12 wallets with both saved
+offline-policy booleans, preserve their identities and registry bytes, and
+verify removed feature bits and RPCs. They do not migrate actual FFOR custody.
+The smoke checks verify Umbrel authentication, native and container restarts,
+and Iroh relay/discovery bridge startup with stable identities. They do not
+test a funded Iroh payment.
+
+The [source-check record](qualification/chicory-qualified-source-checks.json)
+records 292 native library, 8 daemon, 1,255 Lightning, 268 portable, 271 manager,
+152 Chicory, 42 wallet-core receive and 9 matrix-runner tests. Nine Lightning
+tests are ignored. Public portable types and Chicory typechecking pass; the
+portable full-source typecheck retains 19 diagnostics already present in its
+base. The [settings browser checks](qualification/chicory-qualified-settings-browser.json)
+pass all 18 desktop/mobile checks, including trusted-splice validation and
+persistence, with zero browser errors.
+
+The flow records retain exact image identities and installed client/driver
+hashes. The [native build manifest](qualification/chicory-qualified-native-inputs.json)
+identifies the runtime build snapshot. [Client compatibility](client-compatibility.md)
+pins the tested Chicory snapshot, portable engine and patched wallet-core
+installation. Source commits made after the runs preserve that tested work;
+the recorded earlier revisions and tracked-change flags remain unchanged.
+
+These are local candidate results using disposable regtest funds and a Node
+portable client over TCP. AMD64 runs under Docker CPU emulation. No image was
+published or deployed, and the community store remains pinned to 0.1.12.
+Physical phones, physical Umbrel hardware, mainnet payments and end-to-end
+Tor/Iroh payments are not claimed. Follow the
+[migration and reproduction guidance](ffor-removal.md) for the tested setup.
+
 ## Original native and dashboard qualification
 
 - Fourteen manager tests cover authentication, CSRF and Origin checks, Host validation, fail-closed app-proxy DNS, redacted configuration, immutable wallet networks, private files, bounded wallet and RPC counts, out-of-order JSONL replies, uncertain outcomes, and process shutdown.
@@ -69,7 +122,10 @@ Both [AMD64](qualification/release-0.1.3-amd64.json) and [ARM64](qualification/r
 
 The [official Umbrel validator](qualification/release-0.1.3-umbrel-store-lint.json) passes with public image checks and zero errors, retaining only the two previously documented packaging warnings. Anonymous pulls of both architectures match the exact browser-qualified frontend and original native and notice hashes. The community store pins the verified combined 0.1.3 image index.
 
-## Scope and limits
+## Historical release scope and limits
+
+This section describes the preceding historical release qualification. The
+current local candidate's scope is recorded above.
 
 This dashboard exposes the local native implementation. Mainnet is selectable, but all funding and interoperability qualification uses disposable regtest funds. A real Umbrel installation and a real ARM64 Umbrel device have not been modified or qualified.
 

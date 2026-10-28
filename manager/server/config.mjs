@@ -1,5 +1,6 @@
 import { failure } from './files.mjs';
 import { electrumUrl } from './electrum.mjs';
+import { ECDH } from 'node:crypto';
 
 export const NETWORKS = ['regtest', 'signet', 'testnet', 'bitcoin'];
 export const METHODS = new Set(['info', 'balance', 'channels', 'payments', 'peers', 'address', 'invoice', 'pay', 'send_onchain', 'connect', 'disconnect', 'open', 'close', 'sync', 'splice_in', 'splice_out', 'events', 'estimate_onchain']);
@@ -12,6 +13,18 @@ const number = (value, minimum, maximum, name) => {
 const text = (value, maximum, name) => {
   if (typeof value !== 'string' || !value.trim() || value.length > maximum || /[\x00-\x1f]/.test(value)) throw failure(`Invalid ${name}`);
   return value.trim();
+};
+const trustedSplicePeers = value => {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > 128) throw failure('Trusted splice peers must be a list of at most 128 public keys');
+  const peers = value.map(key => {
+    if (typeof key !== 'string' || !/^0[23][0-9a-f]{64}$/i.test(key)) throw failure('Invalid trusted splice peer public key');
+    try { ECDH.convertKey(Buffer.from(key, 'hex'), 'secp256k1'); }
+    catch { throw failure('Invalid trusted splice peer public key'); }
+    return key.toLowerCase();
+  });
+  if (new Set(peers).size !== peers.length) throw failure('Duplicate trusted splice peer public key');
+  return peers;
 };
 
 export function walletConfig(input, previous, { allowLegacyOffline = false } = {}) {
@@ -47,6 +60,7 @@ export function walletConfig(input, previous, { allowLegacyOffline = false } = {
   );
   const chicory = {
     enabled: policy.enabled === true,
+    trusted_splice_peer_pubkeys: trustedSplicePeers(policy.trusted_splice_peer_pubkeys),
     flat_fee_sat: number(policy.flat_fee_sat ?? 100, 0, 100_000, 'flat fee'),
     fee_ppm: number(policy.fee_ppm ?? 1000, 0, 1_000_000, 'proportional fee'),
     max_client_funding_sats: number(policy.max_client_funding_sats ?? 200_000, 10_000, 100_000_000, 'client funding cap'),

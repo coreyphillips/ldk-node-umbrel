@@ -64,7 +64,7 @@ for (const offline_enabled of [false, true]) {
     assert.equal(manager.state(wallet.id).status, 'running');
     assert.equal(manager.state(sibling.id).status, 'stopped');
     const generated = manager.state(wallet.id).process.config;
-    assert.deepEqual(generated.chicory, config.chicory);
+    assert.deepEqual(generated.chicory, { ...config.chicory, trusted_splice_peer_pubkeys: [] });
     assert.equal(generated.network, 'regtest');
     assert.equal(generated.data_dir, nodeDirectory);
     assert.deepEqual(generated.chain_source, config.chain_source);
@@ -82,8 +82,37 @@ for (const offline_enabled of [false, true]) {
 test('new offline requests are refused and disabled legacy options do not enter saved settings', () => {
   assert.throws(() => walletConfig({ ...config, chicory: { ...config.chicory, offline_enabled: true } }), { code: 'OFFLINE_RECEIVE_REMOVED' });
   const normalized = walletConfig({ ...config, chicory: { ...config.chicory, offline_enabled: false } });
-  assert.deepEqual(normalized.chicory, config.chicory);
+  assert.deepEqual(normalized.chicory, { ...config.chicory, trusted_splice_peer_pubkeys: [] });
   const saved = { ...normalized, chicory: { ...normalized.chicory, offline_enabled: true } };
   assert.equal(Object.hasOwn(publicConfig(saved).chicory, 'offline_enabled'), false);
   assert.equal(saved.chicory.offline_enabled, true);
+});
+
+const trustedPeer = '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798';
+test('instant splice trust defaults off and requires valid distinct compressed public keys', () => {
+  const validate = value => walletConfig({ ...config, chicory: { ...config.chicory, trusted_splice_peer_pubkeys: value } });
+  assert.deepEqual(validate(undefined).chicory.trusted_splice_peer_pubkeys, []);
+  assert.deepEqual(validate([trustedPeer.toUpperCase()]).chicory.trusted_splice_peer_pubkeys, [trustedPeer]);
+  for (const value of [null, true, trustedPeer, [null], ['04' + '11'.repeat(64)], ['02' + 'ff'.repeat(32)], [trustedPeer, trustedPeer.toUpperCase()], Array(129).fill(trustedPeer)]) {
+    assert.throws(() => validate(value), /[Tt]rusted splice peer/);
+  }
+});
+
+test('explicit instant splice trust survives manager restart and can be removed', async t => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'ldk-splice-trust-'));
+  const options = { dataDir, binary: '/unused', processFactory: settings => new NativeFixture(settings) };
+  let manager = new WalletManager(options);
+  t.after(async () => { await manager.close(); await fs.rm(dataDir, { recursive: true, force: true }); });
+  await manager.initialize();
+  const wallet = await manager.create({ ...config, chicory: { ...config.chicory, trusted_splice_peer_pubkeys: [trustedPeer] } });
+  await manager.start(wallet.id);
+  assert.deepEqual(manager.state(wallet.id).process.config.chicory.trusted_splice_peer_pubkeys, [trustedPeer]);
+  await manager.close();
+  manager = new WalletManager(options); await manager.initialize(); await manager.start(wallet.id);
+  assert.deepEqual(manager.list()[0].chicory.trusted_splice_peer_pubkeys, [trustedPeer]);
+  assert.deepEqual(manager.state(wallet.id).process.config.chicory.trusted_splice_peer_pubkeys, [trustedPeer]);
+  await manager.stop(wallet.id);
+  await manager.update(wallet.id, { ...config, chicory: { ...config.chicory, trusted_splice_peer_pubkeys: [] } });
+  await manager.start(wallet.id);
+  assert.deepEqual(manager.state(wallet.id).process.config.chicory.trusted_splice_peer_pubkeys, []);
 });

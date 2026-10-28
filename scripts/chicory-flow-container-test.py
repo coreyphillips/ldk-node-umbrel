@@ -22,6 +22,8 @@ from urllib.parse import unquote, urlsplit
 SCENARIOS = {
     'initial-deposit-growth': ({'INITIAL_DEPOSIT': '1', 'INITIAL_DEPOSIT_GROWTH': '1'}, [
         'phone reopen preserves the initial deposit home and post-spend balance',
+        'operator explicitly trusts this disposable wallet for instant confirmed-channel growth',
+        'explicitly trusted JIT growth settles one HTLC before the splice confirms',
         'grown channel sends above its original capacity and survives both restarts',
     ]),
     'baseline-growth-splices': ({'EXISTING_RECEIVE': '1', 'JIT_GROWTH': '1', 'SPLICES': '1'}, [
@@ -36,6 +38,8 @@ SCENARIOS = {
         'unconfirmed direct-funding initial-channel receipt remains pending after both restarts',
         'installed wallet spends from the direct-funded existing-home channel after both restarts',
         'installed wallet spends from the direct-funded initial-channel channel after both restarts',
+        'operator explicitly trusts this disposable wallet for instant confirmed-channel growth',
+        'explicitly trusted JIT growth settles one HTLC before the splice confirms',
         'direct-funding receive completion survives a later JIT splice and both restarts',
     ]),
     **{f'send-max-{kind}': ({'SEND_MAX': kind}, [
